@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
+    <!-- Use Tailwind CSS for a modern, responsive design -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Use Inter font from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom scrollbar styling for the messages container */
+        .message-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .message-container::-webkit-scrollbar-track {
+            background: #f1f5f9; /* slate-100 */
+            border-radius: 10px;
+        }
+
+        .message-container::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1; /* slate-300 */
+            border-radius: 10px;
+            border: 2px solid #f1f5f9;
+        }
+
+        /* Set the body and all elements to use the Inter font */
+        body,
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+
+    <!-- Main application container with a modern card design -->
+    <div class="bg-white rounded-3xl shadow-2xl overflow-hidden w-full max-w-lg flex flex-col h-[700px]">
+
+        <!-- App Header -->
+        <div class="bg-blue-600 text-white p-6 md:p-8 rounded-t-3xl shadow-inner">
+            <h1 class="text-3xl font-bold text-center">Real-time Chat</h1>
+            <p id="userIdDisplay" class="text-xs text-center mt-2 opacity-75 break-all"></p>
+        </div>
+
+        <!-- Messages container -->
+        <div id="messages" class="message-container flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
+            <!-- Messages will be dynamically added here by JavaScript -->
+        </div>
+
+        <!-- Message input form -->
+        <form id="messageForm" class="p-4 md:p-6 border-t border-gray-200">
+            <div class="flex space-x-3">
+                <input type="text" id="messageInput" placeholder="Type a message..." required
+                       class="flex-1 p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                <button type="submit"
+                        class="bg-blue-600 text-white rounded-full p-3 font-semibold hover:bg-blue-700 transition-colors shadow-md">
+                    Send
+                </button>
+            </div>
+        </form>
+
+    </div>
+
+    <!-- Firebase SDKs are imported here for functionality -->
+    <script type="module">
+        // Import necessary Firebase services from their CDN URLs
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, addDoc, setDoc, onSnapshot, collection, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // IMPORTANT: Global variables are automatically provided by the platform.
+        // DO NOT remove or modify these lines.
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // --- Helper Functions ---
+        /**
+         * Generates a random UUID. Fallback for environments that don't support crypto.randomUUID.
+         */
+        const getUUID = () => {
+            if (crypto.randomUUID) {
+                return crypto.randomUUID();
+            } else {
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+            }
+        };
+
+        /**
+         * Displays a temporary message in the UI (e.g., for errors or success).
+         * @param {string} message - The message to display.
+         * @param {string} type - The type of message ('success' or 'error').
+         */
+        const showMessage = (message, type) => {
+            const messagesContainer = document.getElementById('messages');
+            const messageElement = document.createElement('div');
+            messageElement.className = `p-3 rounded-xl text-sm italic text-center ${type === 'error' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`;
+            messageElement.textContent = message;
+            messagesContainer.prepend(messageElement);
+            setTimeout(() => {
+                messageElement.remove();
+            }, 5000);
+        };
+
+        // --- Firebase Initialization and Authentication ---
+        let app, db, auth, userId;
+        let isAuthReady = false;
+
+        try {
+            // Initialize Firebase app
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+
+            // Listen for authentication state changes
+            onAuthStateChanged(auth, async (user) => {
+                // This function runs on app load and whenever the auth state changes
+                if (user) {
+                    // User is signed in
+                    userId = user.uid;
+                    document.getElementById('userIdDisplay').textContent = `Your User ID: ${userId}`;
+                    isAuthReady = true;
+                    // Start listening for messages after authentication is complete
+                    listenForMessages();
+                } else {
+                    // User is signed out, sign in with the provided token or anonymously
+                    try {
+                        if (initialAuthToken) {
+                            await signInWithCustomToken(auth, initialAuthToken);
+                        } else {
+                            await signInAnonymously(auth);
+                            // If signed in anonymously, generate a temporary user ID for data persistence
+                            userId = auth.currentUser.uid || getUUID();
+                            document.getElementById('userIdDisplay').textContent = `Your User ID: ${userId}`;
+                        }
+                    } catch (error) {
+                        console.error("Authentication failed:", error);
+                        showMessage("Authentication failed. Please try reloading.", 'error');
+                    }
+                }
+            });
+
+        } catch (error) {
+            console.error("Firebase initialization failed:", error);
+            showMessage("Failed to initialize the app. Check the console for details.", 'error');
+        }
+
+        // --- Real-time Data Listener ---
+        const listenForMessages = () => {
+            if (!isAuthReady) {
+                console.warn("Auth not ready. Skipping message listener setup.");
+                return;
+            }
+
+            // Define the public collection path for shared messages
+            const messagesRef = collection(db, `artifacts/${appId}/public/data/messages`);
+
+            // Listen for real-time changes using onSnapshot
+            onSnapshot(messagesRef, (querySnapshot) => {
+                const messagesContainer = document.getElementById('messages');
+                messagesContainer.innerHTML = ''; // Clear previous messages
+                const messages = [];
+
+                querySnapshot.forEach((doc) => {
+                    // Collect message data from each document
+                    messages.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Sort messages by timestamp to ensure correct order
+                messages.sort((a, b) => (a.timestamp ? a.timestamp.toDate() : 0) - (b.timestamp ? b.timestamp.toDate() : 0));
+
+                // Render each message to the UI
+                messages.forEach(msg => {
+                    const isMyMessage = msg.senderId === userId;
+                    const messageElement = document.createElement('div');
+                    messageElement.className = `flex ${isMyMessage ? 'justify-end' : 'justify-start'}`;
+
+                    messageElement.innerHTML = `
+                        <div class="max-w-[75%] p-3 rounded-2xl ${isMyMessage ? 'bg-blue-500 text-white rounded-br-none' : 'bg-gray-200 text-gray-800 rounded-bl-none'}"
+                             style="box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);">
+                            <p class="font-bold text-xs ${isMyMessage ? 'text-blue-200' : 'text-gray-500'} break-all">${isMyMessage ? 'You' : msg.senderId}</p>
+                            <p class="text-sm mt-1 break-words">${msg.text}</p>
+                            <span class="block text-right text-[10px] opacity-75 mt-1">${msg.timestamp ? new Date(msg.timestamp.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '...'}</span>
+                        </div>
+                    `;
+                    messagesContainer.appendChild(messageElement);
+                });
+
+                // Scroll to the bottom of the messages container
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            }, (error) => {
+                console.error("Error listening to messages:", error);
+                showMessage("Failed to load messages. Check your console.", 'error');
+            });
+        };
+
+        // --- Form Submission Handler ---
+        document.getElementById('messageForm').addEventListener('submit', async (e) => {
+            e.preventDefault(); // Prevent the default form submission behavior
+
+            if (!isAuthReady) {
+                showMessage("Authentication is not ready. Please wait a moment.", 'error');
+                return;
+            }
+
+            const messageInput = document.getElementById('messageInput');
+            const text = messageInput.value.trim();
+
+            if (text) {
+                try {
+                    // Add a new document to the Firestore collection
+                    const messagesRef = collection(db, `artifacts/${appId}/public/data/messages`);
+                    await addDoc(messagesRef, {
+                        senderId: userId,
+                        text: text,
+                        timestamp: serverTimestamp() // Firestore's server timestamp
+                    });
+                    // Clear the input field after sending
+                    messageInput.value = '';
+                } catch (e) {
+                    console.error("Error adding document: ", e);
+                    showMessage("Failed to send message.", 'error');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
