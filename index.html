@@ -62,6 +62,9 @@
           <!-- Messages will be rendered here by JavaScript -->
         </div>
 
+        <!-- Typing status display -->
+        <div id="typing-status" class="p-2 text-sm text-gray-400 bg-gray-800 border-t border-gray-700"></div>
+
         <!-- Message Input Form -->
         <form id="message-form" class="p-4 border-t border-gray-700 bg-gray-800">
           <div class="flex items-center space-x-2">
@@ -70,10 +73,12 @@
               type="text"
               placeholder="Message #general"
               class="flex-1 p-3 text-sm rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
+              disabled
             />
             <button
               type="submit"
-              class="px-4 py-3 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              class="px-4 py-3 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled
             >
               Send
             </button>
@@ -110,7 +115,7 @@
     // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-    import { getFirestore, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, setDoc, doc, serverTimestamp, query, orderBy, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
     // Global variables from the environment
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -140,9 +145,23 @@
     const usernameModal = document.getElementById('username-modal');
     const usernameForm = document.getElementById('username-form');
     const usernameInput = document.getElementById('username-input');
-    
+    const typingStatusDisplay = document.getElementById('typing-status');
+    const sendButton = messageForm.querySelector('button[type="submit"]');
+
     let currentUser = null;
     let username = '';
+    let isTypingTimeout = null;
+
+    // Function to enable/disable message input and send button
+    const setChatEnabled = (enabled) => {
+      messageInput.disabled = !enabled;
+      sendButton.disabled = !enabled;
+      if (enabled) {
+        messageInput.placeholder = "Message #general";
+      } else {
+        messageInput.placeholder = "Please enter a username to chat...";
+      }
+    };
     
     // Check for a saved username in localStorage
     const savedUsername = localStorage.getItem('chatUsername');
@@ -151,6 +170,7 @@
         usernameModal.style.display = 'none'; // Hide modal if username exists
     } else {
         usernameModal.style.display = 'flex'; // Show modal to get username
+        setChatEnabled(false); // Disable chat until username is entered
     }
 
     // Function to render messages to the DOM
@@ -188,7 +208,33 @@
       // Scroll to the bottom of the chat container
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
     };
-
+    
+    // Function to update the typing status in Firestore
+    const updateTypingStatus = async (isTyping) => {
+      if (!currentUser || !username) return;
+      try {
+        await setDoc(doc(db, `artifacts/${appId}/public/data/typing_status`, currentUser.uid), {
+          user: username,
+          isTyping: isTyping,
+          timestamp: serverTimestamp()
+        });
+      } catch (error) {
+        console.error("Error updating typing status:", error);
+      }
+    };
+    
+    // Function to render other users' typing status
+    const renderTypingStatus = (typingUsers) => {
+      const otherTypingUsers = typingUsers.filter(u => u.id !== currentUser.uid);
+      if (otherTypingUsers.length > 0) {
+        const names = otherTypingUsers.map(u => u.user).join(', ');
+        typingStatusDisplay.textContent = `${names} is typing...`;
+        typingStatusDisplay.style.display = 'block';
+      } else {
+        typingStatusDisplay.style.display = 'none';
+      }
+    };
+    
     // Main logic when the window loads
     window.onload = function() {
       // Sign in the user
@@ -209,20 +255,33 @@
           console.log("User authenticated with UID:", user.uid);
           userIdDisplay.textContent = `User ID: ${user.uid}`;
           currentUserDisplay.textContent = `You (${username || 'guest'})`;
-          setupFirestoreListener(); // Call listener after auth is ready
+          setupFirestoreListeners(); // Call listeners after auth is ready
+          // Enable chat if username is already set
+          if (username) {
+            setChatEnabled(true);
+          }
         } else {
           console.log("User is not authenticated.");
           userIdDisplay.textContent = `User ID: Not Signed In`;
           currentUserDisplay.textContent = `Not Signed In`;
+          setChatEnabled(false);
+        }
+      });
+      
+      // Cleanup typing status on window unload
+      window.addEventListener('beforeunload', () => {
+        if (currentUser) {
+          deleteDoc(doc(db, `artifacts/${appId}/public/data/typing_status`, currentUser.uid));
         }
       });
 
-      // Function to set up the Firestore real-time listener
-      const setupFirestoreListener = () => {
+      // Function to set up the Firestore real-time listeners
+      const setupFirestoreListeners = () => {
+        // Messages listener
         const messagesCollectionRef = collection(db, `artifacts/${appId}/public/data/messages`);
-        const q = query(messagesCollectionRef, orderBy('timestamp'));
+        const qMessages = query(messagesCollectionRef, orderBy('timestamp'));
 
-        onSnapshot(q, (querySnapshot) => {
+        onSnapshot(qMessages, (querySnapshot) => {
           const fetchedMessages = [];
           querySnapshot.forEach((doc) => {
             fetchedMessages.push({ id: doc.id, ...doc.data() });
@@ -231,6 +290,21 @@
           console.log("Fetched messages:", fetchedMessages);
         }, (error) => {
           console.error("Error fetching messages:", error);
+        });
+        
+        // Typing status listener
+        const typingStatusCollectionRef = collection(db, `artifacts/${appId}/public/data/typing_status`);
+        onSnapshot(typingStatusCollectionRef, (querySnapshot) => {
+          const typingUsers = [];
+          querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            if (data.isTyping && data.user) {
+              typingUsers.push({ id: doc.id, user: data.user });
+            }
+          });
+          renderTypingStatus(typingUsers);
+        }, (error) => {
+          console.error("Error fetching typing status:", error);
         });
       };
 
@@ -252,9 +326,24 @@
             timestamp: serverTimestamp()
           });
           messageInput.value = ''; // Clear the input field
+          // Also clear the typing status after sending a message
+          await updateTypingStatus(false);
         } catch (error) {
           console.error("Error adding message:", error);
         }
+      });
+      
+      // Handle typing status updates
+      messageInput.addEventListener('keydown', () => {
+        clearTimeout(isTypingTimeout);
+        updateTypingStatus(true);
+      });
+      
+      messageInput.addEventListener('keyup', () => {
+        clearTimeout(isTypingTimeout);
+        isTypingTimeout = setTimeout(() => {
+          updateTypingStatus(false);
+        }, 3000); // 3-second debounce
       });
     };
     
@@ -269,6 +358,7 @@
             // Update the display with the new username
             if (currentUser) {
               currentUserDisplay.textContent = `You (${username})`;
+              setChatEnabled(true); // Enable chat after setting username
             }
         }
     });
