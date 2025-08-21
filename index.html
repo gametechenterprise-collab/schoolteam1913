@@ -1,4 +1,4 @@
-/<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -69,7 +69,11 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-gray-400 mr-2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
             <span id="current-user-display" class="text-sm">Connecting...</span>
           </div>
-          <button id="sign-out-button" class="mt-4 w-full px-4 py-2 bg-red-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
+          <h2 class="text-md font-semibold text-gray-400 mt-4 mb-2">Settings</h2>
+          <button id="change-username-button" class="w-full px-4 py-2 bg-gray-700 text-gray-200 rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            Change Username
+          </button>
+          <button id="sign-out-button" class="mt-2 w-full px-4 py-2 bg-red-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
             Sign Out
           </button>
         </div>
@@ -87,7 +91,7 @@
 
         <!-- Message Input Form -->
         <form id="message-form" class="p-4 border-t border-gray-700 bg-gray-800">
-          <div class="flex items-center space-x-2">
+          <div class="flex items-end space-x-2">
             <input
               id="message-input"
               type="text"
@@ -151,6 +155,28 @@
       <div class="text-center mt-4">
         <button id="toggle-auth-mode" class="text-sm text-indigo-400 hover:underline">Already have an account? Sign In</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Change Username Modal -->
+  <div id="change-username-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
+    <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-sm">
+      <h2 class="text-xl font-bold text-white mb-4">Change Username</h2>
+      <form id="change-username-form">
+        <div class="mb-4">
+          <input
+            type="text"
+            id="new-username-input"
+            placeholder="Enter new username"
+            class="w-full p-3 text-sm rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
+            required
+          />
+        </div>
+        <div class="flex justify-end space-x-4">
+          <button type="button" id="cancel-change-username" class="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-700">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600">Save</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -243,6 +269,11 @@
     const cancelAllDeleteButton = document.getElementById('cancel-all-delete');
     const deleteAllChatsButton = document.getElementById('delete-all-chats-button');
     const channelMenu = document.getElementById('channel-menu');
+    const changeUsernameButton = document.getElementById('change-username-button');
+    const changeUsernameModal = document.getElementById('change-username-modal');
+    const changeUsernameForm = document.getElementById('change-username-form');
+    const newUsernameInput = document.getElementById('new-username-input');
+    const cancelChangeUsernameButton = document.getElementById('cancel-change-username');
 
     let currentUser = null;
     let authMode = 'signup'; // 'signup' or 'signin'
@@ -555,6 +586,37 @@
           console.error("Error signing out:", error);
           showMessage("Failed to sign out. Please try again.");
         }
+      });
+
+      // Handle change username button click
+      changeUsernameButton.addEventListener('click', () => {
+        if (currentUser) {
+            newUsernameInput.value = currentUser.displayName;
+            changeUsernameModal.classList.remove('hidden');
+        } else {
+            showMessage("You must be signed in to change your username.");
+        }
+      });
+
+      // Handle cancel change username button click
+      cancelChangeUsername.addEventListener('click', () => {
+          changeUsernameModal.classList.add('hidden');
+      });
+      
+      // Handle change username form submission
+      changeUsernameForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const newUsername = newUsernameInput.value.trim();
+          if (newUsername && currentUser) {
+              try {
+                  await updateProfile(currentUser, { displayName: newUsername });
+                  showMessage("Username updated successfully!");
+                  changeUsernameModal.classList.add('hidden');
+              } catch (error) {
+                  console.error("Error updating username:", error);
+                  showMessage(`Failed to update username: ${error.message}`);
+              }
+          }
       });
       
       // Handle auth form submission
