@@ -83,6 +83,28 @@
     </div>
   </div>
 
+  <!-- Modal for username input -->
+  <div id="username-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
+    <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-sm">
+      <h2 class="text-xl font-bold text-white mb-4">Choose a Username</h2>
+      <form id="username-form">
+        <input
+          type="text"
+          id="username-input"
+          placeholder="Enter your username"
+          class="w-full p-3 text-sm rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
+          required
+        />
+        <button
+          type="submit"
+          class="mt-4 w-full px-4 py-3 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        >
+          Start Chatting
+        </button>
+      </form>
+    </div>
+  </div>
+
   <!-- Firebase CDN links -->
   <script type="module">
     // Import the functions you need from the SDKs you need
@@ -115,9 +137,21 @@
     const messagesContainer = document.getElementById('messages-container');
     const userIdDisplay = document.getElementById('user-id-display');
     const currentUserDisplay = document.getElementById('current-user-display');
-
+    const usernameModal = document.getElementById('username-modal');
+    const usernameForm = document.getElementById('username-form');
+    const usernameInput = document.getElementById('username-input');
+    
     let currentUser = null;
-    let isAuthReady = false;
+    let username = '';
+    
+    // Check for a saved username in localStorage
+    const savedUsername = localStorage.getItem('chatUsername');
+    if (savedUsername) {
+        username = savedUsername;
+        usernameModal.style.display = 'none'; // Hide modal if username exists
+    } else {
+        usernameModal.style.display = 'flex'; // Show modal to get username
+    }
 
     // Function to render messages to the DOM
     const renderMessages = (messages) => {
@@ -128,17 +162,25 @@
         
         const avatarChar = msg.user.charAt(0).toUpperCase();
         const timestamp = msg.timestamp?.toDate().toLocaleString() || "Sending...";
-
+        
+        const isSelf = currentUser && msg.userId === currentUser.uid;
+        const messageContainerClass = isSelf ? "flex-row-reverse" : "";
+        const messageBubbleClass = isSelf ? "bg-indigo-600 text-white" : "bg-gray-700 text-gray-300";
+        const messageAvatarClass = isSelf ? "bg-indigo-500" : "bg-gray-500";
+        const messageMarginClass = isSelf ? "ml-auto" : "";
+        
         messageElement.innerHTML = `
-          <div class="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-sm font-bold">
-            ${avatarChar}
-          </div>
-          <div class="ml-3">
-            <div class="flex items-baseline">
-              <span class="font-semibold text-white">${msg.user}</span>
-              <span class="ml-2 text-xs text-gray-500">${timestamp}</span>
+          <div class="flex ${messageContainerClass} items-start w-full">
+            <div class="flex-shrink-0 w-8 h-8 rounded-full ${messageAvatarClass} flex items-center justify-center text-sm font-bold">
+              ${avatarChar}
             </div>
-            <p class="text-sm text-gray-300">${msg.text}</p>
+            <div class="ml-3 mr-3 max-w-3/4 flex flex-col ${messageMarginClass}">
+              <div class="flex items-baseline ${isSelf ? "justify-end" : ""}">
+                <span class="font-semibold text-white">${msg.user}</span>
+                <span class="ml-2 text-xs text-gray-500">${timestamp}</span>
+              </div>
+              <p class="text-sm rounded-xl px-3 py-2 ${messageBubbleClass} break-words mt-1">${msg.text}</p>
+            </div>
           </div>
         `;
         messagesContainer.appendChild(messageElement);
@@ -163,12 +205,10 @@
       // Set up authentication state listener
       onAuthStateChanged(auth, (user) => {
         currentUser = user;
-        isAuthReady = true;
-
         if (user) {
           console.log("User authenticated with UID:", user.uid);
           userIdDisplay.textContent = `User ID: ${user.uid}`;
-          currentUserDisplay.textContent = `You (${user.email || 'guest'})`;
+          currentUserDisplay.textContent = `You (${username || 'guest'})`;
           setupFirestoreListener(); // Call listener after auth is ready
         } else {
           console.log("User is not authenticated.");
@@ -199,8 +239,8 @@
         e.preventDefault();
         const messageText = messageInput.value.trim();
 
-        if (messageText === '' || !currentUser) {
-          console.log("Message is empty or user is not authenticated.");
+        if (messageText === '' || !currentUser || !username) {
+          console.log("Message is empty, user is not authenticated, or username is not set.");
           return;
         }
 
@@ -208,7 +248,7 @@
           await addDoc(collection(db, `artifacts/${appId}/public/data/messages`), {
             text: messageText,
             userId: currentUser.uid,
-            user: currentUser.email || `user-${currentUser.uid.substring(0, 5)}`,
+            user: username,
             timestamp: serverTimestamp()
           });
           messageInput.value = ''; // Clear the input field
@@ -217,6 +257,21 @@
         }
       });
     };
+    
+    // Handle username form submission
+    usernameForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const enteredUsername = usernameInput.value.trim();
+        if (enteredUsername) {
+            username = enteredUsername;
+            localStorage.setItem('chatUsername', username);
+            usernameModal.style.display = 'none';
+            // Update the display with the new username
+            if (currentUser) {
+              currentUserDisplay.textContent = `You (${username})`;
+            }
+        }
+    });
   </script>
 </body>
 </html>
