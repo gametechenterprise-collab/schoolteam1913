@@ -1,9 +1,11 @@
-<!DOCTYPE html>
+!<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simple Chat App</title>
+  <title>School Chats</title>
+  <!-- Messaging icon for the tab -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 15a2 2 0 0 1-2 2H7l-4 4V3a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z'%3E%3C/path%3E%3C/svg%3E">
   <!-- Tailwind CSS CDN for styling -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons CDN for visual elements -->
@@ -27,7 +29,7 @@
       <div class="flex items-center">
         <!-- MessageSquareIcon -->
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6 text-indigo-400 mr-2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V3a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-        <h1 class="text-xl font-bold">Simple Chat App</h1>
+        <h1 class="text-xl font-bold">School Chats</h1>
       </div>
       <div id="user-id-display" class="text-xs text-gray-500 rounded-full px-3 py-1 bg-gray-700">
         User ID: Connecting...
@@ -39,10 +41,19 @@
       <div class="bg-gray-800 w-64 flex-shrink-0 border-r border-gray-700 md:block hidden">
         <div class="p-4">
           <h2 class="text-md font-semibold text-gray-400 mb-2">Channels</h2>
-          <div class="rounded-lg bg-gray-700 p-2 flex items-center cursor-pointer transition-colors duration-200 hover:bg-gray-600">
-            <!-- HashIcon -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-gray-400 mr-2"><line x1="4" x2="20" y1="9" y2="9"></line><line x1="4" x2="20" y1="15" y2="15"></line><line x1="10" x2="14" y1="3" y2="21"></line><line x1="10" x2="14" y1="3" y2="21"></line></svg>
-            <span class="text-sm">general</span>
+          <!-- Channel with pop-up menu -->
+          <div class="relative group">
+            <div class="rounded-lg bg-gray-700 p-2 flex items-center cursor-pointer transition-colors duration-200 hover:bg-gray-600">
+              <!-- HashIcon -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-gray-400 mr-2"><line x1="4" x2="20" y1="9" y2="9"></line><line x1="4" x2="20" y1="15" y2="15"></line><line x1="10" x2="14" y1="3" y2="21"></line><line x1="10" x2="14" y1="3" y2="21"></line></svg>
+              <span class="text-sm">general</span>
+            </div>
+            <!-- Pop-up menu -->
+            <div class="absolute left-full top-0 ml-2 w-48 bg-gray-700 rounded-md shadow-lg py-1 z-10 hidden group-hover:block">
+              <button id="delete-all-chats-button" class="block px-4 py-2 text-sm text-red-400 hover:bg-gray-600 w-full text-left">
+                Delete All My Chats
+              </button>
+            </div>
           </div>
         </div>
         <div class="p-4 border-t border-gray-700">
@@ -154,6 +165,18 @@
     </div>
   </div>
 
+  <!-- All Chats Confirmation Modal -->
+  <div id="all-chats-confirmation-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
+    <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-sm">
+      <h2 class="text-xl font-bold text-white mb-4">Confirm Deletion of All Chats</h2>
+      <p class="text-gray-300 mb-6">Are you sure you want to delete all of your messages? This action cannot be undone.</p>
+      <div class="flex justify-end space-x-4">
+        <button id="cancel-all-delete" class="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-700">Cancel</button>
+        <button id="confirm-all-delete" class="px-4 py-2 bg-red-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-red-700">Delete All</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Firebase CDN links -->
   <script type="module">
     // Import the functions you need from the SDKs you need
@@ -209,6 +232,10 @@
     const confirmationModal = document.getElementById('confirmation-modal');
     const confirmDeleteButton = document.getElementById('confirm-delete');
     const cancelDeleteButton = document.getElementById('cancel-delete');
+    const allChatsConfirmationModal = document.getElementById('all-chats-confirmation-modal');
+    const confirmAllDeleteButton = document.getElementById('confirm-all-delete');
+    const cancelAllDeleteButton = document.getElementById('cancel-all-delete');
+    const deleteAllChatsButton = document.getElementById('delete-all-chats-button');
 
     let currentUser = null;
     let authMode = 'signup'; // 'signup' or 'signin'
@@ -313,6 +340,35 @@
             showMessage("Failed to delete message. Please try again.");
         }
     };
+
+    window.deleteAllMyChats = async () => {
+      if (!currentUser) {
+        showMessage("You must be signed in to delete your messages.");
+        return;
+      }
+      try {
+        const messagesCollectionRef = collection(db, `artifacts/${appId}/public/data/messages`);
+        const q = query(messagesCollectionRef, where("userId", "==", currentUser.uid));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+          showMessage("No messages to delete.");
+          return;
+        }
+
+        const deletionPromises = [];
+        querySnapshot.forEach(doc => {
+          deletionPromises.push(deleteDoc(doc.ref));
+        });
+
+        await Promise.all(deletionPromises);
+        showMessage("All of your messages have been deleted.");
+        messagesContainer.innerHTML = '';
+      } catch (error) {
+        console.error("Error deleting all chats:", error);
+        showMessage("Failed to delete all chats. Please try again.");
+      }
+    };
     
     // Close menus when clicking anywhere else
     window.addEventListener('click', () => {
@@ -335,6 +391,16 @@
     cancelDeleteButton.addEventListener('click', () => {
         messageToDeleteId = null;
         confirmationModal.classList.add('hidden');
+    });
+
+    // Handle all chats confirmation modal buttons
+    confirmAllDeleteButton.addEventListener('click', () => {
+      deleteAllMyChats();
+      allChatsConfirmationModal.classList.add('hidden');
+    });
+
+    cancelAllDeleteButton.addEventListener('click', () => {
+      allChatsConfirmationModal.classList.add('hidden');
     });
 
     // Function to update the typing status in Firestore
@@ -513,6 +579,11 @@
           usernameField.classList.remove('hidden');
           toggleAuthModeButton.textContent = 'Already have an account? Sign In';
         }
+      });
+
+      // Add event listener to the new delete all chats button
+      deleteAllChatsButton.addEventListener('click', () => {
+        allChatsConfirmationModal.classList.remove('hidden');
       });
     };
   </script>
