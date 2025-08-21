@@ -375,7 +375,7 @@
 
         await Promise.all(deletionPromises);
         showMessage("All of your messages have been deleted.");
-        messagesContainer.innerHTML = '';
+        // The onSnapshot listener will handle the UI update, so no need to clear it manually.
       } catch (error) {
         console.error("Error deleting all chats:", error);
         showMessage("Failed to delete all chats. Please try again.");
