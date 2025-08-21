@@ -384,18 +384,18 @@
       messageForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const messageText = messageInput.value.trim();
-
-        if (messageText === '' || !currentUser || !currentUser.displayName) {
-          console.log("Message is empty, user is not authenticated, or username is not set.");
-          return;
-        }
         
-        // Check for the /deletemychats command
+        // Check for the /deletemychats command first
         if (messageText === '/deletemychats') {
             messageInput.value = ''; // Clear the input
             await updateTypingStatus(false);
             await deleteMyChats();
             return; // Exit the function to prevent a new message from being sent
+        }
+        
+        if (messageText === '' || !currentUser || !currentUser.displayName) {
+          console.log("Message is empty, user is not authenticated, or username is not set.");
+          return;
         }
 
         try {
