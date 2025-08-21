@@ -56,9 +56,12 @@
             </div>
             <!-- Pop-up menu -->
             <div id="channel-menu" class="absolute left-full top-0 ml-2 w-48 bg-gray-700 rounded-md shadow-lg py-1 z-10 hidden">
-              <button id="delete-other-chats-button" class="block px-4 py-2 text-sm text-red-400 hover:bg-gray-600 w-full text-left">
-                Delete Other Messages (Only on your screen)
-              </button>
+                <button id="delete-other-messages-button" class="block px-4 py-2 text-sm text-red-400 hover:bg-gray-600 w-full text-left">
+                    Delete Other Messages (Only on your screen)
+                </button>
+                <button id="delete-my-chats-button" class="block px-4 py-2 text-sm text-red-400 hover:bg-gray-600 w-full text-left">
+                    Delete All My Chats
+                </button>
             </div>
           </div>
         </div>
@@ -258,7 +261,7 @@
     const allChatsConfirmationModal = document.getElementById('all-chats-confirmation-modal');
     const confirmAllDeleteButton = document.getElementById('confirm-all-delete');
     const cancelAllDeleteButton = document.getElementById('cancel-all-delete');
-    const deleteAllChatsButton = document.getElementById('delete-all-chats-button');
+    const deleteOtherMessagesButton = document.getElementById('delete-other-messages-button');
     const channelMenu = document.getElementById('channel-menu');
     const deleteAccountModal = document.getElementById('delete-account-modal');
     const confirmDeleteAccountButton = document.getElementById('confirm-delete-account');
@@ -433,20 +436,30 @@
             showMessage("You must be signed in to use this feature.");
             return;
         }
+        
         const messagesCollectionRef = collection(db, `artifacts/${appId}/public/data/messages`);
-        const q = query(messagesCollectionRef);
-        onSnapshot(q, (querySnapshot) => {
-            const allMessages = [];
+        const q = query(messagesCollectionRef, where("userId", "!=", currentUser.uid));
+        
+        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+            const otherUsersMessages = [];
             querySnapshot.forEach(doc => {
-                allMessages.push({ id: doc.id, ...doc.data() });
+                otherUsersMessages.push({ id: doc.id, ...doc.data() });
             });
-            const hiddenMessages = allMessages
-                .filter(msg => msg.userId !== currentUser.uid)
-                .map(msg => msg.id);
+            const hiddenMessages = otherUsersMessages.map(msg => msg.id);
 
             localStorage.setItem('hiddenMessages', JSON.stringify(hiddenMessages));
-            renderMessages(allMessages.filter(msg => !hiddenMessages.includes(msg.id)));
+            unsubscribe(); // Detach the listener after getting the messages once
+            
+            // Re-render the messages with the new hidden list
+            const allMessages = messagesContainer.querySelectorAll('[id^="message-"]');
+            allMessages.forEach(msgElement => {
+                const msgId = msgElement.id.split('-')[1];
+                if (hiddenMessages.includes(msgId)) {
+                    msgElement.remove();
+                }
+            });
         });
+
         showMessage("All messages from other users have been hidden from your view.");
     }
 
@@ -716,6 +729,12 @@
           usernameField.classList.remove('hidden');
           toggleAuthModeButton.textContent = 'Already have an account? Sign In';
         }
+      });
+      
+      // Add event listener for the delete my messages button
+      deleteOtherMessagesButton.addEventListener('click', () => {
+          hideAllOtherUsersMessages();
+          channelMenu.classList.add('hidden');
       });
 
       // Add event listener to the new delete all chats button
