@@ -1,585 +1,226 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CoolChats</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/phosphor-icons"></script>
-    <style>
-        /* Custom scrollbar styling for the messages container */
-        .message-container::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .message-container::-webkit-scrollbar-track {
-            background: #f1f5f9; /* slate-100 */
-            border-radius: 10px;
-        }
-
-        .message-container::-webkit-scrollbar-thumb {
-            background-color: #cbd5e1; /* slate-300 */
-            border-radius: 10px;
-            border: 2px solid #f1f5f9;
-        }
-
-        /* Set the body and all elements to use the Inter font */
-        body,
-        * {
-            font-family: 'Inter', sans-serif;
-        }
-
-        /* Modal backdrop styling */
-        .modal-backdrop {
-            background-color: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(5px);
-            z-index: 10;
-        }
-
-        /* Transition for the chat rooms panel */
-        .chat-rooms-panel {
-            transition: transform 0.3s ease-in-out;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Chat App</title>
+  <!-- Tailwind CSS CDN for styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons CDN for visual elements -->
+  <script src="https://cdn.jsdelivr.net/npm/lucide@latest"></script>
+  <!-- Inter font from Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+<body class="bg-gray-900 text-gray-100 h-screen flex flex-col">
 
-    <div id="appError" class="hidden absolute top-10 left-1/2 -translate-x-1/2 bg-red-500 text-white p-4 rounded-lg shadow-lg max-w-sm w-full text-center z-50">
-        An error occurred. Please check the console for details.
+  <!-- Main container -->
+  <div class="flex flex-col h-screen bg-gray-900 text-gray-100 font-inter">
+    <!-- Header -->
+    <div class="bg-gray-800 p-4 border-b border-gray-700 flex items-center justify-between">
+      <div class="flex items-center">
+        <!-- MessageSquareIcon -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6 text-indigo-400 mr-2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V3a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        <h1 class="text-xl font-bold">Simple Chat App</h1>
+      </div>
+      <div id="user-id-display" class="text-xs text-gray-500 rounded-full px-3 py-1 bg-gray-700">
+        User ID: Loading...
+      </div>
     </div>
 
-    <div id="authModal" class="modal-backdrop fixed inset-0 flex items-center justify-center transition-opacity duration-300 ease-in-out">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full transform scale-95 md:scale-100 transition-transform duration-300 ease-in-out">
-            <h2 class="text-2xl font-bold text-gray-800 text-center mb-6">Sign In or Sign Up</h2>
-            <form id="authForm" class="space-y-4">
-                <div>
-                    <input type="email" id="emailInput" placeholder="Email" required
-                           class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                </div>
-                <div>
-                    <input type="password" id="passwordInput" placeholder="Password" required
-                           class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                </div>
-                <button type="button" id="signInBtn" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition-colors shadow-md">
-                    Sign In
-                </button>
-                <button type="button" id="signUpBtn" class="w-full bg-green-600 text-white font-bold py-3 rounded-lg hover:bg-green-700 transition-colors shadow-md">
-                    Sign Up
-                </button>
-            </form>
-            <button id="forgotPasswordBtn" class="mt-4 w-full text-center text-blue-600 hover:underline text-sm font-semibold">Forgot Password?</button>
-            <div id="authMessage" class="mt-4 text-center text-red-600 text-sm"></div>
+    <div class="flex flex-1 overflow-hidden">
+      <!-- Sidebar -->
+      <div class="bg-gray-800 w-64 flex-shrink-0 border-r border-gray-700 md:block hidden">
+        <div class="p-4">
+          <h2 class="text-md font-semibold text-gray-400 mb-2">Channels</h2>
+          <div class="rounded-lg bg-gray-700 p-2 flex items-center cursor-pointer transition-colors duration-200 hover:bg-gray-600">
+            <!-- HashIcon -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-gray-400 mr-2"><line x1="4" x2="20" y1="9" y2="9"></line><line x1="4" x2="20" y1="15" y2="15"></line><line x1="10" x2="14" y1="3" y2="21"></line><line x1="10" x2="14" y1="3" y2="21"></line></svg>
+            <span class="text-sm">general</span>
+          </div>
         </div>
-    </div>
-    
-    <div id="usernameModal" class="modal-backdrop fixed inset-0 flex items-center justify-center transition-opacity duration-300 ease-in-out hidden">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full transform scale-95 md:scale-100 transition-transform duration-300 ease-in-out">
-            <h2 class="text-2xl font-bold text-gray-800 text-center mb-6">Choose a Username</h2>
-            <form id="usernameForm" class="space-y-4">
-                <div>
-                    <input type="text" id="newUsernameInput" placeholder="Username" required
-                           class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                </div>
-                <button type="submit" id="saveUsernameBtn" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition-colors shadow-md">
-                    Save Username
-                </button>
-            </form>
-            <div id="usernameMessage" class="mt-4 text-center text-red-600 text-sm"></div>
+        <div class="p-4 border-t border-gray-700">
+          <h2 class="text-md font-semibold text-gray-400 mb-2">Users</h2>
+          <div class="rounded-lg p-2 flex items-center">
+            <!-- UserIcon -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-gray-400 mr-2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <span id="current-user-display" class="text-sm">Loading...</span>
+          </div>
         </div>
-    </div>
-    
-    <div id="resetPasswordModal" class="modal-backdrop fixed inset-0 flex items-center justify-center transition-opacity duration-300 ease-in-out hidden">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full transform scale-95 md:scale-100 transition-transform duration-300 ease-in-out">
-            <h2 class="text-2xl font-bold text-gray-800 text-center mb-6">Reset Password</h2>
-            <form id="resetPasswordForm" class="space-y-4">
-                <div>
-                    <input type="email" id="resetEmailInput" placeholder="Email" required
-                           class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                </div>
-                <button type="submit" id="sendResetLinkBtn" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition-colors shadow-md">
-                    Send Reset Link
-                </button>
-            </form>
-            <button id="backToSignInBtn" class="mt-4 w-full text-center text-gray-600 hover:underline text-sm">Back to Sign In</button>
-            <div id="resetMessage" class="mt-4 text-center text-red-600 text-sm"></div>
+      </div>
+
+      <!-- Main Chat Content -->
+      <div class="flex-1 flex flex-col">
+        <!-- Messages Area -->
+        <div id="messages-container" class="flex-1 p-4 overflow-y-auto space-y-4">
+          <!-- Messages will be rendered here by JavaScript -->
         </div>
+
+        <!-- Message Input Form -->
+        <form id="message-form" class="p-4 border-t border-gray-700 bg-gray-800">
+          <div class="flex items-center space-x-2">
+            <input
+              id="message-input"
+              type="text"
+              placeholder="Message #general"
+              class="flex-1 p-3 text-sm rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
+            />
+            <button
+              type="submit"
+              class="px-4 py-3 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              Send
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
 
-    <div id="addMemberModal" class="modal-backdrop fixed inset-0 flex items-center justify-center transition-opacity duration-300 ease-in-out hidden">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full transform scale-95 md:scale-100 transition-transform duration-300 ease-in-out">
-            <h2 class="text-2xl font-bold text-gray-800 text-center mb-6">Add Member</h2>
-            <form id="addMemberForm" class="space-y-4">
-                <div>
-                    <input type="text" id="addUsernameInput" placeholder="Username of person to add" required
-                           class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                </div>
-                <button type="submit" id="addMemberBtn" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition-colors shadow-md">
-                    Add User
-                </button>
-            </form>
-            <button id="closeAddMemberBtn" class="mt-4 w-full text-center text-gray-600 hover:underline text-sm">Cancel</button>
-            <div id="addMemberMessage" class="mt-4 text-center text-red-600 text-sm"></div>
-        </div>
-    </div>
+  <!-- Firebase CDN links -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+    // Global variables from the environment
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : undefined;
 
-    <div id="chatApp" class="bg-white rounded-3xl shadow-2xl overflow-hidden w-full max-w-5xl flex flex-row h-[700px] hidden relative">
+    // Firebase Initialization
+    let app, auth, db;
+    try {
+      app = initializeApp(firebaseConfig);
+      db = getFirestore(app);
+      auth = getAuth(app);
+    } catch (error) {
+      console.error("Firebase initialization failed:", error);
+    }
 
-        <div id="chatRoomsPanel" class="w-full md:w-64 bg-gray-900 text-white flex flex-col rounded-l-3xl p-4 md:p-6">
-            <div class="p-6 md:p-0 flex items-center justify-between">
-                <h2 class="text-2xl font-bold">CoolChats</h2>
+    // DOM elements
+    const messageForm = document.getElementById('message-form');
+    const messageInput = document.getElementById('message-input');
+    const messagesContainer = document.getElementById('messages-container');
+    const userIdDisplay = document.getElementById('user-id-display');
+    const currentUserDisplay = document.getElementById('current-user-display');
+
+    let currentUser = null;
+    let isAuthReady = false;
+
+    // Function to render messages to the DOM
+    const renderMessages = (messages) => {
+      messagesContainer.innerHTML = '';
+      messages.forEach(msg => {
+        const messageElement = document.createElement('div');
+        messageElement.className = "flex items-start";
+        
+        const avatarChar = msg.user.charAt(0).toUpperCase();
+        const timestamp = msg.timestamp?.toDate().toLocaleString() || "Sending...";
+
+        messageElement.innerHTML = `
+          <div class="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-sm font-bold">
+            ${avatarChar}
+          </div>
+          <div class="ml-3">
+            <div class="flex items-baseline">
+              <span class="font-semibold text-white">${msg.user}</span>
+              <span class="ml-2 text-xs text-gray-500">${timestamp}</span>
             </div>
-            <div id="chatRoomsList" class="flex-1 overflow-y-auto p-4 space-y-2">
-                </div>
-            <div class="p-4 border-t border-gray-700">
-                <button id="createChatBtn" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition-colors shadow-md">
-                    + New Chat
-                </button>
-            </div>
-        </div>
+            <p class="text-sm text-gray-300">${msg.text}</p>
+          </div>
+        `;
+        messagesContainer.appendChild(messageElement);
+      });
+      // Scroll to the bottom of the chat container
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    };
 
-        <div class="flex-1 flex flex-col relative md:static">
-            <div class="bg-blue-600 text-white p-6 md:p-8 rounded-t-3xl md:rounded-tr-3xl md:rounded-tl-none shadow-inner flex justify-between items-center">
-                <h1 id="chatRoomName" class="text-xl md:text-2xl font-bold text-center flex-1 truncate">
-                    Select a Chat Room
-                </h1>
-                <button id="addMemberIcon" class="hidden text-white font-semibold hover:opacity-80 transition-opacity ml-4">
-                    <i class="ph-dots-three-circle-fill text-2xl"></i>
-                </button>
-                <button id="signOutBtn" class="text-sm font-semibold hover:opacity-80 transition-opacity ml-4">Sign Out</button>
-            </div>
+    // Main logic when the window loads
+    window.onload = function() {
+      if (!auth || !db) {
+        console.error("Firebase services are not initialized. Cannot proceed.");
+        return;
+      }
 
-            <div id="messages" class="message-container flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
-                </div>
-
-            <form id="messageForm" class="p-4 md:p-6 border-t border-gray-200">
-                <div class="flex space-x-3">
-                    <input type="text" id="messageInput" placeholder="Type a message..." required
-                           class="flex-1 p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                    <button type="submit"
-                            class="bg-blue-600 text-white rounded-full p-3 font-semibold hover:bg-blue-700 transition-colors shadow-md">
-                        Send
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <script type="module">
-        // Import necessary Firebase services from their CDN URLs
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-analytics.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, addDoc, setDoc, onSnapshot, collection, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
-
-        // IMPORTANT: The Firebase configuration for your project.
-        const firebaseConfig = {
-            apiKey: "AIzaSyC-IMwOrOH07TzGKHVL9kKO9tQq1_tTkdE",
-            authDomain: "aditya-sassistant-3d086.firebaseapp.com",
-            projectId: "aditya-sassistant-3d086",
-            storageBucket: "aditya-sassistant-3d086.firebasestorage.app",
-            messagingSenderId: "890134396965",
-            appId: "1:890134396965:web:98f25895eb76c90aee7fcc",
-            measurementId: "G-EGJBEST9EL"
-        };
-        const appId = firebaseConfig.appId;
-
-        // --- Global State Variables ---
-        let app, db, auth, userId, username;
-        let isAuthReady = false;
-        let currentChatRoomId = null;
-        let unsubscribeFromMessages = null;
-
-        // --- Helper Functions ---
-        /**
-         * Displays a temporary message in the UI (e.g., for errors or success).
-         * @param {string} message - The message to display.
-         * @param {string} type - The type of message ('success' or 'error').
-         */
-        const showMessage = (message, type) => {
-            const messagesContainer = document.getElementById('messages');
-            if (!messagesContainer) return; // Add a check to prevent errors
-            const messageElement = document.createElement('div');
-            messageElement.className = `p-3 rounded-xl text-sm italic text-center ${type === 'error' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`;
-            messageElement.textContent = message;
-            messagesContainer.prepend(messageElement);
-            setTimeout(() => {
-                messageElement.remove();
-            }, 5000);
-        };
-
-        /**
-         * Switches to a different chat room and sets up a new message listener.
-         * @param {string} roomId - The ID of the chat room to switch to.
-         * @param {string} roomName - The name of the chat room.
-         */
-        const switchChatRoom = (roomId, roomName) => {
-            // Unsubscribe from the previous chat room's messages listener
-            if (unsubscribeFromMessages) {
-                unsubscribeFromMessages();
-            }
-
-            // Update the global state
-            currentChatRoomId = roomId;
-            const chatRoomNameHeader = document.getElementById('chatRoomName');
-            chatRoomNameHeader.textContent = roomName;
-            const messagesContainer = document.getElementById('messages');
-            messagesContainer.innerHTML = ''; // Clear messages from the old room
-
-            // Start listening for messages in the new chat room
-            listenForMessages(roomId);
-        };
-
-        /**
-         * Listens for real-time messages in a specific chat room.
-         * @param {string} roomId - The ID of the chat room.
-         */
-        const listenForMessages = (roomId) => {
-            if (!isAuthReady || !roomId) return;
-
-            const messagesRef = collection(db, `artifacts/${appId}/public/data/chatRooms/${roomId}/messages`);
-
-            unsubscribeFromMessages = onSnapshot(messagesRef, async (querySnapshot) => {
-                const messages = [];
-                const senderIds = new Set();
-                querySnapshot.forEach((doc) => {
-                    const msg = { id: doc.id, ...doc.data() };
-                    messages.push(msg);
-                    senderIds.add(msg.senderId);
-                });
-
-                messages.sort((a, b) => (a.timestamp ? a.timestamp.toDate() : 0) - (b.timestamp ? b.timestamp.toDate() : 0));
-
-                // Fetch all usernames in one go
-                const usernameMap = {};
-                for (const id of senderIds) {
-                    const userDocRef = doc(db, `artifacts/${appId}/public/data/users`, id);
-                    const userDoc = await getDoc(userDocRef);
-                    if (userDoc.exists()) {
-                        usernameMap[id] = userDoc.data().username;
-                    } else {
-                        usernameMap[id] = "Unknown User";
-                    }
-                }
-
-                const messagesContainer = document.getElementById('messages');
-                messagesContainer.innerHTML = '';
-                messages.forEach(msg => {
-                    const isMyMessage = msg.senderId === userId;
-                    const messageElement = document.createElement('div');
-                    messageElement.className = `flex ${isMyMessage ? 'justify-end' : 'justify-start'}`;
-
-                    messageElement.innerHTML = `
-                        <div class="max-w-[75%] p-3 rounded-2xl ${isMyMessage ? 'bg-blue-500 text-white rounded-br-none' : 'bg-gray-200 text-gray-800 rounded-bl-none'}"
-                             style="box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);">
-                            <p class="font-bold text-xs ${isMyMessage ? 'text-blue-200' : 'text-gray-500'} break-all">
-                                ${isMyMessage ? 'You' : usernameMap[msg.senderId]}
-                            </p>
-                            <p class="text-sm mt-1 break-words">${msg.text}</p>
-                            <span class="block text-right text-[10px] opacity-75 mt-1">
-                                ${msg.timestamp ? new Date(msg.timestamp.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '...'}
-                            </span>
-                        </div>
-                    `;
-                    messagesContainer.appendChild(messageElement);
-                });
-
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            }, (error) => {
-                console.error("Error listening to messages:", error);
-                showMessage("Failed to load messages.", 'error');
-            });
-        };
-
-        /**
-         * Listens for real-time updates to the list of chat rooms.
-         */
-        const listenForChatRooms = () => {
-            if (!isAuthReady) return;
-
-            const chatRoomsRef = collection(db, `artifacts/${appId}/public/data/chatRooms`);
-
-            onSnapshot(chatRoomsRef, (querySnapshot) => {
-                const chatRoomsList = document.getElementById('chatRoomsList');
-                chatRoomsList.innerHTML = '';
-                const rooms = [];
-                querySnapshot.forEach((doc) => {
-                    rooms.push({ id: doc.id, ...doc.data() });
-                });
-
-                if (rooms.length === 0) {
-                    chatRoomsList.innerHTML = `<p class="text-gray-400 italic text-center text-sm">No chats found. Create one to get started!</p>`;
-                } else {
-                    rooms.sort((a, b) => (a.createdAt ? a.createdAt.toDate() : 0) - (b.createdAt ? b.createdAt.toDate() : 0));
-                    rooms.forEach(room => {
-                        const roomElement = document.createElement('button');
-                        roomElement.textContent = room.name;
-                        roomElement.className = 'w-full text-left p-3 rounded-lg hover:bg-gray-700 transition-colors text-lg';
-                        roomElement.addEventListener('click', () => switchChatRoom(room.id, room.name));
-                        chatRoomsList.appendChild(roomElement);
-                    });
-
-                    // Auto-select the first chat room if none are selected
-                    if (!currentChatRoomId) {
-                        switchChatRoom(rooms[0].id, rooms[0].name);
-                    }
-                }
-            }, (error) => {
-                console.error("Error listening to chat rooms:", error);
-                showMessage("Failed to load chat rooms.", 'error');
-            });
-        };
-
-        // --- Firebase Initialization and Authentication ---
+      // Sign in the user
+      const signInUser = async () => {
         try {
-            if (firebaseConfig && firebaseConfig.projectId) {
-                app = initializeApp(firebaseConfig);
-                const analytics = getAnalytics(app); // Initialize analytics with the new app instance
-                db = getFirestore(app);
-                auth = getAuth(app);
-
-                onAuthStateChanged(auth, async (user) => {
-                    const authModal = document.getElementById('authModal');
-                    const usernameModal = document.getElementById('usernameModal');
-                    const chatApp = document.getElementById('chatApp');
-
-                    if (user) {
-                        userId = user.uid;
-                        // Check if the user has a username
-                        const userDocRef = doc(db, `artifacts/${appId}/public/data/users`, userId);
-                        const userDoc = await getDoc(userDocRef);
-
-                        if (userDoc.exists()) {
-                            // User has a username, hide modals and show chat app
-                            username = userDoc.data().username;
-                            isAuthReady = true;
-                            if (authModal) authModal.classList.add('hidden');
-                            if (usernameModal) usernameModal.classList.add('hidden');
-                            if (chatApp) chatApp.classList.remove('hidden');
-                            listenForChatRooms();
-                        } else {
-                            // User is new and needs to set a username
-                            if (authModal) authModal.classList.add('hidden');
-                            if (usernameModal) usernameModal.classList.remove('hidden');
-                            if (chatApp) chatApp.classList.add('hidden');
-                        }
-                    } else {
-                        // User is signed out, show auth modal
-                        isAuthReady = false;
-                        if (authModal) authModal.classList.remove('hidden');
-                        if (usernameModal) usernameModal.classList.add('hidden');
-                        if (chatApp) chatApp.classList.add('hidden');
-                    }
-                });
-
-            } else {
-                console.error("Firebase initialization failed: Missing or invalid firebaseConfig.");
-                document.getElementById('appError').classList.remove('hidden');
-            }
-
+          if (initialAuthToken) {
+            await signInWithCustomToken(auth, initialAuthToken);
+          } else {
+            await signInAnonymously(auth);
+          }
         } catch (error) {
-            console.error("Firebase initialization failed:", error);
-            document.getElementById('appError').classList.remove('hidden');
+          console.error("Authentication failed:", error);
+        }
+      };
+
+      signInUser();
+
+      // Set up authentication state listener
+      onAuthStateChanged(auth, (user) => {
+        currentUser = user;
+        isAuthReady = true;
+
+        if (user) {
+          console.log("User authenticated with UID:", user.uid);
+          userIdDisplay.textContent = `User ID: ${user.uid}`;
+          currentUserDisplay.textContent = `You (${user.email || 'guest'})`;
+          setupFirestoreListener(); // Call listener after auth is ready
+        } else {
+          console.log("User is not authenticated.");
+          userIdDisplay.textContent = `User ID: Not Signed In`;
+          currentUserDisplay.textContent = `Not Signed In`;
+        }
+      });
+
+      // Function to set up the Firestore real-time listener
+      const setupFirestoreListener = () => {
+        const messagesCollectionRef = collection(db, `artifacts/${appId}/public/data/messages`);
+        const q = query(messagesCollectionRef, orderBy('timestamp'));
+
+        onSnapshot(q, (querySnapshot) => {
+          const fetchedMessages = [];
+          querySnapshot.forEach((doc) => {
+            fetchedMessages.push({ id: doc.id, ...doc.data() });
+          });
+          renderMessages(fetchedMessages);
+          console.log("Fetched messages:", fetchedMessages);
+        }, (error) => {
+          console.error("Error fetching messages:", error);
+        });
+      };
+
+      // Handle message form submission
+      messageForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const messageText = messageInput.value.trim();
+
+        if (messageText === '' || !currentUser) {
+          console.log("Message is empty or user is not authenticated.");
+          return;
         }
 
-        // --- Authentication Form Logic ---
-        const emailInput = document.getElementById('emailInput');
-        const passwordInput = document.getElementById('passwordInput');
-        const signInBtn = document.getElementById('signInBtn');
-        const signUpBtn = document.getElementById('signUpBtn');
-        const authMessage = document.getElementById('authMessage');
-        const signOutBtn = document.getElementById('signOutBtn');
-
-        const displayAuthMessage = (message, isError = true) => {
-            if (!authMessage) return; // Check if the element exists
-            authMessage.textContent = message;
-            authMessage.className = `mt-4 text-center text-sm ${isError ? 'text-red-600' : 'text-green-600'}`;
-        };
-
-        if (signInBtn) signInBtn.addEventListener('click', async () => {
-            const email = emailInput.value.trim();
-            const password = passwordInput.value;
-            try {
-                displayAuthMessage('', false);
-                await signInWithEmailAndPassword(auth, email, password);
-            } catch (error) {
-                console.error("Sign-in failed:", error);
-                if (error.code === 'auth/invalid-email' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-                    displayAuthMessage("Invalid email or password. Please try again.");
-                } else if (error.code === 'auth/admin-restricted-operation') {
-                    displayAuthMessage("Email/Password sign-in is not enabled in your Firebase console under Authentication > Settings.");
-                } else {
-                    displayAuthMessage(`Authentication failed: ${error.message}`);
-                }
-            }
-        });
-
-        if (signUpBtn) signUpBtn.addEventListener('click', async () => {
-            const email = emailInput.value.trim();
-            const password = passwordInput.value;
-            try {
-                displayAuthMessage('', false);
-                await createUserWithEmailAndPassword(auth, email, password);
-                // User is signed in after sign-up, onAuthStateChanged listener handles the rest
-            } catch (error) {
-                console.error("Sign-up failed:", error);
-                if (error.code === 'auth/invalid-email') {
-                    displayAuthMessage("Please enter a valid email address.");
-                } else if (error.code === 'auth/weak-password') {
-                    displayAuthMessage("Password should be at least 6 characters.");
-                } else if (error.code === 'auth/email-already-in-use') {
-                    displayAuthMessage("This email is already in use. Please sign in instead.");
-                } else {
-                    displayAuthMessage(`Registration failed: ${error.message}`);
-                }
-            }
-        });
-        
-        if (signOutBtn) signOutBtn.addEventListener('click', async () => {
-            try {
-                await signOut(auth);
-            } catch (error) {
-                console.error("Sign out failed:", error);
-                showMessage("Sign out failed. Please try again.", 'error');
-            }
-        });
-
-        // --- Username Form Logic ---
-        const usernameModal = document.getElementById('usernameModal');
-        const newUsernameInput = document.getElementById('newUsernameInput');
-        const usernameForm = document.getElementById('usernameForm');
-        const usernameMessage = document.getElementById('usernameMessage');
-
-        if (usernameForm) usernameForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const newUsername = newUsernameInput.value.trim();
-
-            if (newUsername.length < 3) {
-                usernameMessage.textContent = "Username must be at least 3 characters long.";
-                return;
-            }
-
-            try {
-                const userDocRef = doc(db, `artifacts/${appId}/public/data/users`, userId);
-                await setDoc(userDocRef, { username: newUsername });
-                username = newUsername; // Update global variable
-                if (usernameModal) usernameModal.classList.add('hidden');
-                const chatApp = document.getElementById('chatApp');
-                if (chatApp) chatApp.classList.remove('hidden');
-                listenForChatRooms();
-            } catch (error) {
-                console.error("Error setting username:", error);
-                if (usernameMessage) usernameMessage.textContent = `Failed to set username: ${error.message}`;
-            }
-        });
-
-        // --- Password Reset Logic ---
-        const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
-        const resetPasswordModal = document.getElementById('resetPasswordModal');
-        const resetEmailInput = document.getElementById('resetEmailInput');
-        const resetPasswordForm = document.getElementById('resetPasswordForm');
-        const resetMessage = document.getElementById('resetMessage');
-        const backToSignInBtn = document.getElementById('backToSignInBtn');
-
-        if (forgotPasswordBtn) forgotPasswordBtn.addEventListener('click', () => {
-            if (resetPasswordModal) resetPasswordModal.classList.remove('hidden');
-            const authModal = document.getElementById('authModal');
-            if (authModal) authModal.classList.add('hidden');
-            if (resetMessage) resetMessage.textContent = '';
-        });
-
-        if (backToSignInBtn) backToSignInBtn.addEventListener('click', () => {
-            if (resetPasswordModal) resetPasswordModal.classList.add('hidden');
-            const authModal = document.getElementById('authModal');
-            if (authModal) authModal.classList.remove('hidden');
-        });
-
-        if (resetPasswordForm) resetPasswordForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = resetEmailInput.value.trim();
-            if (!email) {
-                if (resetMessage) resetMessage.textContent = "Please enter an email.";
-                return;
-            }
-
-            try {
-                await sendPasswordResetEmail(auth, email);
-                if (resetMessage) resetMessage.textContent = "Password reset link sent! Check your inbox.";
-                if (resetMessage) resetMessage.className = "mt-4 text-center text-sm text-green-600";
-            } catch (error) {
-                console.error("Password reset failed:", error);
-                if (resetMessage) {
-                    if (error.code === 'auth/user-not-found') {
-                        resetMessage.textContent = "No user found with that email address.";
-                    } else {
-                        resetMessage.textContent = `Error: ${error.message}`;
-                    }
-                    resetMessage.className = "mt-4 text-center text-sm text-red-600";
-                }
-            }
-        });
-
-        // --- Chat Room and Message Logic ---
-        const messagesContainer = document.getElementById('messages');
-        const chatRoomNameHeader = document.getElementById('chatRoomName');
-        const chatRoomsList = document.getElementById('chatRoomsList');
-
-        // Check for element existence before adding event listeners
-        const createChatBtn = document.getElementById('createChatBtn');
-        const messageForm = document.getElementById('messageForm');
-
-        if (createChatBtn) createChatBtn.addEventListener('click', async () => {
-            if (!isAuthReady) {
-                showMessage("Please sign in to create a new chat.", 'error');
-                return;
-            }
-            const chatName = prompt("Enter a name for the new chat room:");
-            if (chatName && chatName.trim().length > 0) {
-                try {
-                    const chatRoomsRef = collection(db, `artifacts/${appId}/public/data/chatRooms`);
-                    const newChatDoc = await addDoc(chatRoomsRef, {
-                        name: chatName,
-                        createdAt: serverTimestamp()
-                    });
-                    showMessage(`'${chatName}' created successfully!`, 'success');
-                    switchChatRoom(newChatDoc.id, chatName);
-                } catch (e) {
-                    console.error("Error creating chat room:", e);
-                    showMessage("Failed to create chat room.", 'error');
-                }
-            } else if (chatName !== null) {
-                showMessage("Chat name cannot be empty.", 'error');
-            }
-        });
-        if (messageForm) messageForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            if (!isAuthReady || !currentChatRoomId) {
-                showMessage("Please select a chat room first.", 'error');
-                return;
-            }
-
-            const messageInput = document.getElementById('messageInput');
-            const text = messageInput.value.trim();
-
-            if (text) {
-                try {
-                    const messagesRef = collection(db, `artifacts/${appId}/public/data/chatRooms/${currentChatRoomId}/messages`);
-                    await addDoc(messagesRef, {
-                        senderId: userId,
-                        text: text,
-                        timestamp: serverTimestamp()
-                    });
-                    messageInput.value = '';
-                } catch (e) {
-                    console.error("Error adding document: ", e);
-                    showMessage("Failed to send message.", 'error');
-                }
-            }
-        });
-    </script>
+        try {
+          await addDoc(collection(db, `artifacts/${appId}/public/data/messages`), {
+            text: messageText,
+            userId: currentUser.uid,
+            user: currentUser.email || `user-${currentUser.uid.substring(0, 5)}`,
+            timestamp: serverTimestamp()
+          });
+          messageInput.value = ''; // Clear the input field
+        } catch (error) {
+          console.error("Error adding message:", error);
+        }
+      });
+    };
+  </script>
 </body>
 </html>
