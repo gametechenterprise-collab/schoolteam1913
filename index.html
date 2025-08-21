@@ -202,9 +202,9 @@
   <!-- Firebase CDN links -->
   <script type="module">
     // Import the functions you need from the SDKs you need
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, deleteUser, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-    import { getFirestore, collection, addDoc, setDoc, doc, serverTimestamp, query, where, getDocs, onSnapshot, deleteDoc, orderBy, limit } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, deleteUser, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, setDoc, doc, serverTimestamp, query, where, getDocs, onSnapshot, deleteDoc, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // Global variables from the environment
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -276,4 +276,405 @@
         setTimeout(() => {
             messageBox.classList.add('hidden');
         }, 5000); // Hide after 5 seconds
-  
+    }
+
+    // Function to enable/disable message input and send button
+    const setChatEnabled = (enabled) => {
+      messageInput.disabled = !enabled;
+      sendButton.disabled = !enabled;
+      if (enabled) {
+        messageInput.placeholder = "Message #general";
+      } else {
+        messageInput.placeholder = "Please sign in to chat...";
+      }
+    };
+    
+    // Function to render messages to the DOM
+    const renderMessages = (messages) => {
+      messagesContainer.innerHTML = '';
+      messages.forEach(msg => {
+        const messageElement = document.createElement('div');
+        messageElement.className = "flex items-start group relative";
+        
+        const avatarChar = msg.user ? msg.user.charAt(0).toUpperCase() : 'U';
+        const timestamp = msg.timestamp?.toDate().toLocaleString() || "Sending...";
+        
+        const isSelf = currentUser && msg.userId === currentUser.uid;
+        const messageContainerClass = isSelf ? "flex-row-reverse" : "";
+        const messageBubbleClass = isSelf ? "bg-indigo-600 text-white" : "bg-gray-700 text-gray-300";
+        const messageAvatarClass = isSelf ? "bg-indigo-500" : "bg-gray-500";
+        const messageMarginClass = isSelf ? "ml-3 mr-3 max-w-3/4" : "ml-3 mr-3 max-w-3/4";
+        
+        messageElement.innerHTML = `
+          <div class="flex ${messageContainerClass} items-start w-full">
+            <div class="flex-shrink-0 w-8 h-8 rounded-full ${messageAvatarClass} flex items-center justify-center text-sm font-bold">
+              ${avatarChar}
+            </div>
+            <div class="${messageMarginClass} flex flex-col ${isSelf ? "items-end" : "items-start"}">
+              <div class="flex items-baseline ${isSelf ? "flex-row-reverse" : ""}">
+                <span class="font-semibold text-white">${msg.user}</span>
+                <span class="ml-2 mr-2 text-xs text-gray-500">${timestamp}</span>
+              </div>
+              <p class="text-sm rounded-xl px-3 py-2 ${messageBubbleClass} break-words mt-1">${msg.text}</p>
+            </div>
+            ${isSelf ? `
+            <div class="absolute inset-y-0 ${isSelf ? 'left-0' : 'right-0'} flex items-center pr-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div class="relative">
+                    <button class="flex items-center text-gray-400 hover:text-white focus:outline-none" onclick="toggleMenu(event, '${msg.id}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                    </button>
+                    <div id="menu-${msg.id}" class="absolute ${isSelf ? 'left-6' : 'right-6'} top-1/2 -translate-y-1/2 w-48 bg-gray-700 rounded-md shadow-lg py-1 z-10 hidden">
+                        <button class="block px-4 py-2 text-sm text-red-400 hover:bg-gray-600 w-full text-left" onclick="showConfirmationModal('${msg.id}')">
+                            Remove my words
+                        </button>
+                    </div>
+                </div>
+            </div>
+            ` : ''}
+          </div>
+        `;
+        messagesContainer.appendChild(messageElement);
+      });
+      // Scroll to the bottom of the chat container
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    };
+    
+    // Global functions to be called from inline HTML
+    window.toggleMenu = (event, msgId) => {
+        event.stopPropagation();
+        const menu = document.getElementById(`menu-${msgId}`);
+        menu.classList.toggle('hidden');
+    };
+
+    window.toggleChannelMenu = (event) => {
+        event.stopPropagation();
+        channelMenu.classList.toggle('hidden');
+    };
+
+    window.showConfirmationModal = (msgId) => {
+        messageToDeleteId = msgId;
+        confirmationModal.classList.remove('hidden');
+        // Hide all other menus
+        document.querySelectorAll('[id^="menu-"]').forEach(menu => {
+            if (!menu.classList.contains('hidden')) {
+                menu.classList.add('hidden');
+            }
+        });
+    };
+
+    window.deleteMessage = async (msgId) => {
+        try {
+            const messageRef = doc(db, `artifacts/${appId}/public/data/messages`, msgId);
+            await deleteDoc(messageRef);
+            showMessage("Message deleted successfully.");
+        } catch (error) {
+            console.error("Error deleting message:", error);
+            showMessage("Failed to delete message. Please try again.");
+        }
+    };
+
+    window.deleteAllMyChats = async () => {
+      if (!currentUser) {
+        showMessage("You must be signed in to delete your messages.");
+        return;
+      }
+      try {
+        const messagesCollectionRef = collection(db, `artifacts/${appId}/public/data/messages`);
+        const q = query(messagesCollectionRef, where("userId", "==", currentUser.uid));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+          showMessage("No messages to delete.");
+          return;
+        }
+
+        const deletionPromises = [];
+        querySnapshot.forEach(doc => {
+          deletionPromises.push(deleteDoc(doc.ref));
+        });
+
+        await Promise.all(deletionPromises);
+        showMessage("All of your messages have been deleted.");
+        // The onSnapshot listener will handle the UI update, so no need to clear it manually.
+      } catch (error) {
+        console.error("Error deleting all chats:", error);
+        showMessage("Failed to delete all chats. Please try again.");
+      }
+    };
+
+    window.deleteAccount = async () => {
+        if (!currentUser) {
+            showMessage("You must be signed in to delete your account.");
+            return;
+        }
+        try {
+            // First, delete all the user's messages
+            const messagesCollectionRef = collection(db, `artifacts/${appId}/public/data/messages`);
+            const q = query(messagesCollectionRef, where("userId", "==", currentUser.uid));
+            const querySnapshot = await getDocs(q);
+            const deletionPromises = [];
+            querySnapshot.forEach(doc => {
+                deletionPromises.push(deleteDoc(doc.ref));
+            });
+            await Promise.all(deletionPromises);
+
+            // Then delete the user account
+            await deleteUser(currentUser);
+            showMessage("Account and all associated messages deleted successfully.");
+        } catch (error) {
+            console.error("Error deleting account:", error);
+            showMessage(`Failed to delete account. Please try again: ${error.message}`);
+        }
+    };
+    
+    // Close menus when clicking anywhere else
+    window.addEventListener('click', () => {
+        document.querySelectorAll('[id^="menu-"]').forEach(menu => {
+            if (!menu.classList.contains('hidden')) {
+                menu.classList.add('hidden');
+            }
+        });
+        if (!channelMenu.classList.contains('hidden')) {
+            channelMenu.classList.add('hidden');
+        }
+    });
+
+    // Handle confirmation modal buttons
+    confirmDeleteButton.addEventListener('click', () => {
+        if (messageToDeleteId) {
+            deleteMessage(messageToDeleteId);
+            messageToDeleteId = null;
+        }
+        confirmationModal.classList.add('hidden');
+    });
+
+    cancelDeleteButton.addEventListener('click', () => {
+        messageToDeleteId = null;
+        confirmationModal.classList.add('hidden');
+    });
+
+    // Handle all chats confirmation modal buttons
+    confirmAllDeleteButton.addEventListener('click', () => {
+      deleteAllMyChats();
+      allChatsConfirmationModal.classList.add('hidden');
+    });
+
+    cancelAllDeleteButton.addEventListener('click', () => {
+      allChatsConfirmationModal.classList.add('hidden');
+    });
+    
+    // Handle delete account modal buttons
+    confirmDeleteAccountButton.addEventListener('click', () => {
+        deleteAccount();
+        deleteAccountModal.classList.add('hidden');
+    });
+
+    cancelDeleteAccountButton.addEventListener('click', () => {
+        deleteAccountModal.classList.add('hidden');
+    });
+
+    // Function to update the typing status in Firestore
+    const updateTypingStatus = async (isTyping) => {
+      if (!currentUser || !currentUser.displayName) return;
+      try {
+        await setDoc(doc(db, `artifacts/${appId}/public/data/typing_status`, currentUser.uid), {
+          user: currentUser.displayName,
+          isTyping: isTyping,
+          timestamp: serverTimestamp()
+        });
+      } catch (error) {
+        console.error("Error updating typing status:", error);
+      }
+    };
+    
+    // Function to render other users' typing status
+    const renderTypingStatus = (typingUsers) => {
+      const otherTypingUsers = typingUsers.filter(u => u.id !== (currentUser ? currentUser.uid : null));
+      if (otherTypingUsers.length > 0) {
+        const names = otherTypingUsers.map(u => u.user).join(', ');
+        typingStatusDisplay.textContent = `${names} is typing...`;
+        typingStatusDisplay.style.display = 'block';
+      } else {
+        typingStatusDisplay.style.display = 'none';
+      }
+    };
+    
+    // Main logic when the window loads
+    window.onload = function() {
+      if (!auth || !db) return; // Exit if Firebase is not initialized
+      
+      // Listen for authentication state changes
+      onAuthStateChanged(auth, (user) => {
+        currentUser = user;
+        if (user) {
+          console.log("User authenticated with UID:", user.uid);
+          userIdDisplay.textContent = `User ID: ${user.uid}`;
+          currentUserDisplay.textContent = `You (${user.displayName || 'guest'})`;
+          authModal.classList.add('hidden');
+          setChatEnabled(true);
+          setupFirestoreListeners();
+        } else {
+          console.log("User is not authenticated.");
+          userIdDisplay.textContent = `User ID: Not Signed In`;
+          currentUserDisplay.textContent = `Not Signed In`;
+          authModal.classList.remove('hidden');
+          setChatEnabled(false);
+        }
+      });
+      
+      // Cleanup typing status on window unload
+      window.addEventListener('beforeunload', () => {
+        if (currentUser) {
+          deleteDoc(doc(db, `artifacts/${appId}/public/data/typing_status`, currentUser.uid));
+        }
+      });
+
+      // Function to set up the Firestore real-time listeners
+      const setupFirestoreListeners = () => {
+        // Messages listener
+        const messagesCollectionRef = collection(db, `artifacts/${appId}/public/data/messages`);
+        const qMessages = query(messagesCollectionRef, orderBy('timestamp'));
+
+        onSnapshot(qMessages, (querySnapshot) => {
+          const fetchedMessages = [];
+          querySnapshot.forEach((doc) => {
+            fetchedMessages.push({ id: doc.id, ...doc.data() });
+          });
+          renderMessages(fetchedMessages);
+          console.log("Fetched messages:", fetchedMessages);
+        }, (error) => {
+          console.error("Error fetching messages:", error);
+          showMessage("Failed to load messages. Check your internet connection.");
+        });
+        
+        // Typing status listener
+        const typingStatusCollectionRef = collection(db, `artifacts/${appId}/public/data/typing_status`);
+        onSnapshot(typingStatusCollectionRef, (querySnapshot) => {
+          const typingUsers = [];
+          querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            if (data.isTyping && data.user) {
+              typingUsers.push({ id: doc.id, user: data.user });
+            }
+          });
+          renderTypingStatus(typingUsers);
+        }, (error) => {
+          console.error("Error fetching typing status:", error);
+        });
+      };
+      
+      // Handle message form submission
+      messageForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const messageText = messageInput.value.trim();
+
+        if (messageText === '' || !currentUser || !currentUser.displayName) {
+          console.log("Message is empty, user is not authenticated, or username is not set.");
+          return;
+        }
+        
+        try {
+          await addDoc(collection(db, `artifacts/${appId}/public/data/messages`), {
+            text: messageText,
+            userId: currentUser.uid,
+            user: currentUser.displayName,
+            timestamp: serverTimestamp()
+          });
+          messageInput.value = ''; // Clear the input field
+          await updateTypingStatus(false);
+        } catch (error) {
+          console.error("Error adding message:", error);
+          showMessage("Failed to send message. Please try again.");
+        }
+      });
+      
+      // Handle typing status updates
+      messageInput.addEventListener('keydown', () => {
+        clearTimeout(isTypingTimeout);
+        updateTypingStatus(true);
+      });
+      
+      messageInput.addEventListener('keyup', () => {
+        clearTimeout(isTypingTimeout);
+        isTypingTimeout = setTimeout(() => {
+          updateTypingStatus(false);
+        }, 3000); // 3-second debounce
+      });
+
+      // Handle sign out
+      signOutButton.addEventListener('click', async () => {
+        try {
+          await signOut(auth);
+          console.log("User signed out.");
+        } catch (error) {
+          console.error("Error signing out:", error);
+          showMessage("Failed to sign out. Please try again.");
+        }
+      });
+
+      // Show delete account modal
+      deleteAccountButton.addEventListener('click', () => {
+        if (currentUser) {
+            deleteAccountModal.classList.remove('hidden');
+        } else {
+            showMessage("You must be signed in to delete your account.");
+        }
+      });
+
+      // Handle delete account modal buttons
+      confirmDeleteAccountButton.addEventListener('click', () => {
+        deleteAccount();
+        deleteAccountModal.classList.add('hidden');
+      });
+
+      cancelDeleteAccountButton.addEventListener('click', () => {
+        deleteAccountModal.classList.add('hidden');
+      });
+
+      // Handle auth form submission
+      authForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = authEmailInput.value;
+        const password = authPasswordInput.value;
+        const username = authUsernameInput.value;
+
+        try {
+          if (authMode === 'signup') {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            await updateProfile(userCredential.user, { displayName: username });
+            showMessage("Account created successfully!");
+          } else {
+            await signInWithEmailAndPassword(auth, email, password);
+            showMessage("Signed in successfully!");
+          }
+        } catch (error) {
+          console.error("Authentication error:", error);
+          showMessage(`Authentication failed: ${error.message}`);
+        }
+      });
+
+      // Toggle between sign up and sign in modes
+      toggleAuthModeButton.addEventListener('click', () => {
+        if (authMode === 'signup') {
+          authMode = 'signin';
+          authTitle.textContent = 'Sign In';
+          authSubmitButton.textContent = 'Sign In';
+          usernameField.classList.add('hidden');
+          toggleAuthModeButton.textContent = 'Need an account? Sign Up';
+        } else {
+          authMode = 'signup';
+          authTitle.textContent = 'Create Account';
+          authSubmitButton.textContent = 'Sign Up';
+          usernameField.classList.remove('hidden');
+          toggleAuthModeButton.textContent = 'Already have an account? Sign In';
+        }
+      });
+
+      // Add event listener to the new delete all chats button
+      deleteAllChatsButton.addEventListener('click', () => {
+        allChatsConfirmationModal.classList.remove('hidden');
+      });
+    };
+  </script>
+</body>
+</html>
