@@ -165,9 +165,9 @@
     
     // Check for a saved username in localStorage
     const savedUsername = localStorage.getItem('chatUsername');
-    if (savedUsername) {
+    if (savedUsername && savedUsername.trim() !== '') {
         username = savedUsername;
-        usernameModal.style.display = 'none'; // Hide modal if username exists
+        usernameModal.style.display = 'none'; // Hide modal if username exists and is not empty
     } else {
         usernameModal.style.display = 'flex'; // Show modal to get username
         setChatEnabled(false); // Disable chat until username is entered
