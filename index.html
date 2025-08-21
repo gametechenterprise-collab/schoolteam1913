@@ -147,7 +147,7 @@
     // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-    import { getFirestore, collection, addDoc, setDoc, doc, serverTimestamp, query, where, getDocs, onSnapshot, deleteDoc, orderBy, limit } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, setDoc, doc, serverTimestamp, query, orderBy, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
     // Global variables from the environment
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -344,39 +344,6 @@
           console.error("Error fetching typing status:", error);
         });
       };
-      
-      // Function to delete the last 5 of the current user's messages
-      const deleteMyChats = async () => {
-        if (!currentUser) {
-          showMessage("You must be signed in to delete your messages.");
-          return;
-        }
-
-        try {
-          // Query for the last 5 messages sent by the current user's UID
-          const messagesCollectionRef = collection(db, `artifacts/${appId}/public/data/messages`);
-          const q = query(messagesCollectionRef, where("userId", "==", currentUser.uid), orderBy("timestamp", "desc"), limit(5));
-          const querySnapshot = await getDocs(q);
-          
-          if (querySnapshot.empty) {
-            showMessage("No messages to delete.");
-            return;
-          }
-
-          // Delete each document found
-          const deletionPromises = [];
-          querySnapshot.forEach(doc => {
-            deletionPromises.push(deleteDoc(doc.ref));
-          });
-          
-          await Promise.all(deletionPromises);
-          showMessage("Your last 5 messages have been deleted.");
-          
-        } catch (error) {
-          console.error("Error deleting messages:", error);
-          showMessage("Failed to delete messages. Please try again.");
-        }
-      };
 
       // Handle message form submission
       messageForm.addEventListener('submit', async (e) => {
@@ -386,14 +353,6 @@
         if (messageText === '' || !currentUser || !currentUser.displayName) {
           console.log("Message is empty, user is not authenticated, or username is not set.");
           return;
-        }
-        
-        // Check for the /deletemychats command
-        if (messageText === '/deletemychats') {
-            messageInput.value = ''; // Clear the input
-            await updateTypingStatus(false);
-            await deleteMyChats();
-            return; // Exit the function to prevent a new message from being sent
         }
 
         try {
