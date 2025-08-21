@@ -291,9 +291,18 @@
     
     // Function to render messages to the DOM
     const renderMessages = (messages) => {
+      // Get the list of hidden message IDs from local storage
+      const hiddenMessages = JSON.parse(localStorage.getItem('hiddenMessages')) || [];
+      
       messagesContainer.innerHTML = '';
       messages.forEach(msg => {
+        // Skip rendering the message if its ID is in the hiddenMessages list
+        if (hiddenMessages.includes(msg.id)) {
+            return;
+        }
+
         const messageElement = document.createElement('div');
+        messageElement.id = `message-${msg.id}`; // Add an ID to the message element
         messageElement.className = "flex items-start group relative";
         
         const avatarChar = msg.user ? msg.user.charAt(0).toUpperCase() : 'U';
@@ -326,6 +335,9 @@
                     <div id="menu-${msg.id}" class="absolute ${isSelf ? 'left-6' : 'right-6'} top-1/2 -translate-y-1/2 w-48 bg-gray-700 rounded-md shadow-lg py-1 z-10 hidden">
                         <button class="block px-4 py-2 text-sm text-red-400 hover:bg-gray-600 w-full text-left" onclick="showConfirmationModal('${msg.id}')">
                             Remove my words
+                        </button>
+                        <button class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-600 w-full text-left" onclick="hideMessageForUser('${msg.id}')">
+                            Hide from my view
                         </button>
                     </div>
                 </div>
@@ -361,6 +373,22 @@
             }
         });
     };
+    
+    // Function to hide a message from the user's view
+    window.hideMessageForUser = (msgId) => {
+        // Get existing hidden messages, or an empty array if none exist
+        const hiddenMessages = JSON.parse(localStorage.getItem('hiddenMessages')) || [];
+        // Add the new message ID to the list
+        hiddenMessages.push(msgId);
+        // Save the updated list to local storage
+        localStorage.setItem('hiddenMessages', JSON.stringify(hiddenMessages));
+        // Remove the message element from the DOM
+        const messageElement = document.getElementById(`message-${msgId}`);
+        if (messageElement) {
+            messageElement.remove();
+        }
+        showMessage("Message hidden from your view.");
+    };
 
     window.deleteMessage = async (msgId) => {
         try {
@@ -395,7 +423,6 @@
 
         await Promise.all(deletionPromises);
         showMessage("All of your messages have been deleted.");
-        // The onSnapshot listener will handle the UI update, so no need to clear it manually.
       } catch (error) {
         console.error("Error deleting all chats:", error);
         showMessage("Failed to delete all chats. Please try again.");
