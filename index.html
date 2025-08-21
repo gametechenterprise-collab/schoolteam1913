@@ -371,7 +371,9 @@
           
           await Promise.all(deletionPromises);
           showMessage("All of your messages have been deleted.");
-
+          // Clear the chat display immediately after successful deletion
+          messagesContainer.innerHTML = '';
+          
         } catch (error) {
           console.error("Error deleting messages:", error);
           showMessage("Failed to delete messages. Please try again.");
