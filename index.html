@@ -224,7 +224,7 @@
       messagesContainer.innerHTML = '';
       messages.forEach(msg => {
         const messageElement = document.createElement('div');
-        messageElement.className = "flex items-start";
+        messageElement.className = "flex items-start group relative";
         
         const avatarChar = msg.user ? msg.user.charAt(0).toUpperCase() : 'U';
         const timestamp = msg.timestamp?.toDate().toLocaleString() || "Sending...";
@@ -247,6 +247,20 @@
               </div>
               <p class="text-sm rounded-xl px-3 py-2 ${messageBubbleClass} break-words mt-1">${msg.text}</p>
             </div>
+            ${isSelf ? `
+            <div class="absolute inset-y-0 ${isSelf ? 'left-0' : 'right-0'} flex items-center pr-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div class="relative">
+                    <button class="flex items-center text-gray-400 hover:text-white focus:outline-none" onclick="toggleMenu(event, '${msg.id}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                    </button>
+                    <div id="menu-${msg.id}" class="absolute ${isSelf ? 'left-6' : 'right-6'} top-1/2 -translate-y-1/2 w-48 bg-gray-700 rounded-md shadow-lg py-1 z-10 hidden">
+                        <button class="block px-4 py-2 text-sm text-red-400 hover:bg-gray-600 w-full text-left" onclick="deleteMessage('${msg.id}')">
+                            Remove my words
+                        </button>
+                    </div>
+                </div>
+            </div>
+            ` : ''}
           </div>
         `;
         messagesContainer.appendChild(messageElement);
@@ -255,6 +269,33 @@
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
     };
     
+    // Global functions to be called from inline HTML
+    window.toggleMenu = (event, msgId) => {
+        event.stopPropagation();
+        const menu = document.getElementById(`menu-${msgId}`);
+        menu.classList.toggle('hidden');
+    };
+
+    window.deleteMessage = async (msgId) => {
+        try {
+            const messageRef = doc(db, `artifacts/${appId}/public/data/messages`, msgId);
+            await deleteDoc(messageRef);
+            showMessage("Message deleted successfully.");
+        } catch (error) {
+            console.error("Error deleting message:", error);
+            showMessage("Failed to delete message. Please try again.");
+        }
+    };
+    
+    // Close menus when clicking anywhere else
+    window.addEventListener('click', () => {
+        document.querySelectorAll('[id^="menu-"]').forEach(menu => {
+            if (!menu.classList.contains('hidden')) {
+                menu.classList.add('hidden');
+            }
+        });
+    });
+
     // Function to update the typing status in Firestore
     const updateTypingStatus = async (isTyping) => {
       if (!currentUser || !currentUser.displayName) return;
