@@ -300,10 +300,6 @@
       'ass', 'fag', 'chink', 'hitler', 'nazi'
     ];
     
-    // Tracks the last mention time for each user to prevent spam
-    const mentionCooldowns = new Map();
-    const mentionCooldownPeriod = 10000; // 10 seconds in milliseconds
-
     // Function to create a more flexible regex pattern for a single word
     function createProfanityRegex(word) {
       // Create a pattern that allows one or more of each character
@@ -1126,25 +1122,6 @@
               if (isProfanityFilterEnabled) {
                   messageText = filterProfanity(messageText);
               }
-              
-              // Check for @-mentions and send notifications
-              const mentionRegex = /@(\w+)/g;
-              let match;
-              let mentionedUsernames = [];
-              while ((match = mentionRegex.exec(messageText)) !== null) {
-                  mentionedUsernames.push(match[1]);
-              }
-              
-              mentionedUsernames.forEach(username => {
-                  const mentionedUser = userList.find(user => user.displayName === username);
-                  if (mentionedUser && currentUser.uid !== mentionedUser.uid) {
-                      const lastMentionTime = mentionCooldowns.get(mentionedUser.uid) || 0;
-                      if (Date.now() - lastMentionTime > mentionCooldownPeriod) {
-                          sendNotification(`${currentUser.displayName} mentioned you!`, messageText);
-                          mentionCooldowns.set(mentionedUser.uid, Date.now());
-                      }
-                  }
-              });
               
               try {
                 await addDoc(collection(db, `artifacts/${appId}/chats/${activeChatId}/messages`), {
