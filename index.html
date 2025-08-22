@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jordan High School Chat</title>
+  <title>Schoolchats</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 15a2 2 0 0 1-2 2H7l-4 4V3a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z'%3E%3C/path%3E%3C/svg%3E">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@latest"></script>
@@ -22,7 +22,7 @@
     <div class="bg-gray-800 p-4 border-b border-gray-700 flex items-center justify-between">
       <div class="flex items-center">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6 text-indigo-400 mr-2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V3a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-        <h1 class="text-xl font-bold">Jordan High School Chat</h1>
+        <h1 class="text-xl font-bold">Schoolchats</h1>
       </div>
       <div id="user-id-display" class="text-xs text-gray-500 rounded-full px-3 py-1 bg-gray-700">
         User ID: Connecting...
@@ -221,6 +221,20 @@
       messagingSenderId: "663520599356",
       appId: "1:663520599356:web:85ba7c1d8fb2bb2394d239"
     };
+
+    // Profanity list for filtering
+    const profanityList = ['fuck', 'shit', 'cunt', 'bitch', 'asshole', 'bastard', 'dick', 'pussy', 'whore'];
+
+    // Function to filter out profanity
+    function filterProfanity(message) {
+      let filteredMessage = message;
+      profanityList.forEach(word => {
+        const regex = new RegExp(`\\b${word}\\b`, 'gi');
+        filteredMessage = filteredMessage.replace(regex, '****');
+      });
+      return filteredMessage;
+    }
+
 
     // Firebase Initialization
     let app, auth, db;
@@ -868,18 +882,21 @@
       if (messageForm) {
           messageForm.addEventListener('submit', async (e) => {
               e.preventDefault();
-              const messageText = messageInput.value.trim();
+              let messageText = messageInput.value.trim();
 
               if (messageText.toLowerCase() === '/delete messages') {
                 e.target.reset();
                 if (allChatsConfirmationModal) allChatsConfirmationModal.classList.remove('hidden');
                 return;
               }
-
+              
               if (messageText === '' || !currentUser || !currentUser.displayName) {
                 return;
               }
               
+              // Apply profanity filter
+              messageText = filterProfanity(messageText);
+
               try {
                 await addDoc(collection(db, `artifacts/${appId}/chats/${activeChatId}/messages`), {
                   text: messageText,
