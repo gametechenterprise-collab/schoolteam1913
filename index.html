@@ -225,14 +225,12 @@
     // Profanity list for filtering
     const profanityList = [
       'fuck', 'shit', 'cunt', 'bitch', 'asshole', 'bastard', 'dick', 'pussy', 'whore',
-      'nigga', 'nigger', 'cuck', 'slut', 'fucking', 'fucker', 'retard'
+      'nigga', 'nigger', 'cuck', 'slut', 'fucking', 'fucker', 'retard', 'faggot', 'chink', 'gook', 'kike','fag','chink'
     ];
 
     // Function to filter out profanity
     function filterProfanity(message) {
       let filteredMessage = message;
-      // Using a regex to match the words, including variations like repeated letters (e.g., ffuckk)
-      // and checking for them within other words
       const pattern = new RegExp(`(${profanityList.join('|')})`, 'gi');
       filteredMessage = filteredMessage.replace(pattern, '****');
       return filteredMessage;
@@ -309,7 +307,7 @@
     let messagesUnsubscribe = null;
     let typingUnsubscribe = null;
     let canSendMessage = true;
-    const cooldownPeriod = 5000; // 5 seconds in milliseconds
+    const cooldownPeriod = 2000; // 2 seconds in milliseconds
 
 
     // Show a custom message box
