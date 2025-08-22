@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+/<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -225,14 +225,24 @@
     // Profanity list for filtering
     const profanityList = [
       'fuck', 'shit', 'cunt', 'bitch', 'asshole', 'bastard', 'dick', 'pussy', 'whore',
-      'nigga', 'nigger', 'cuck', 'slut', 'fucking', 'fucker', 'retard', 'faggot', 'chink', 'gook', 'kike','fag','chink'
+      'nigga', 'nigger', 'cuck', 'slut', 'fucking', 'fucker', 'retard', 'faggot', 'chink', 'gook', 'kike'
     ];
+    
+    // Function to create a more flexible regex pattern for a single word
+    function createProfanityRegex(word) {
+      // Create a pattern that allows one or more of each character, separated by an optional word boundary or any character, and allows for optional whitespace.
+      // E.g., 'retard' becomes 'r+e+t+a+r+d+'
+      const pattern = word.split('').map(char => `${char}+`).join('');
+      return new RegExp(pattern, 'gi');
+    }
 
     // Function to filter out profanity
     function filterProfanity(message) {
       let filteredMessage = message;
-      const pattern = new RegExp(`(${profanityList.join('|')})`, 'gi');
-      filteredMessage = filteredMessage.replace(pattern, '****');
+      profanityList.forEach(profanity => {
+        const pattern = createProfanityRegex(profanity);
+        filteredMessage = filteredMessage.replace(pattern, '****');
+      });
       return filteredMessage;
     }
 
@@ -319,6 +329,22 @@
             messageBox.classList.add('hidden');
         }, 5000); // Hide after 5 seconds
     }
+    
+    // Function to handle desktop notifications
+    function sendNotification(title, body) {
+        if (!("Notification" in window)) {
+            console.log("This browser does not support desktop notification");
+        } else if (Notification.permission === "granted") {
+            const notification = new Notification(title, { body: body, icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%3E%3Cpath d="M21 15a2 2 0 0 1-2 2H7l-4 4V3a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"%3E%3C/path%3E%3C/svg%3E' });
+        } else if (Notification.permission !== "denied") {
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    const notification = new Notification(title, { body: body, icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%3E%3Cpath d="M21 15a2 2 0 0 1-2 2H7l-4 4V3a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"%3E%3C/path%3E%3C/svg%3E' });
+                }
+            });
+        }
+    }
+
 
     // Function to enable/disable message input and send button
     const setChatEnabled = (enabled) => {
@@ -579,8 +605,8 @@
                 console.error("Re-authentication failed:", error);
                 showMessage(`Re-authentication failed: ${error.message}`);
             }
-        });
-    }
+          });
+      }
 
     if (cancelDeleteAccountButton) {
         cancelDeleteAccountButton.addEventListener('click', () => {
@@ -635,6 +661,12 @@
         const qMessages = query(messagesCollectionRef, orderBy('timestamp'));
         messagesUnsubscribe = onSnapshot(qMessages, (querySnapshot) => {
             const fetchedMessages = [];
+            querySnapshot.docChanges().forEach((change) => {
+                const msg = { id: change.doc.id, ...change.doc.data() };
+                if (change.type === "added" && currentUser && msg.userId !== currentUser.uid) {
+                    sendNotification(msg.user, msg.text);
+                }
+            });
             querySnapshot.forEach((doc) => {
                 fetchedMessages.push({ id: doc.id, ...doc.data() });
             });
