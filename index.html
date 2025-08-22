@@ -14,6 +14,57 @@
     body {
       font-family: 'Inter', sans-serif;
     }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 24px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #4B5563;
+      transition: .4s;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+    }
+
+    input:checked + .slider {
+      background-color: #6366F1;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(16px);
+    }
+
+    .slider.round {
+      border-radius: 24px;
+    }
+
+    .slider.round:before {
+      border-radius: 50%;
+    }
   </style>
 </head>
 <body class="bg-gray-900 text-gray-100 h-screen flex flex-col transition-colors duration-300">
@@ -246,7 +297,7 @@
     const profanityList = [
       'fuck', 'shit', 'cunt', 'bitch', 'asshole', 'bastard', 'dick', 'pussy', 'whore',
       'nigga', 'nigger', 'cuck', 'slut', 'fucking', 'fucker', 'retard', 'faggot', 'chink', 'gook', 'kike',
-      'ass', 'fag', 'hitler', 'nazi'
+      'ass', 'fag', 'chink', 'hitler', 'nazi'
     ];
     
     // Tracks the last mention time for each user to prevent spam
@@ -358,6 +409,22 @@
         }, 5000); // Hide after 5 seconds
     }
     
+    // Function to handle desktop notifications
+    function sendNotification(title, body) {
+        if (!("Notification" in window)) {
+            console.log("This browser does not support desktop notification");
+        } else if (Notification.permission === "granted") {
+            const notification = new Notification(title, { body: body, icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%3E%3Cpath d="M21 15a2 2 0 0 1-2 2H7l-4 4V3a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"%3E%3C/path%3E%3C/svg%3E' });
+        } else if (Notification.permission !== "denied") {
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    const notification = new Notification(title, { body: body, icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%3E%3Cpath d="M21 15a2 2 0 0 1-2 2H7l-4 4V3a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"%3E%3C/path%3E%3C/svg%3E' });
+                }
+            });
+        }
+    }
+
+
     // Function to enable/disable message input and send button
     const setChatEnabled = (enabled) => {
       if (messageInput) messageInput.disabled = !enabled;
@@ -752,6 +819,16 @@
         const qMessages = query(messagesCollectionRef, orderBy('timestamp'));
         messagesUnsubscribe = onSnapshot(qMessages, (querySnapshot) => {
             const fetchedMessages = [];
+            querySnapshot.docChanges().forEach((change) => {
+                const msg = { id: change.doc.id, ...change.doc.data() };
+                const isDM = activeChatId !== 'general';
+                if (change.type === "added" && currentUser && msg.userId !== currentUser.uid) {
+                    if (isDM) {
+                      const filteredText = profanityFilterToggle.checked ? filterProfanity(msg.text) : msg.text;
+                      sendNotification(msg.user, filteredText);
+                    }
+                }
+            });
             querySnapshot.forEach((doc) => {
                 fetchedMessages.push({ id: doc.id, ...doc.data() });
             });
@@ -1049,7 +1126,26 @@
               if (isProfanityFilterEnabled) {
                   messageText = filterProfanity(messageText);
               }
-
+              
+              // Check for @-mentions and send notifications
+              const mentionRegex = /@(\w+)/g;
+              let match;
+              let mentionedUsernames = [];
+              while ((match = mentionRegex.exec(messageText)) !== null) {
+                  mentionedUsernames.push(match[1]);
+              }
+              
+              mentionedUsernames.forEach(username => {
+                  const mentionedUser = userList.find(user => user.displayName === username);
+                  if (mentionedUser && currentUser.uid !== mentionedUser.uid) {
+                      const lastMentionTime = mentionCooldowns.get(mentionedUser.uid) || 0;
+                      if (Date.now() - lastMentionTime > mentionCooldownPeriod) {
+                          sendNotification(`${currentUser.displayName} mentioned you!`, messageText);
+                          mentionCooldowns.set(mentionedUser.uid, Date.now());
+                      }
+                  }
+              });
+              
               try {
                 await addDoc(collection(db, `artifacts/${appId}/chats/${activeChatId}/messages`), {
                   text: messageText,
