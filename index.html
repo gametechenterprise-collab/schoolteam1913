@@ -56,6 +56,9 @@
       </div>
 
       <div class="flex-1 flex flex-col">
+        <div id="public-chat-banner" class="bg-yellow-500 text-yellow-900 p-2 text-center text-sm font-semibold hidden">
+          This is a public chat. All messages are deleted every hour.
+        </div>
         <div id="chat-header" class="bg-gray-800 p-4 border-b border-gray-700 flex items-center justify-between hidden">
           <h2 id="chat-name" class="text-xl font-bold"></h2>
         </div>
@@ -225,7 +228,8 @@
     // Profanity list for filtering
     const profanityList = [
       'fuck', 'shit', 'cunt', 'bitch', 'asshole', 'bastard', 'dick', 'pussy', 'whore',
-      'nigga', 'nigger', 'cuck', 'slut', 'fucking', 'fucker', 'retard', 'faggot', 'chink', 'gook', 'kike'
+      'nigga', 'nigger', 'cuck', 'slut', 'fucking', 'fucker', 'retard', 'faggot', 'chink', 'gook', 'kike',
+      'ass', 'fag', 'chink', 'hitler', 'nazi'
     ];
     
     // Tracks the last mention time for each user to prevent spam
@@ -234,6 +238,7 @@
 
     // Function to create a more flexible regex pattern for a single word
     function createProfanityRegex(word) {
+      // Create a pattern that allows one or more of each character
       const pattern = word.split('').map(char => `${char}+`).join('');
       return new RegExp(pattern, 'gi');
     }
@@ -305,6 +310,7 @@
     const channelsList = document.getElementById('channels-list');
     const groupChatNameField = document.getElementById('group-chat-name-field');
     const groupChatNameInput = document.getElementById('group-chat-name-input');
+    const publicChatBanner = document.getElementById('public-chat-banner');
 
 
     let currentUser = null;
@@ -332,22 +338,6 @@
         }, 5000); // Hide after 5 seconds
     }
     
-    // Function to handle desktop notifications
-    function sendNotification(title, body) {
-        if (!("Notification" in window)) {
-            console.log("This browser does not support desktop notification");
-        } else if (Notification.permission === "granted") {
-            const notification = new Notification(title, { body: body, icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%3E%3Cpath d="M21 15a2 2 0 0 1-2 2H7l-4 4V3a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"%3E%3C/path%3E%3C/svg%3E' });
-        } else if (Notification.permission !== "denied") {
-            Notification.requestPermission().then(permission => {
-                if (permission === "granted") {
-                    const notification = new Notification(title, { body: body, icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%3E%3Cpath d="M21 15a2 2 0 0 1-2 2H7l-4 4V3a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"%3E%3C/path%3E%3C/svg%3E' });
-                }
-            });
-        }
-    }
-
-
     // Function to enable/disable message input and send button
     const setChatEnabled = (enabled) => {
       if (messageInput) messageInput.disabled = !enabled;
@@ -357,6 +347,19 @@
       } else {
         if (messageInput) messageInput.placeholder = "Please sign in to chat...";
       }
+    };
+
+    const updateChannelUI = (newChatId) => {
+        // Remove 'bg-gray-700' from all channel elements
+        document.querySelectorAll('#channels-list > div').forEach(element => {
+            element.classList.remove('bg-gray-700');
+        });
+        
+        // Add 'bg-gray-700' to the newly selected channel
+        const newActiveChannel = document.getElementById(`channel-${newChatId}`);
+        if (newActiveChannel) {
+            newActiveChannel.classList.add('bg-gray-700');
+        }
     };
     
     // Function to render messages to the DOM
@@ -642,7 +645,15 @@
 
     const switchChat = (chatId, chatName) => {
         activeChatId = chatId;
+        updateChannelUI(chatId);
+        
         if (chatNameDisplay) chatNameDisplay.textContent = chatName;
+        
+        if (chatId === 'general') {
+            publicChatBanner.classList.remove('hidden');
+        } else {
+            publicChatBanner.classList.add('hidden');
+        }
 
         if (messagesContainer) messagesContainer.innerHTML = `<div class="flex items-center justify-center h-full text-gray-400 text-lg">
           Loading messages...
@@ -663,15 +674,6 @@
         const qMessages = query(messagesCollectionRef, orderBy('timestamp'));
         messagesUnsubscribe = onSnapshot(qMessages, (querySnapshot) => {
             const fetchedMessages = [];
-            querySnapshot.docChanges().forEach((change) => {
-                const msg = { id: change.doc.id, ...change.doc.data() };
-                const isDM = activeChatId !== 'general';
-                if (change.type === "added" && currentUser && msg.userId !== currentUser.uid) {
-                    if (isDM) {
-                      sendNotification(msg.user, msg.text);
-                    }
-                }
-            });
             querySnapshot.forEach((doc) => {
                 fetchedMessages.push({ id: doc.id, ...doc.data() });
             });
@@ -711,6 +713,7 @@
           channelsList.innerHTML = '';
           
           const publicChatElement = document.createElement('div');
+          publicChatElement.id = 'channel-general'; // Add ID for updating highlight
           publicChatElement.className = `rounded-lg p-2 flex items-center justify-between cursor-pointer transition-colors duration-200 hover:bg-gray-600 mb-2 ${activeChatId === 'general' ? 'bg-gray-700' : ''}`;
           publicChatElement.onclick = () => switchChat('general', 'Public');
           publicChatElement.innerHTML = `
@@ -732,6 +735,7 @@
               }
 
               const chatElement = document.createElement('div');
+              chatElement.id = `channel-${chatId}`; // Add ID for updating highlight
               chatElement.className = `rounded-lg p-2 flex items-center justify-between cursor-pointer transition-colors duration-200 hover:bg-gray-600 mb-2 ${activeChatId === chatId ? 'bg-gray-700' : ''}`;
               chatElement.onclick = () => switchChat(chatId, chatName);
               chatElement.innerHTML = `
@@ -801,6 +805,29 @@
         userListContainer.innerHTML = '<p class="text-red-400">Failed to load users.</p>';
       }
     };
+    
+    // Set up hourly message deletion for the public chat
+    const setupHourlyDeletion = () => {
+        const deletePublicMessages = async () => {
+            const messagesRef = collection(db, `artifacts/${appId}/chats/general/messages`);
+            const q = query(messagesRef);
+            const querySnapshot = await getDocs(q);
+            
+            if (!querySnapshot.empty) {
+                const batch = writeBatch(db);
+                querySnapshot.forEach((doc) => {
+                    batch.delete(doc.ref);
+                });
+                await batch.commit();
+                console.log("Public chat messages deleted.");
+            }
+        };
+
+        // Run immediately and then every hour
+        deletePublicMessages();
+        setInterval(deletePublicMessages, 60 * 60 * 1000); // 1 hour
+    };
+
 
     if (createChatButton) {
       createChatButton.addEventListener('click', () => {
@@ -893,6 +920,7 @@
           setChatEnabled(true);
           fetchUsers(); // Call fetchUsers first
           switchChat('general', 'Public');
+          setupHourlyDeletion();
         } else {
           if (userIdDisplay) userIdDisplay.textContent = `User ID: Not Signed In`;
           if (currentUserDisplay) currentUserDisplay.textContent = `Not Signed In`;
