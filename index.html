@@ -46,7 +46,10 @@
             <span id="current-user-display" class="text-sm">Connecting...</span>
           </div>
           <h2 class="text-md font-semibold text-gray-400 mt-4 mb-2">Settings</h2>
-          <button id="delete-account-button" class="w-full px-4 py-2 bg-red-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
+          <button id="change-username-button" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            Change Username
+          </button>
+          <button id="delete-account-button" class="mt-2 w-full px-4 py-2 bg-red-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
             Delete Account
           </button>
           <button id="sign-out-button" class="mt-2 w-full px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
@@ -284,6 +287,7 @@
     const sendButton = messageForm.querySelector('button[type="submit"]');
     const signOutButton = document.getElementById('sign-out-button');
     const deleteAccountButton = document.getElementById('delete-account-button');
+    const changeUsernameButton = document.getElementById('change-username-button');
     const messageBox = document.getElementById('message-box');
     const messageText = document.getElementById('message-text');
     const confirmationModal = document.getElementById('confirmation-modal');
@@ -616,6 +620,44 @@
     if (cancelDeleteAccountButton) {
         cancelDeleteAccountButton.addEventListener('click', () => {
             if (deleteAccountModal) deleteAccountModal.classList.add('hidden');
+        });
+    }
+
+    if (changeUsernameButton) {
+        changeUsernameButton.addEventListener('click', async () => {
+            if (!currentUser) {
+                showMessage("You must be signed in to change your username.");
+                return;
+            }
+            const newUsername = prompt("Enter your new username:");
+            if (newUsername && newUsername.trim() !== '') {
+                try {
+                    await updateProfile(currentUser, { displayName: newUsername });
+                    // Update username in the users collection
+                    await setDoc(doc(db, `artifacts/${appId}/public/data/users`, currentUser.uid), { displayName: newUsername }, { merge: true });
+                    
+                    // Update messages with the old username to the new one
+                    const messagesRef = collection(db, `artifacts/${appId}/chats/general/messages`);
+                    const q = query(messagesRef, where('userId', '==', currentUser.uid));
+                    const messagesSnapshot = await getDocs(q);
+                    
+                    const batch = writeBatch(db);
+                    messagesSnapshot.forEach(doc => {
+                        batch.update(doc.ref, { user: newUsername });
+                    });
+                    await batch.commit();
+
+                    showMessage("Username updated successfully!");
+                    // Update UI
+                    if (currentUserDisplay) currentUserDisplay.textContent = `You (${newUsername})`;
+                    fetchUsers();
+                } catch (error) {
+                    console.error("Error changing username:", error);
+                    showMessage(`Failed to change username. Please try again: ${error.message}`);
+                }
+            } else if (newUsername !== null) {
+                showMessage("Username cannot be empty.");
+            }
         });
     }
 
@@ -969,26 +1011,6 @@
               
               // Apply profanity filter
               messageText = filterProfanity(messageText);
-
-              // Check for @-mentions and send notifications
-              const mentionRegex = /@(\w+)/g;
-              let match;
-              let mentionedUsernames = [];
-              while ((match = mentionRegex.exec(messageText)) !== null) {
-                  mentionedUsernames.push(match[1]);
-              }
-              
-              // Send notifications for mentions and apply cooldown
-              mentionedUsernames.forEach(username => {
-                  const mentionedUser = userList.find(user => user.displayName === username);
-                  if (mentionedUser) {
-                      const lastMentionTime = mentionCooldowns.get(mentionedUser.uid) || 0;
-                      if (Date.now() - lastMentionTime > mentionCooldownPeriod) {
-                          sendNotification(`You were mentioned by ${currentUser.displayName}`, `In a chat: ${messageText}`);
-                          mentionCooldowns.set(mentionedUser.uid, Date.now());
-                      }
-                  }
-              });
 
               try {
                 await addDoc(collection(db, `artifacts/${appId}/chats/${activeChatId}/messages`), {
