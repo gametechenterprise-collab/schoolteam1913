@@ -206,7 +206,7 @@
     // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, deleteUser, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, setDoc, doc, serverTimestamp, query, where, getDocs, onSnapshot, deleteDoc, orderBy, limit, arrayUnion } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, setDoc, doc, serverTimestamp, query, where, getDocs, onSnapshot, deleteDoc, orderBy, limit, arrayUnion, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // Global variables from the environment
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -425,7 +425,7 @@
 
     window.deleteMessage = async (msgId) => {
         try {
-            const messageRef = doc(db, `artifacts/${appId}/public/data/messages`, msgId);
+            const messageRef = doc(db, `artifacts/${appId}/chats/${activeChatId}/messages`, msgId);
             await deleteDoc(messageRef);
             showMessage("Message deleted successfully.");
         } catch (error) {
@@ -433,62 +433,40 @@
             showMessage("Failed to delete message. Please try again.");
         }
     };
-
-    window.deleteAllMyChats = async () => {
-      if (!currentUser) {
-        showMessage("You must be signed in to delete your messages.");
-        return;
-      }
-      try {
-        const messagesCollectionRef = collection(db, `artifacts/${appId}/public/data/messages`);
-        const q = query(messagesCollectionRef, where("userId", "==", currentUser.uid));
-        const querySnapshot = await getDocs(q);
-
-        if (querySnapshot.empty) {
-          showMessage("No messages to delete.");
-          return;
-        }
-
-        const deletionPromises = [];
-        querySnapshot.forEach(doc => {
-          deletionPromises.push(deleteDoc(doc.ref));
-        });
-
-        await Promise.all(deletionPromises);
-        showMessage("All of your messages have been deleted.");
-      } catch (error) {
-        console.error("Error deleting all chats:", error);
-        showMessage("Failed to delete all chats. Please try again.");
-      }
-    };
     
-    // Hide all messages from other users on a screen
-    window.hideAllOtherUsersMessages = () => {
-        if (!currentUser) {
-            showMessage("You must be signed in to use this feature.");
-            return;
+    // Function to delete all messages in the current chat
+    const deleteAllMessagesInChat = async () => {
+        try {
+            const messagesRef = collection(db, `artifacts/${appId}/chats/${activeChatId}/messages`);
+            const q = query(messagesRef);
+            const querySnapshot = await getDocs(q);
+
+            const batch = writeBatch(db);
+            querySnapshot.forEach((doc) => {
+                batch.delete(doc.ref);
+            });
+
+            await batch.commit();
+            showMessage("All messages in this chat have been deleted.");
+        } catch (error) {
+            console.error("Error deleting all messages:", error);
+            showMessage("Failed to delete all messages. Please try again.");
         }
-        const messagesCollectionRef = collection(db, `artifacts/${appId}/public/data/messages`);
-        const q = query(messagesCollectionRef, where("userId", "!=", currentUser.uid));
-        const unsubscribe = onSnapshot(q, (querySnapshot) => {
-            const otherUsersMessages = [];
-            querySnapshot.forEach(doc => {
-                otherUsersMessages.push({ id: doc.id, ...doc.data() });
-            });
-            const hiddenMessages = otherUsersMessages.map(msg => msg.id);
-            localStorage.setItem('hiddenMessages', JSON.stringify(hiddenMessages));
-            unsubscribe();
-            const allMessages = messagesContainer.querySelectorAll('[id^="message-"]');
-            allMessages.forEach(msgElement => {
-                const msgId = msgElement.id.split('-')[1];
-                if (hiddenMessages.includes(msgId)) {
-                    msgElement.remove();
-                }
-            });
+    };
+
+    if (confirmAllDeleteButton) {
+        confirmAllDeleteButton.addEventListener('click', () => {
+            deleteAllMessagesInChat();
+            if (allChatsConfirmationModal) allChatsConfirmationModal.classList.add('hidden');
         });
-        showMessage("All messages from other users have been hidden from your view.");
     }
 
+    if (cancelAllDeleteButton) {
+        cancelAllDeleteButton.addEventListener('click', () => {
+            if (allChatsConfirmationModal) allChatsConfirmationModal.classList.add('hidden');
+        });
+    }
+    
     window.deleteAccount = async () => {
         if (!currentUser) {
             showMessage("You must be signed in to delete your account.");
@@ -542,7 +520,7 @@
 
     if (confirmAllDeleteButton) {
         confirmAllDeleteButton.addEventListener('click', () => {
-            deleteAllMyChats();
+            deleteAllMessagesInChat();
             if (allChatsConfirmationModal) allChatsConfirmationModal.classList.add('hidden');
         });
     }
@@ -876,6 +854,12 @@
           messageForm.addEventListener('submit', async (e) => {
               e.preventDefault();
               const messageText = messageInput.value.trim();
+
+              if (messageText.toLowerCase() === '/delete messages') {
+                e.target.reset();
+                if (allChatsConfirmationModal) allChatsConfirmationModal.classList.remove('hidden');
+                return;
+              }
 
               if (messageText === '' || !currentUser || !currentUser.displayName) {
                 return;
