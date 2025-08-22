@@ -473,16 +473,31 @@
             return;
         }
         try {
-            const messagesCollectionRef = collection(db, `artifacts/${appId}/public/data/messages`);
-            const q = query(messagesCollectionRef, where("userId", "==", currentUser.uid));
-            const querySnapshot = await getDocs(q);
+            const userChatsRef = collection(db, `artifacts/${appId}/chats`);
+            const qChats = query(userChatsRef, where('participants', 'array-contains', currentUser.uid));
+            const chatsSnapshot = await getDocs(qChats);
+            
             const deletionPromises = [];
-            querySnapshot.forEach(doc => {
-                deletionPromises.push(deleteDoc(doc.ref));
+            
+            chatsSnapshot.forEach(chatDoc => {
+                // Delete messages subcollection
+                const messagesRef = collection(db, `artifacts/${appId}/chats/${chatDoc.id}/messages`);
+                const qMessages = query(messagesRef);
+                getDocs(qMessages).then(messagesSnapshot => {
+                    messagesSnapshot.forEach(messageDoc => {
+                        deletionPromises.push(deleteDoc(messageDoc.ref));
+                    });
+                });
+                // Delete the chat document itself
+                deletionPromises.push(deleteDoc(chatDoc.ref));
             });
+
             await Promise.all(deletionPromises);
+            
+            // Finally, delete the user's public user data and the user account itself
+            await deleteDoc(doc(db, `artifacts/${appId}/public/data/users`, currentUser.uid));
             await deleteUser(currentUser);
-            showMessage("Account and all associated messages deleted successfully.");
+            showMessage("Account and all associated data deleted successfully.");
         } catch (error) {
             console.error("Error deleting account:", error);
             showMessage(`Failed to delete account. Please try again: ${error.message}`);
@@ -715,22 +730,22 @@
       });
     };
 
-    const fetchUsers = () => {
+    const fetchUsers = async () => {
+      if (!currentUser) return;
       if (usersUnsubscribe) {
         usersUnsubscribe();
       }
+      userListContainer.innerHTML = '<p class="text-gray-400">Loading users...</p>';
       const usersCollectionRef = collection(db, `artifacts/${appId}/public/data/users`);
-      usersUnsubscribe = onSnapshot(usersCollectionRef, (querySnapshot) => {
-        userList = [];
-        querySnapshot.forEach(doc => {
-          const user = doc.data();
-          userList.push({ uid: doc.id, displayName: user.displayName });
-        });
-        getAndRenderChats(); // Call renderChats after fetching users
-      }, (error) => {
+      try {
+        const querySnapshot = await getDocs(usersCollectionRef);
+        userList = querySnapshot.docs.map(doc => ({ uid: doc.id, displayName: doc.data().displayName }));
+        renderUserList(userList);
+        getAndRenderChats();
+      } catch (error) {
         console.error("Error fetching users:", error);
         userListContainer.innerHTML = '<p class="text-red-400">Failed to load users.</p>';
-      });
+      }
     };
 
     if (createChatButton) {
