@@ -734,19 +734,15 @@
     const createNewChat = async () => {
       try {
         const chatName = groupChatNameInput.value.trim();
-        const chatPassword = groupChatPasswordInput.value.trim();
+        const chatCode = Math.floor(10000000 + Math.random() * 90000000).toString();
 
-        if (chatName === '' || chatPassword === '') {
-          showMessage("Please enter a group chat name and password.");
+        if (chatName === '') {
+          showMessage("Please enter a group chat name.");
           return;
         }
-        
-        // Generate a random 8-digit code
-        const chatCode = Math.floor(10000000 + Math.random() * 90000000).toString();
 
         await addDoc(collection(db, `artifacts/${appId}/public/data/chats`), {
           name: chatName,
-          password: chatPassword,
           code: chatCode,
           members: [currentUser.uid],
           createdAt: serverTimestamp()
@@ -755,7 +751,6 @@
         showMessage(`Chat "${chatName}" created successfully! Your join code is: ${chatCode}`);
         if (createChatModal) createChatModal.classList.add('hidden');
         groupChatNameInput.value = '';
-        groupChatPasswordInput.value = '';
         if (chatCodeDisplay) chatCodeDisplay.textContent = '';
       } catch (error) {
         console.error("Error creating new chat:", error);
@@ -969,6 +964,45 @@
               if (toggleAuthModeButton) toggleAuthModeButton.textContent = 'Already have an account? Sign In';
             }
           });
+      }
+      
+      if (createChatButton) {
+          createChatButton.addEventListener('click', () => {
+              if (createChatModal) createChatModal.classList.remove('hidden');
+              if (chatCodeDisplay) chatCodeDisplay.textContent = Math.floor(10000000 + Math.random() * 90000000).toString();
+          });
+      }
+
+      if (cancelCreateChatButton) {
+          cancelCreateChatButton.addEventListener('click', () => {
+              if (createChatModal) createChatModal.classList.add('hidden');
+          });
+      }
+      
+      if (createChatForm) {
+          createChatForm.addEventListener('submit', async (e) => {
+              e.preventDefault();
+              createNewChat();
+          });
+      }
+
+      if (joinChatButton) {
+          joinChatButton.addEventListener('click', () => {
+            if (joinChatModal) joinChatModal.classList.remove('hidden');
+          });
+      }
+
+      if (joinChatForm) {
+        joinChatForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          joinChat();
+        });
+      }
+
+      if (cancelJoinChatButton) {
+        cancelJoinChatButton.addEventListener('click', () => {
+          if (joinChatModal) joinChatModal.classList.add('hidden');
+        });
       }
     };
   </script>
