@@ -42,13 +42,14 @@
         <div class="p-4">
           <h2 class="text-md font-semibold text-gray-400 mb-2">Channels</h2>
           <div id="channels-list">
-             <div class="rounded-lg bg-gray-700 p-2 flex items-center justify-between cursor-pointer transition-colors duration-200 hover:bg-gray-600">
-              <div class="flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-gray-400 mr-2"><line x1="4" x2="20" y1="9" y2="9"></line><line x1="4" x2="20" y1="15" y2="15"></line><line x1="10" x2="14" y1="3" y2="21"></line><line x1="10" x2="14" y1="3" y2="21"></line></svg>
-                <span class="text-sm">public</span>
-              </div>
-            </div>
+             <!-- Chats will be rendered here by JavaScript -->
           </div>
+          <button id="create-chat-button" class="mt-4 w-full px-4 py-2 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            + New Chat
+          </button>
+          <button id="join-chat-button" class="mt-2 w-full px-4 py-2 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            Join Chat
+          </button>
         </div>
         <div class="p-4 border-t border-gray-700">
           <h2 class="text-md font-semibold text-gray-400 mb-2">Users</h2>
@@ -69,6 +70,10 @@
 
       <!-- Main Chat Content -->
       <div class="flex-1 flex flex-col">
+        <!-- Chat header (for private chats) -->
+        <div id="chat-header" class="bg-gray-800 p-4 border-b border-gray-700 flex items-center justify-between hidden">
+          <h2 id="chat-name" class="text-xl font-bold"></h2>
+        </div>
         <!-- Messages Area -->
         <div id="messages-container" class="flex-1 p-4 overflow-y-auto space-y-4">
           <div class="flex items-center justify-center h-full text-gray-400 text-lg">
@@ -85,7 +90,7 @@
             <input
               id="message-input"
               type="text"
-              placeholder="Message #public"
+              placeholder="Message"
               class="flex-1 p-3 text-sm rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
             />
             <button
@@ -187,11 +192,46 @@
     </div>
   </div>
 
+  <!-- Create Chat Modal -->
+  <div id="create-chat-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
+    <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-lg">
+      <h2 id="create-chat-title" class="text-xl font-bold text-white mb-4">New Direct Message</h2>
+      <form id="create-chat-form">
+        <div id="user-search-container" class="mb-4">
+            <input
+              type="text"
+              id="user-search-input"
+              placeholder="Search for users"
+              class="w-full p-3 text-sm rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
+            />
+        </div>
+        <div id="group-chat-name-field" class="mb-4 hidden">
+            <input
+              type="text"
+              id="group-chat-name-input"
+              placeholder="Group chat name"
+              class="w-full p-3 text-sm rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
+            />
+        </div>
+        <div id="user-list-container" class="max-h-48 overflow-y-auto bg-gray-700 rounded-lg p-2 mb-4">
+          <p class="text-gray-400">Loading users...</p>
+        </div>
+        <div class="flex justify-end space-x-4">
+            <button type="button" id="cancel-create-chat" class="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-700">Cancel</button>
+            <button type="submit" id="create-chat-submit-button" class="px-4 py-2 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed">
+                Create Chat
+            </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Firebase CDN links -->
   <script type="module">
     // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, deleteUser, EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, setDoc, doc, serverTimestamp, query, where, getDocs, onSnapshot, deleteDoc, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, deleteUser, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, setDoc, doc, serverTimestamp, query, where, getDocs, onSnapshot, deleteDoc, orderBy, limit, arrayUnion } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // Global variables from the environment
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -234,7 +274,7 @@
     const usernameField = document.getElementById('username-field');
     const toggleAuthModeButton = document.getElementById('toggle-auth-mode');
     const typingStatusDisplay = document.getElementById('typing-status');
-    const sendButton = messageForm?.querySelector('button[type="submit"]');
+    const sendButton = messageForm.querySelector('button[type="submit"]');
     const signOutButton = document.getElementById('sign-out-button');
     const deleteAccountButton = document.getElementById('delete-account-button');
     const messageBox = document.getElementById('message-box');
@@ -245,15 +285,38 @@
     const allChatsConfirmationModal = document.getElementById('all-chats-confirmation-modal');
     const confirmAllDeleteButton = document.getElementById('confirm-all-delete');
     const cancelAllDeleteButton = document.getElementById('cancel-all-delete');
+    const deleteOtherMessagesButton = document.getElementById('delete-other-messages-button');
+    const deleteMyChatsButton = document.getElementById('delete-my-chats-button');
     const channelMenu = document.getElementById('channel-menu');
     const deleteAccountModal = document.getElementById('delete-account-modal');
     const confirmDeleteAccountButton = document.getElementById('confirm-delete-account');
     const cancelDeleteAccountButton = document.getElementById('cancel-delete-account');
-    
+    const createChatButton = document.getElementById('create-chat-button');
+    const createChatModal = document.getElementById('create-chat-modal');
+    const createChatForm = document.getElementById('create-chat-form');
+    const userSearchInput = document.getElementById('user-search-input');
+    const userListContainer = document.getElementById('user-list-container');
+    const createChatSubmitButton = document.getElementById('create-chat-submit-button');
+    const cancelCreateChatButton = document.getElementById('cancel-create-chat');
+    const chatHeader = document.getElementById('chat-header');
+    const chatNameDisplay = document.getElementById('chat-name');
+    const channelsList = document.getElementById('channels-list');
+    const groupChatNameField = document.getElementById('group-chat-name-field');
+    const groupChatNameInput = document.getElementById('group-chat-name-input');
+
+
     let currentUser = null;
     let authMode = 'signup'; // 'signup' or 'signin'
     let isTypingTimeout = null;
     let messageToDeleteId = null;
+    let activeChatId = 'general';
+    let userList = [];
+    let selectedUsers = [];
+    let usersUnsubscribe = null;
+    let chatsUnsubscribe = null;
+    let messagesUnsubscribe = null;
+    let typingUnsubscribe = null;
+
 
     // Show a custom message box
     function showMessage(msg) {
@@ -270,7 +333,7 @@
       if (messageInput) messageInput.disabled = !enabled;
       if (sendButton) sendButton.disabled = !enabled;
       if (enabled) {
-        if (messageInput) messageInput.placeholder = "Message #public";
+        if (messageInput) messageInput.placeholder = "Message #general";
       } else {
         if (messageInput) messageInput.placeholder = "Please sign in to chat...";
       }
@@ -278,16 +341,20 @@
     
     // Function to render messages to the DOM
     const renderMessages = (messages) => {
+      // Get the list of hidden message IDs from local storage
       const hiddenMessages = JSON.parse(localStorage.getItem('hiddenMessages')) || [];
+      
       if (!messagesContainer) return;
 
       messagesContainer.innerHTML = '';
       messages.forEach(msg => {
+        // Skip rendering the message if its ID is in the hiddenMessages list
         if (hiddenMessages.includes(msg.id)) {
             return;
         }
+
         const messageElement = document.createElement('div');
-        messageElement.id = `message-${msg.id}`; 
+        messageElement.id = `message-${msg.id}`; // Add an ID to the message element
         messageElement.className = "flex items-start group relative";
         
         const avatarChar = msg.user ? msg.user.charAt(0).toUpperCase() : 'U';
@@ -332,11 +399,12 @@
         `;
         messagesContainer.appendChild(messageElement);
       });
+      // Scroll to the bottom of the chat container
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
     };
     
     // Global functions to be called from inline HTML
-    window.toggleMenu = (event, msgId) => {
+    window.toggleMenu = (event, msgId, isSelf) => {
         event.stopPropagation();
         const menu = document.getElementById(`menu-${msgId}`);
         if (menu) {
@@ -346,18 +414,17 @@
 
     window.toggleChannelMenu = (event) => {
         event.stopPropagation();
-        const menu = document.getElementById('channel-menu');
-        if (menu) {
-            menu.classList.toggle('hidden');
+        if (channelMenu) {
+            channelMenu.classList.toggle('hidden');
         }
     };
-    
+
     window.showConfirmationModal = (msgId) => {
         messageToDeleteId = msgId;
-        const modal = document.getElementById('confirmation-modal');
-        if (modal) {
-            modal.classList.remove('hidden');
+        if (confirmationModal) {
+            confirmationModal.classList.remove('hidden');
         }
+        // Hide all other menus
         document.querySelectorAll('[id^="menu-"]').forEach(menu => {
             if (!menu.classList.contains('hidden')) {
                 menu.classList.add('hidden');
@@ -365,10 +432,15 @@
         });
     };
     
+    // Function to hide a message from the user's view
     window.hideMessageForUser = (msgId) => {
+        // Get existing hidden messages, or an empty array if none exist
         const hiddenMessages = JSON.parse(localStorage.getItem('hiddenMessages')) || [];
+        // Add the new message ID to the list
         hiddenMessages.push(msgId);
+        // Save the updated list to local storage
         localStorage.setItem('hiddenMessages', JSON.stringify(hiddenMessages));
+        // Remove the message element from the DOM
         const messageElement = document.getElementById(`message-${msgId}`);
         if (messageElement) {
             messageElement.remove();
@@ -415,6 +487,7 @@
       }
     };
     
+    // Hide all messages from other users on a screen
     window.hideAllOtherUsersMessages = () => {
         if (!currentUser) {
             showMessage("You must be signed in to use this feature.");
