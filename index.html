@@ -1,4 +1,4 @@
-/<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -652,10 +652,9 @@
         });
         if (messageInput) messageInput.placeholder = `Message ${chatName}`;
     };
-
-    const renderChats = async () => {
+    
+    const getAndRenderChats = () => {
       if (!currentUser) return;
-
       if (chatsUnsubscribe) {
           chatsUnsubscribe();
       }
@@ -752,7 +751,7 @@
           const user = doc.data();
           userList.push({ uid: doc.id, displayName: user.displayName });
         });
-        renderUserList(userList);
+        getAndRenderChats(); // Call renderChats after fetching users
       }, (error) => {
         console.error("Error fetching users:", error);
         userListContainer.innerHTML = '<p class="text-red-400">Failed to load users.</p>';
@@ -848,7 +847,7 @@
           if (currentUserDisplay) currentUserDisplay.textContent = `You (${user.displayName || 'guest'})`;
           if (authModal) authModal.classList.add('hidden');
           setChatEnabled(true);
-          renderChats();
+          fetchUsers(); // Call fetchUsers first
           switchChat('general', 'Public');
         } else {
           if (userIdDisplay) userIdDisplay.textContent = `User ID: Not Signed In`;
