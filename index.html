@@ -1,4 +1,4 @@
-/<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -228,10 +228,12 @@
       'nigga', 'nigger', 'cuck', 'slut', 'fucking', 'fucker', 'retard', 'faggot', 'chink', 'gook', 'kike'
     ];
     
+    // Tracks the last mention time for each user to prevent spam
+    const mentionCooldowns = new Map();
+    const mentionCooldownPeriod = 10000; // 10 seconds in milliseconds
+
     // Function to create a more flexible regex pattern for a single word
     function createProfanityRegex(word) {
-      // Create a pattern that allows one or more of each character, separated by an optional word boundary or any character, and allows for optional whitespace.
-      // E.g., 'retard' becomes 'r+e+t+a+r+d+'
       const pattern = word.split('').map(char => `${char}+`).join('');
       return new RegExp(pattern, 'gi');
     }
@@ -663,8 +665,11 @@
             const fetchedMessages = [];
             querySnapshot.docChanges().forEach((change) => {
                 const msg = { id: change.doc.id, ...change.doc.data() };
+                const isDM = activeChatId !== 'general';
                 if (change.type === "added" && currentUser && msg.userId !== currentUser.uid) {
-                    sendNotification(msg.user, msg.text);
+                    if (isDM) {
+                      sendNotification(msg.user, msg.text);
+                    }
                 }
             });
             querySnapshot.forEach((doc) => {
@@ -936,6 +941,26 @@
               
               // Apply profanity filter
               messageText = filterProfanity(messageText);
+
+              // Check for @-mentions and send notifications
+              const mentionRegex = /@(\w+)/g;
+              let match;
+              let mentionedUsernames = [];
+              while ((match = mentionRegex.exec(messageText)) !== null) {
+                  mentionedUsernames.push(match[1]);
+              }
+              
+              // Send notifications for mentions and apply cooldown
+              mentionedUsernames.forEach(username => {
+                  const mentionedUser = userList.find(user => user.displayName === username);
+                  if (mentionedUser) {
+                      const lastMentionTime = mentionCooldowns.get(mentionedUser.uid) || 0;
+                      if (Date.now() - lastMentionTime > mentionCooldownPeriod) {
+                          sendNotification(`You were mentioned by ${currentUser.displayName}`, `In a chat: ${messageText}`);
+                          mentionCooldowns.set(mentionedUser.uid, Date.now());
+                      }
+                  }
+              });
 
               try {
                 await addDoc(collection(db, `artifacts/${appId}/chats/${activeChatId}/messages`), {
