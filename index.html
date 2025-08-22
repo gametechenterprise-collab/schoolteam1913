@@ -38,9 +38,6 @@
           <button id="create-chat-button" class="mt-4 w-full px-4 py-2 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
             + New Chat
           </button>
-          <button id="join-chat-button" class="mt-2 w-full px-4 py-2 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            Join Chat
-          </button>
         </div>
         <div class="p-4 border-t border-gray-700">
           <h2 class="text-md font-semibold text-gray-400 mb-2">Users</h2>
@@ -359,7 +356,7 @@
             <div class="absolute inset-y-0 ${isSelf ? 'left-0' : 'right-0'} flex items-center pr-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <div class="relative">
                     <button class="flex items-center text-gray-400 hover:text-white focus:outline-none" onclick="toggleMenu(event, '${msg.id}', ${isSelf})">
-                        <svg xmlns="http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='h-5 w-5'><circle cx='12' cy='12' r='1'></circle><circle cx='19' cy='12' r='1'></circle><circle cx='5' cy='12' r='1'></circle></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
                     </button>
                     <div id="menu-${msg.id}" class="absolute ${isSelf ? 'left-6' : 'right-6'} top-1/2 -translate-y-1/2 w-48 bg-gray-700 rounded-md shadow-lg py-1 z-10 hidden">
                         ${isSelf ? `
