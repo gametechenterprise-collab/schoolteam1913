@@ -1,4 +1,4 @@
-/<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -223,15 +223,18 @@
     };
 
     // Profanity list for filtering
-    const profanityList = ['fuck', 'shit', 'cunt', 'bitch', 'asshole', 'bastard', 'dick', 'pussy', 'whore'];
+    const profanityList = [
+      'fuck', 'shit', 'cunt', 'bitch', 'asshole', 'bastard', 'dick', 'pussy', 'whore',
+      'nigga', 'nigger', 'cuck', 'slut', 'fucking', 'fucker', 'retard'
+    ];
 
     // Function to filter out profanity
     function filterProfanity(message) {
       let filteredMessage = message;
-      profanityList.forEach(word => {
-        const regex = new RegExp(`\\b${word}\\b`, 'gi');
-        filteredMessage = filteredMessage.replace(regex, '****');
-      });
+      // Using a regex to match the words, including variations like repeated letters (e.g., ffuckk)
+      // and checking for them within other words
+      const pattern = new RegExp(`(${profanityList.join('|')})`, 'gi');
+      filteredMessage = filteredMessage.replace(pattern, '****');
       return filteredMessage;
     }
 
@@ -305,6 +308,8 @@
     let chatsUnsubscribe = null;
     let messagesUnsubscribe = null;
     let typingUnsubscribe = null;
+    let canSendMessage = true;
+    const cooldownPeriod = 5000; // 5 seconds in milliseconds
 
 
     // Show a custom message box
@@ -884,6 +889,11 @@
               e.preventDefault();
               let messageText = messageInput.value.trim();
 
+              if (!canSendMessage) {
+                showMessage("Please wait before sending another message.");
+                return;
+              }
+
               if (messageText.toLowerCase() === '/delete messages') {
                 e.target.reset();
                 if (allChatsConfirmationModal) allChatsConfirmationModal.classList.remove('hidden');
@@ -906,6 +916,13 @@
                 });
                 messageInput.value = '';
                 await updateTypingStatus(false);
+                
+                // Start cooldown
+                canSendMessage = false;
+                setTimeout(() => {
+                  canSendMessage = true;
+                }, cooldownPeriod);
+
               } catch (error) {
                 showMessage("Failed to send message. Please try again.");
               }
