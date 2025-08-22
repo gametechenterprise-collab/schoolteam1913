@@ -65,6 +65,17 @@
     .slider.round:before {
       border-radius: 50%;
     }
+
+    /* New styles for menu visibility */
+    body.sidebar-open #menu-toggle {
+        display: none;
+    }
+    body.sidebar-open #close-menu-toggle {
+        display: block;
+    }
+    #close-menu-toggle {
+        display: none;
+    }
   </style>
 </head>
 <body class="bg-gray-900 text-gray-100 h-screen flex flex-col transition-colors duration-300">
@@ -1263,12 +1274,14 @@
       if (menuToggle) {
           menuToggle.addEventListener('click', () => {
               sidebar.classList.remove('-translate-x-full');
+              document.body.classList.add('sidebar-open');
           });
       }
 
       if (closeMenuToggle) {
           closeMenuToggle.addEventListener('click', () => {
               sidebar.classList.add('-translate-x-full');
+              document.body.classList.remove('sidebar-open');
           });
       }
     };
