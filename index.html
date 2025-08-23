@@ -129,35 +129,6 @@
         </div>
         <div id="chat-header" class="bg-gray-800 p-4 border-b border-gray-700 flex items-center justify-between hidden">
           <h2 id="chat-name" class="text-xl font-bold"></h2>
-          <div class="relative">
-            <button
-              type="button"
-              id="chat-actions-button"
-              class="p-2 text-gray-400 hover:text-white rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
-            </button>
-            <div id="chat-actions-menu" class="absolute top-12 right-0 w-48 bg-gray-700 rounded-md shadow-lg py-1 z-10 hidden">
-              <button id="join-facetime-button" class="block px-4 py-2 text-sm text-white hover:bg-gray-600 w-full text-left">
-                <div class="flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-green-400"><path d="M12 21.5V10l-4 4-4-4V2.5A1.5 1.5 0 0 1 6.5 1h11A1.5 1.5 0 0 1 19 2.5V10l-4 4-4-4v11.5z"></path></svg>
-                  Join a Facetime
-                </div>
-              </button>
-              <button id="add-user-button" class="block px-4 py-2 text-sm text-white hover:bg-gray-600 w-full text-left hidden">
-                <div class="flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-blue-400"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><path d="M20 8v6M23 11h-6"></path></svg>
-                  Add User
-                </div>
-              </button>
-              <button id="leave-chat-button" class="block px-4 py-2 text-sm text-red-400 hover:bg-gray-600 w-full text-left hidden">
-                <div class="flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-red-400"><path d="M16 16v1a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h14l-4 4-4-4"></path><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V3a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                  Leave Chat
-                </div>
-              </button>
-            </div>
-          </div>
         </div>
         <div id="messages-container" class="flex-1 p-4 overflow-y-auto space-y-4">
           <div class="flex items-center justify-center h-full text-gray-400 text-lg">
@@ -169,6 +140,23 @@
 
         <form id="message-form" class="p-4 border-t border-gray-700 bg-gray-800 hidden">
           <div class="flex items-end space-x-2">
+            <div class="relative flex items-center self-end">
+              <button
+                type="button"
+                id="three-dots-button"
+                class="p-2 text-gray-400 hover:text-white rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+              </button>
+              <div id="facetime-menu" class="absolute bottom-12 left-0 w-48 bg-gray-700 rounded-md shadow-lg py-1 z-10 hidden">
+                <button id="join-facetime-button" class="block px-4 py-2 text-sm text-white hover:bg-gray-600 w-full text-left">
+                  <div class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-green-400"><path d="M12 21.5V10l-4 4-4-4V2.5A1.5 1.5 0 0 1 6.5 1h11A1.5 1.5 0 0 1 19 2.5V10l-4 4-4-4v11.5z"></path></svg>
+                    Join a Facetime
+                  </div>
+                </button>
+              </div>
+            </div>
             <input
               id="message-input"
               type="text"
@@ -301,48 +289,12 @@
       </form>
     </div>
   </div>
-
-  <div id="leave-chat-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
-    <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-sm">
-      <h2 class="text-xl font-bold text-white mb-4">Leave Chat</h2>
-      <p id="leave-chat-message" class="text-gray-300 mb-6">Are you sure you want to leave this chat? You will be removed and will lose access to the chat history.</p>
-      <div class="flex justify-end space-x-4">
-        <button id="cancel-leave-chat" class="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-700">Cancel</button>
-        <button id="confirm-leave-chat" class="px-4 py-2 bg-red-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-red-700">Leave</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="add-user-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
-    <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-lg">
-      <h2 class="text-xl font-bold text-white mb-4">Add User to Chat</h2>
-      <form id="add-user-form">
-        <div id="add-user-search-container" class="mb-4">
-            <input
-              type="text"
-              id="add-user-search-input"
-              placeholder="Search for users"
-              class="w-full p-3 text-sm rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
-            />
-        </div>
-        <div id="add-user-list-container" class="max-h-48 overflow-y-auto bg-gray-700 rounded-lg p-2 mb-4">
-          <p class="text-gray-400">Loading users...</p>
-        </div>
-        <div class="flex justify-end space-x-4">
-            <button type="button" id="cancel-add-user" class="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-700">Cancel</button>
-            <button type="submit" id="add-user-submit-button" class="px-4 py-2 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed">
-              Add User
-            </button>
-        </div>
-      </form>
-    </div>
-  </div>
   
   <script type="module">
     // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, deleteUser, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, setDoc, doc, serverTimestamp, query, where, getDocs, onSnapshot, deleteDoc, orderBy, limit, arrayUnion, writeBatch, getDoc, updateDoc, arrayRemove } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, setDoc, doc, serverTimestamp, query, where, getDocs, onSnapshot, deleteDoc, orderBy, limit, arrayUnion, writeBatch, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // Global variables from the environment
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -443,29 +395,16 @@
     const publicChatBanner = document.getElementById('public-chat-banner');
     const themeToggle = document.getElementById('theme-toggle');
     const profanityFilterToggle = document.getElementById('profanity-filter-toggle');
-
-    const chatActionsButton = document.getElementById('chat-actions-button');
-    const chatActionsMenu = document.getElementById('chat-actions-menu');
+    const threeDotsButton = document.getElementById('three-dots-button');
+    const facetimeMenu = document.getElementById('facetime-menu');
     const joinFacetimeButton = document.getElementById('join-facetime-button');
-    const addUserButton = document.getElementById('add-user-button');
-    const leaveChatButton = document.getElementById('leave-chat-button');
-    const leaveChatModal = document.getElementById('leave-chat-modal');
-    const leaveChatMessage = document.getElementById('leave-chat-message');
-    const confirmLeaveChatButton = document.getElementById('confirm-leave-chat');
-    const cancelLeaveChatButton = document.getElementById('cancel-leave-chat');
-    const addUserModal = document.getElementById('add-user-modal');
-    const addUserForm = document.getElementById('add-user-form');
-    const addUserSearchInput = document.getElementById('add-user-search-input');
-    const addUserListContainer = document.getElementById('add-user-list-container');
-    const addUserSubmitButton = document.getElementById('add-user-submit-button');
-    const cancelAddUserButton = document.getElementById('cancel-add-user');
+
 
     let currentUser = null;
     let authMode = 'signup'; // 'signup' or 'signin'
     let isTypingTimeout = null;
     let messageToDeleteId = null;
     let activeChatId = 'general';
-    let activeChatData = null; // Store active chat data
     let userList = [];
     let selectedUsers = [];
     let usersUnsubscribe = null;
@@ -726,8 +665,8 @@
         if (channelMenu && !channelMenu.classList.contains('hidden')) {
             channelMenu.classList.add('hidden');
         }
-        if (chatActionsMenu && !chatActionsMenu.contains(e.target) && e.target !== chatActionsButton) {
-            chatActionsMenu.classList.add('hidden');
+        if (facetimeMenu && !facetimeMenu.contains(e.target) && e.target !== threeDotsButton) {
+            facetimeMenu.classList.add('hidden');
         }
     });
 
@@ -876,28 +815,8 @@
         
         if (chatId === 'general') {
             publicChatBanner.classList.remove('hidden');
-            chatActionsButton.classList.add('hidden');
-            addUserButton.classList.add('hidden');
-            leaveChatButton.classList.add('hidden');
         } else {
             publicChatBanner.classList.add('hidden');
-            chatActionsButton.classList.remove('hidden');
-            joinFacetimeButton.classList.remove('hidden');
-            leaveChatButton.classList.remove('hidden');
-            // Check chat data to show or hide add user button
-            const chatRef = doc(db, `artifacts/${appId}/chats`, chatId);
-            getDoc(chatRef).then(chatDoc => {
-              if (chatDoc.exists()) {
-                activeChatData = chatDoc.data();
-                if (activeChatData.type === 'group') {
-                  addUserButton.classList.remove('hidden');
-                } else {
-                  addUserButton.classList.add('hidden');
-                }
-              } else {
-                addUserButton.classList.add('hidden');
-              }
-            });
         }
 
         if (messagesContainer) messagesContainer.innerHTML = `<div class="flex items-center justify-center h-full text-gray-400 text-lg">
@@ -961,7 +880,7 @@
       const chatsCollectionRef = collection(db, `artifacts/${appId}/chats`);
       const qChats = query(chatsCollectionRef, where('participants', 'array-contains', currentUser.uid));
       
-      chatsUnsubscribe = onSnapshot(qChats, async (querySnapshot) => {
+      chatsUnsubscribe = onSnapshot(qChats, (querySnapshot) => {
           if (!channelsList) return;
           channelsList.innerHTML = '';
           
@@ -977,12 +896,11 @@
           `;
           channelsList.appendChild(publicChatElement);
 
-          for (const doc of querySnapshot.docs) {
+          querySnapshot.forEach(doc => {
               const chat = doc.data();
               const chatId = doc.id;
               let chatName = chat.name || 'Group Chat';
-
-              if (chat.type === 'direct_message') {
+              if (chat.type === 'direct_message' && chat.participants.length === 2) {
                   const otherUserId = chat.participants.find(uid => uid !== currentUser.uid);
                   const otherUser = userList.find(u => u.uid === otherUserId);
                   chatName = otherUser ? otherUser.displayName : 'Direct Message';
@@ -999,17 +917,17 @@
                   </div>
               `;
               channelsList.appendChild(chatElement);
-          }
+          });
       }, (error) => {
           console.error("Error fetching chats:", error);
           showMessage("Failed to load your chats.");
       });
     };
 
-    const renderUserList = (users, container, checkboxHandler) => {
-      container.innerHTML = '';
+    const renderUserList = (users) => {
+      userListContainer.innerHTML = '';
       if (users.length === 0) {
-        container.innerHTML = '<p class="text-gray-400">No users found.</p>';
+        userListContainer.innerHTML = '<p class="text-gray-400">No users found.</p>';
         return;
       }
       users.forEach(user => {
@@ -1023,48 +941,40 @@
           </div>
           <input type="checkbox" data-uid="${user.uid}" data-name="${user.displayName}" class="form-checkbox h-4 w-4 text-indigo-600 bg-gray-700 rounded border-gray-600 focus:ring-indigo-500">
         `;
-        const checkbox = userItem.querySelector('input[type="checkbox"]');
-        checkbox.addEventListener('change', checkboxHandler);
-        container.appendChild(userItem);
-      });
-    };
-
-    const fetchUsers = async (searchInput, userContainer, isAdding) => {
-      if (!currentUser) return;
-      userContainer.innerHTML = '<p class="text-gray-400">Loading users...</p>';
-      const usersCollectionRef = collection(db, `artifacts/${appId}/public/data/users`);
-      try {
-        const querySnapshot = await getDocs(usersCollectionRef);
-        let allUsers = querySnapshot.docs.map(doc => ({ uid: doc.id, displayName: doc.data().displayName }));
-        userList = allUsers;
-
-        if (isAdding && activeChatData) {
-          allUsers = allUsers.filter(user => !activeChatData.participants.includes(user.uid));
-        }
-
-        renderUserList(allUsers, userContainer, (e) => {
+        userItem.querySelector('input[type="checkbox"]').addEventListener('change', (e) => {
             const uid = e.target.dataset.uid;
             const name = e.target.dataset.name;
             if (e.target.checked) {
-              selectedUsers.push({ uid, displayName: name });
+                selectedUsers.push({ uid, displayName: name });
             } else {
-              selectedUsers = selectedUsers.filter(u => u.uid !== uid);
+                selectedUsers = selectedUsers.filter(u => u.uid !== uid);
             }
-            if (!isAdding && selectedUsers.length > 1) {
+            // Logic to show group name field
+            if (selectedUsers.length > 1) {
               groupChatNameField.classList.remove('hidden');
-            } else if (!isAdding) {
+            } else {
               groupChatNameField.classList.add('hidden');
             }
-            if (isAdding) {
-              addUserSubmitButton.disabled = selectedUsers.length === 0;
-            } else {
-              createChatSubmitButton.disabled = selectedUsers.length === 0 && selectedUsers.length < 2;
-            }
         });
+        userListContainer.appendChild(userItem);
+      });
+    };
+
+    const fetchUsers = async () => {
+      if (!currentUser) return;
+      if (usersUnsubscribe) {
+        usersUnsubscribe();
+      }
+      userListContainer.innerHTML = '<p class="text-gray-400">Loading users...</p>';
+      const usersCollectionRef = collection(db, `artifacts/${appId}/public/data/users`);
+      try {
+        const querySnapshot = await getDocs(usersCollectionRef);
+        userList = querySnapshot.docs.map(doc => ({ uid: doc.id, displayName: doc.data().displayName }));
+        renderUserList(userList);
         getAndRenderChats();
       } catch (error) {
         console.error("Error fetching users:", error);
-        userContainer.innerHTML = '<p class="text-red-400">Failed to load users.</p>';
+        userListContainer.innerHTML = '<p class="text-red-400">Failed to load users.</p>';
       }
     };
     
@@ -1090,48 +1000,6 @@
         setInterval(deletePublicMessages, 60 * 60 * 1000); // 1 hour
     };
 
-    const leaveChat = async (chatId) => {
-        try {
-            const chatRef = doc(db, `artifacts/${appId}/chats`, chatId);
-            const chatDoc = await getDoc(chatRef);
-            if (!chatDoc.exists()) {
-                showMessage("Chat does not exist.");
-                return;
-            }
-            const chatData = chatDoc.data();
-            const newParticipants = chatData.participants.filter(uid => uid !== currentUser.uid);
-
-            if (newParticipants.length === 0) {
-                await deleteDoc(chatRef);
-                showMessage("Chat deleted successfully.");
-            } else {
-                await updateDoc(chatRef, {
-                    participants: newParticipants
-                });
-                showMessage("You have left the chat.");
-            }
-            
-            switchChat('general', 'Public'); // Redirect to public chat
-        } catch (error) {
-            console.error("Error leaving chat:", error);
-            showMessage("Failed to leave chat. Please try again.");
-        }
-    };
-
-    const addUsersToChat = async (chatId, newUsers) => {
-        try {
-            const chatRef = doc(db, `artifacts/${appId}/chats`, chatId);
-            const userUidsToAdd = newUsers.map(user => user.uid);
-            await updateDoc(chatRef, {
-                participants: arrayUnion(...userUidsToAdd)
-            });
-            showMessage("Users added to chat successfully!");
-        } catch (error) {
-            console.error("Error adding users to chat:", error);
-            showMessage("Failed to add users to chat. Please try again.");
-        }
-    };
-
 
     if (createChatButton) {
       createChatButton.addEventListener('click', () => {
@@ -1141,10 +1009,7 @@
           }
           selectedUsers = [];
           if (createChatModal) createChatModal.classList.remove('hidden');
-          if (createChatTitle) createChatTitle.textContent = 'New Direct Message';
-          if (groupChatNameField) groupChatNameField.classList.add('hidden');
-          if (groupChatNameInput) groupChatNameInput.value = '';
-          fetchUsers(userSearchInput, userListContainer, false);
+          fetchUsers();
       });
     }
 
@@ -1174,9 +1039,12 @@
           const chatType = selectedUsers.length === 1 ? 'direct_message' : 'group';
           const chatName = chatType === 'group' ? groupChatNameInput.value.trim() : null;
 
+          // Check if a DM chat already exists
           if (chatType === 'direct_message') {
               const chatsRef = collection(db, `artifacts/${appId}/chats`);
-              const q = query(chatsRef, where('participants', 'array-contains', currentUser.uid));
+              const q = query(chatsRef, 
+                  where('participants', 'array-contains', currentUser.uid)
+              );
               const existingChats = await getDocs(q);
               let existingChatId = null;
               existingChats.forEach(doc => {
@@ -1210,89 +1078,7 @@
       });
     }
 
-    if (chatActionsButton) {
-        chatActionsButton.addEventListener('click', (e) => {
-            e.stopPropagation();
-            chatActionsMenu.classList.toggle('hidden');
-        });
-    }
 
-    if (joinFacetimeButton) {
-        joinFacetimeButton.addEventListener('click', async () => {
-            if (!currentUser || !currentUser.displayName) {
-                showMessage("You must be signed in to create a link.");
-                return;
-            }
-            const meetingId = Math.random().toString(36).substring(2, 10);
-            const meetLink = `https://meet.google.com/lookup/${meetingId}`;
-            const messageText = `${currentUser.displayName} started a video call! Join now: <a href="${meetLink}" target="_blank" class="text-indigo-400 hover:underline">${meetLink}</a>`;
-            try {
-                await addDoc(collection(db, `artifacts/${appId}/chats/${activeChatId}/messages`), {
-                    text: messageText,
-                    userId: currentUser.uid,
-                    user: currentUser.displayName,
-                    timestamp: serverTimestamp(),
-                    isHTML: true // To render the link properly
-                });
-                showMessage("Video call link sent!");
-            } catch (error) {
-                showMessage("Failed to send video call link.");
-                console.error("Error sending video call link:", error);
-            }
-            chatActionsMenu.classList.add('hidden');
-        });
-    }
-
-    if (addUserButton) {
-      addUserButton.addEventListener('click', () => {
-          if (!currentUser) return;
-          selectedUsers = [];
-          if (addUserModal) addUserModal.classList.remove('hidden');
-          fetchUsers(addUserSearchInput, addUserListContainer, true);
-      });
-    }
-
-    if (cancelAddUserButton) {
-      cancelAddUserButton.addEventListener('click', () => {
-        if (addUserModal) addUserModal.classList.add('hidden');
-        selectedUsers = [];
-      });
-    }
-
-    if (addUserForm) {
-      addUserForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        if (selectedUsers.length === 0) {
-          showMessage("Please select at least one user to add.");
-          return;
-        }
-        await addUsersToChat(activeChatId, selectedUsers);
-        if (addUserModal) addUserModal.classList.add('hidden');
-        selectedUsers = [];
-      });
-    }
-
-    if (leaveChatButton) {
-        leaveChatButton.addEventListener('click', () => {
-            if (leaveChatModal) leaveChatModal.classList.remove('hidden');
-            if (leaveChatMessage) leaveChatMessage.textContent = `Are you sure you want to leave ${chatNameDisplay.textContent}? You will be removed and will lose access to the chat history.`;
-            chatActionsMenu.classList.add('hidden');
-        });
-    }
-
-    if (cancelLeaveChatButton) {
-        cancelLeaveChatButton.addEventListener('click', () => {
-            if (leaveChatModal) leaveChatModal.classList.add('hidden');
-        });
-    }
-
-    if (confirmLeaveChatButton) {
-        confirmLeaveChatButton.addEventListener('click', () => {
-            leaveChat(activeChatId);
-            if (leaveChatModal) leaveChatModal.classList.add('hidden');
-        });
-    }
-    
     // Main logic when the window loads
     window.onload = function() {
       if (!auth || !db) return; // Exit if Firebase is not initialized
@@ -1300,14 +1086,17 @@
       onAuthStateChanged(auth, async (user) => {
         currentUser = user;
         if (user) {
+          // Check if the user document exists in Firestore for social sign-ins
           const userDocRef = doc(db, `artifacts/${appId}/public/data/users`, user.uid);
           const userDoc = await getDoc(userDocRef);
           if (!userDoc.exists()) {
+            // Create a new user document if one doesn't exist
             await setDoc(userDocRef, {
               displayName: user.displayName || user.email.split('@')[0],
               email: user.email,
               createdAt: serverTimestamp()
             });
+            // Update the currentUser object with the new display name
             currentUser.displayName = user.displayName || user.email.split('@')[0];
           }
           
@@ -1315,7 +1104,7 @@
           if (currentUserDisplay) currentUserDisplay.textContent = `You (${user.displayName || 'guest'})`;
           if (authModal) authModal.classList.add('hidden');
           setChatEnabled(true);
-          fetchUsers(userSearchInput, userListContainer, false);
+          fetchUsers(); // Call fetchUsers first
           switchChat('general', 'Public');
           setupHourlyDeletion();
         } else {
@@ -1379,6 +1168,7 @@
                 messageInput.value = '';
                 await updateTypingStatus(false);
                 
+                // Start cooldown
                 canSendMessage = false;
                 setTimeout(() => {
                   canSendMessage = true;
@@ -1490,6 +1280,38 @@
               if (usernameField) usernameField.classList.remove('hidden');
               if (toggleAuthModeButton) toggleAuthModeButton.textContent = 'Already have an account? Sign In';
             }
+          });
+      }
+      
+      if (threeDotsButton) {
+          threeDotsButton.addEventListener('click', (e) => {
+              e.stopPropagation(); // Prevents the click from closing the menu immediately
+              facetimeMenu.classList.toggle('hidden');
+          });
+      }
+
+      if (joinFacetimeButton) {
+          joinFacetimeButton.addEventListener('click', async () => {
+              if (!currentUser || !currentUser.displayName) {
+                  showMessage("You must be signed in to create a link.");
+                  return;
+              }
+              const meetingId = Math.random().toString(36).substring(2, 10);
+              const meetLink = `https://meet.google.com/lookup/${meetingId}`;
+              const messageText = `${currentUser.displayName} started a video call! Join now: <a href="${meetLink}" target="_blank" class="text-indigo-400 hover:underline">${meetLink}</a>`;;
+              try {
+                  await addDoc(collection(db, `artifacts/${appId}/chats/${activeChatId}/messages`), {
+                      text: messageText,
+                      userId: currentUser.uid,
+                      user: currentUser.displayName,
+                      timestamp: serverTimestamp()
+                  });
+                  showMessage("Video call link sent!");
+              } catch (error) {
+                  showMessage("Failed to send video call link.");
+                  console.error("Error sending video call link:", error);
+              }
+              facetimeMenu.classList.add('hidden'); // Hide the menu after clicking
           });
       }
     };
