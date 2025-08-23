@@ -1298,7 +1298,7 @@
               }
               const meetingId = Math.random().toString(36).substring(2, 10);
               const meetLink = `https://meet.google.com/lookup/${meetingId}`;
-              const messageText = `${currentUser.displayName} started a video call! Join now: ${meetLink}`;
+              const messageText = `${currentUser.displayName} started a video call! Join now: <a href="${meetLink}" target="_blank" class="text-indigo-400 hover:underline">${meetLink}</a>`;;
               try {
                   await addDoc(collection(db, `artifacts/${appId}/chats/${activeChatId}/messages`), {
                       text: messageText,
