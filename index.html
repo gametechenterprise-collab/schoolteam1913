@@ -138,39 +138,75 @@
         
         <div id="typing-status" class="p-2 text-sm text-gray-400 bg-gray-800 border-t border-gray-700 hidden"></div>
 
-        <form id="message-form" class="p-4 border-t border-gray-700 bg-gray-800 hidden">
-          <div class="flex items-end space-x-2">
-            <div class="relative flex items-center self-end">
-              <button
-                type="button"
-                id="three-dots-button"
-                class="p-2 text-gray-400 hover:text-white rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
-              </button>
-              <div id="facetime-menu" class="absolute bottom-12 left-0 w-48 bg-gray-700 rounded-md shadow-lg py-1 z-10 hidden">
-                <button id="join-facetime-button" class="block px-4 py-2 text-sm text-white hover:bg-gray-600 w-full text-left">
-                  <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-green-400"><path d="M12 21.5V10l-4 4-4-4V2.5A1.5 1.5 0 0 1 6.5 1h11A1.5 1.5 0 0 1 19 2.5V10l-4 4-4-4v11.5z"></path></svg>
-                    Join a Facetime
-                  </div>
-                </button>
-              </div>
-            </div>
-            <input
-              id="message-input"
-              type="text"
-              placeholder="Message"
-              class="flex-1 p-3 text-sm rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
-            />
-            <button
-              type="submit"
-              class="px-4 py-3 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Send
-            </button>
-          </div>
-        </form>
+<form id="message-form" class="p-4 border-t border-gray-700 bg-gray-800 hidden">
+  <div class="flex items-end space-x-2">
+    <div class="relative flex items-center self-end">
+      <button
+        type="button"
+        id="three-dots-button"
+        class="p-2 text-gray-400 hover:text-white rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="h-6 w-6"
+        >
+          <circle cx="12" cy="12" r="1"></circle>
+          <circle cx="19" cy="12" r="1"></circle>
+          <circle cx="5" cy="12" r="1"></circle>
+        </svg>
+      </button>
+      <div
+        id="facetime-menu"
+        class="absolute bottom-12 left-0 w-48 bg-gray-700 rounded-md shadow-lg py-1 z-10 hidden"
+      >
+        <button
+          id="join-facetime-button"
+          class="block px-4 py-2 text-sm text-white hover:bg-gray-600 w-full text-left"
+        >
+          <div class="flex items-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="mr-2 text-green-400"
+            >
+              <path
+                d="M12 21.5V10l-4 4-4-4V2.5A1.5 1.5 0 0 1 6.5 1h11A1.5 1.5 0 0 1 19 2.5V10l-4 4-4-4v11.5z"
+              ></path>
+            </svg>
+            Join a Facetime
+          </div>
+        </button>
+      </div>
+    </div>
+    <input
+      id="message-input"
+      type="text"
+      placeholder="Message"
+      class="flex-1 p-3 text-sm rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
+    />
+    <button
+      type="submit"
+      class="px-4 py-3 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      Send
+    </button>
+  </div>
+</form>
       </div>
     </div>
   </div>
