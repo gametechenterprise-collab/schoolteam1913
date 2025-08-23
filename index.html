@@ -140,7 +140,7 @@
 
         <form id="message-form" class="p-4 border-t border-gray-700 bg-gray-800 hidden">
           <div class="flex items-end space-x-2">
-                        <div class="relative flex items-center">
+            <div class="relative flex items-center self-end">
               <button
                 type="button"
                 id="three-dots-button"
@@ -157,7 +157,7 @@
                 </button>
               </div>
             </div>
-                        <input
+            <input
               id="message-input"
               type="text"
               placeholder="Message"
@@ -214,12 +214,6 @@
           Sign Up
         </button>
       </form>
-      <button
-          id="google-sign-in-button"
-          class="w-full px-4 py-3 bg-red-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 mt-4"
-      >
-          Sign In with Google
-      </button>
       <div class="text-center mt-4">
         <button id="toggle-auth-mode" class="text-sm text-indigo-400 hover:underline">Already have an account? Sign In</button>
       </div>
@@ -299,7 +293,7 @@
   <script type="module">
     // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, deleteUser, reauthenticateWithCredential, EmailAuthProvider, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, deleteUser, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, collection, addDoc, setDoc, doc, serverTimestamp, query, where, getDocs, onSnapshot, deleteDoc, orderBy, limit, arrayUnion, writeBatch, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // Global variables from the environment
@@ -351,9 +345,6 @@
       showMessage("Failed to initialize Firebase. Check your console for details.");
       console.error("Firebase initialization failed:", error);
     }
-    
-    // Create Google Auth Provider
-    const googleProvider = new GoogleAuthProvider();
 
     // DOM elements
     const messageForm = document.getElementById('message-form');
@@ -404,7 +395,6 @@
     const publicChatBanner = document.getElementById('public-chat-banner');
     const themeToggle = document.getElementById('theme-toggle');
     const profanityFilterToggle = document.getElementById('profanity-filter-toggle');
-    const googleSignInButton = document.getElementById('google-sign-in-button');
     const threeDotsButton = document.getElementById('three-dots-button');
     const facetimeMenu = document.getElementById('facetime-menu');
     const joinFacetimeButton = document.getElementById('join-facetime-button');
@@ -1289,34 +1279,6 @@
               if (authSubmitButton) authSubmitButton.textContent = 'Sign Up';
               if (usernameField) usernameField.classList.remove('hidden');
               if (toggleAuthModeButton) toggleAuthModeButton.textContent = 'Already have an account? Sign In';
-            }
-          });
-      }
-
-      if (googleSignInButton) {
-          googleSignInButton.addEventListener('click', async () => {
-            try {
-              const result = await signInWithPopup(auth, googleProvider);
-              const user = result.user;
-              
-              // Check if the user document already exists in Firestore
-              const userDocRef = doc(db, `artifacts/${appId}/public/data/users`, user.uid);
-              const userDoc = await getDoc(userDocRef);
-              
-              if (!userDoc.exists()) {
-                // Create a new user document if one doesn't exist
-                await setDoc(userDocRef, {
-                  displayName: user.displayName || user.email.split('@')[0],
-                  email: user.email,
-                  createdAt: serverTimestamp()
-                });
-                showMessage("Signed in with Google and account created!");
-              } else {
-                showMessage("Signed in with Google successfully!");
-              }
-            } catch (error) {
-              console.error("Google Sign-In failed:", error);
-              showMessage(`Google Sign-In failed: ${error.message}`);
             }
           });
       }
