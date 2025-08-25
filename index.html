@@ -1112,9 +1112,8 @@
             const fetchedMessages = [];
             querySnapshot.docChanges().forEach((change) => {
                 const msg = { id: change.doc.id, ...change.doc.data() };
-                const isDM = activeChatId !== 'general';
                 if (change.type === "added" && currentUser && msg.userId !== currentUser.uid) {
-                    if (isDM && document.hidden) {
+                    if (activeChatId !== chatId || document.hidden) {
                       const filteredText = profanityFilterToggle.checked ? filterProfanity(msg.text) : msg.text;
                       sendNotification(msg.user, filteredText);
                     }
