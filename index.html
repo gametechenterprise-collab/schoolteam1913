@@ -72,6 +72,15 @@
   <div class="flex flex-col h-screen bg-gray-900 text-gray-100 font-inter">
     <div class="bg-gray-800 p-4 border-b border-gray-700 flex items-center justify-between">
       <div class="flex items-center">
+        <!-- Container for the hamburger and close icons, hidden on desktop -->
+        <div id="menu-icons-container" class="relative mr-2 md:hidden">
+          <button id="menu-toggle" class="p-2 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="6" x2="20" y2="6"></line><line x1="4" y1="18" x2="20" y2="18"></line></svg>
+          </button>
+          <button id="close-menu-toggle" class="p-2 text-gray-400 hover:text-white focus:outline-none hidden absolute top-0 left-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6 text-indigo-400 mr-2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V3a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
         <h1 class="text-xl font-bold">Schoolchats</h1>
       </div>
@@ -81,17 +90,19 @@
     </div>
 
     <div class="flex flex-1 overflow-hidden">
-      <div class="bg-gray-800 w-64 flex-shrink-0 border-r border-gray-700 overflow-y-auto md:block hidden">
+      <!-- Side menu container -->
+      <div id="sidebar" class="bg-gray-800 w-64 flex-shrink-0 border-r border-gray-700 overflow-y-auto z-40 transition-transform duration-300 ease-in-out md:block md:relative md:transform-none fixed inset-y-0 left-0 transform -translate-x-full">
+        
         <div class="p-4">
           <h2 class="text-md font-semibold text-gray-400 mb-2">Channels</h2>
           <div id="channels-list">
-              </div>
+             </div>
           <button id="create-chat-button" class="mt-4 w-full px-4 py-2 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
             + New Chat
           </button>
         </div>
         <div class="p-4 border-t border-gray-700">
-          <h2 class="text-md font-semibold text-gray-400 mt-4 mb-2">Users</h2>
+          <h2 class="text-md font-semibold text-gray-400 mb-2">Users</h2>
           <div class="rounded-lg p-2 flex items-center">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-gray-400 mr-2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
             <span id="current-user-display" class="text-sm">Connecting...</span>
@@ -103,15 +114,15 @@
           <div class="mt-2 p-2 rounded-lg bg-gray-700 flex items-center justify-between">
               <span>Dark Mode</span>
               <label class="switch">
-                <input type="checkbox" id="theme-toggle">
-                <span class="slider round"></span>
+                  <input type="checkbox" id="theme-toggle">
+                  <span class="slider round"></span>
               </label>
           </div>
           <div class="mt-2 p-2 rounded-lg bg-gray-700 flex items-center justify-between">
               <span>Profanity Filter</span>
               <label class="switch">
-                <input type="checkbox" id="profanity-filter-toggle" checked>
-                <span class="slider round"></span>
+                  <input type="checkbox" id="profanity-filter-toggle" checked>
+                  <span class="slider round"></span>
               </label>
           </div>
           <button id="delete-account-button" class="mt-2 w-full px-4 py-2 bg-red-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
@@ -140,23 +151,6 @@
 
         <form id="message-form" class="p-4 border-t border-gray-700 bg-gray-800 hidden">
           <div class="flex items-end space-x-2">
-            <div class="relative flex items-center self-end">
-              <button
-                type="button"
-                id="three-dots-button"
-                class="p-2 text-gray-400 hover:text-white rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
-              </button>
-              <div id="facetime-menu" class="absolute bottom-12 left-0 w-48 bg-gray-700 rounded-md shadow-lg py-1 z-10 hidden">
-                <button id="join-facetime-button" class="block px-4 py-2 text-sm text-white hover:bg-gray-600 w-full text-left">
-                  <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-green-400"><path d="M12 21.5V10l-4 4-4-4V2.5A1.5 1.5 0 0 1 6.5 1h11A1.5 1.5 0 0 1 19 2.5V10l-4 4-4-4v11.5z"></path></svg>
-                    Join a Facetime
-                  </div>
-                </button>
-              </div>
-            </div>
             <input
               id="message-input"
               type="text"
@@ -283,7 +277,7 @@
         <div class="flex justify-end space-x-4">
             <button type="button" id="cancel-create-chat" class="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-700">Cancel</button>
             <button type="submit" id="create-chat-submit-button" class="px-4 py-2 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed">
-              Create Chat
+                Create Chat
             </button>
         </div>
       </form>
@@ -294,7 +288,7 @@
     // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, deleteUser, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, setDoc, doc, serverTimestamp, query, where, getDocs, onSnapshot, deleteDoc, orderBy, limit, arrayUnion, writeBatch, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, setDoc, doc, serverTimestamp, query, where, getDocs, onSnapshot, deleteDoc, orderBy, limit, arrayUnion, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // Global variables from the environment
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -336,7 +330,7 @@
 
 
     // Firebase Initialization
-    let app, auth, db;
+    var app, auth, db;
     try {
       app = initializeApp(firebaseConfig);
       auth = getAuth(app);
@@ -395,23 +389,23 @@
     const publicChatBanner = document.getElementById('public-chat-banner');
     const themeToggle = document.getElementById('theme-toggle');
     const profanityFilterToggle = document.getElementById('profanity-filter-toggle');
-    const threeDotsButton = document.getElementById('three-dots-button');
-    const facetimeMenu = document.getElementById('facetime-menu');
-    const joinFacetimeButton = document.getElementById('join-facetime-button');
+    const menuToggle = document.getElementById('menu-toggle');
+    const closeMenuToggle = document.getElementById('close-menu-toggle');
+    const sidebar = document.getElementById('sidebar');
 
 
-    let currentUser = null;
-    let authMode = 'signup'; // 'signup' or 'signin'
-    let isTypingTimeout = null;
-    let messageToDeleteId = null;
-    let activeChatId = 'general';
-    let userList = [];
-    let selectedUsers = [];
-    let usersUnsubscribe = null;
-    let chatsUnsubscribe = null;
-    let messagesUnsubscribe = null;
-    let typingUnsubscribe = null;
-    let canSendMessage = true;
+    var currentUser = null;
+    var authMode = 'signup'; // 'signup' or 'signin'
+    var isTypingTimeout = null;
+    var messageToDeleteId = null;
+    var activeChatId = 'general';
+    var userList = [];
+    var selectedUsers = [];
+    var usersUnsubscribe = null;
+    var chatsUnsubscribe = null;
+    var messagesUnsubscribe = null;
+    var typingUnsubscribe = null;
+    var canSendMessage = true;
     const cooldownPeriod = 2000; // 2 seconds in milliseconds
 
 
@@ -511,9 +505,9 @@
                     </button>
                     <div id="menu-${msg.id}" class="absolute ${isSelf ? 'left-6' : 'right-6'} top-1/2 -translate-y-1/2 w-48 bg-gray-700 rounded-md shadow-lg py-1 z-10 hidden">
                         ${isSelf ? `
-                            <button class="block px-4 py-2 text-sm text-red-400 hover:bg-gray-600 w-full text-left" onclick="showConfirmationModal('${msg.id}')">
-                                Remove my words
-                            </button>
+                          <button class="block px-4 py-2 text-sm text-red-400 hover:bg-gray-600 w-full text-left" onclick="showConfirmationModal('${msg.id}')">
+                              Remove my words
+                          </button>
                         ` : ''}
                         <button class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-600 w-full text-left" onclick="hideMessageForUser('${msg.id}')">
                             Hide from my view
@@ -655,7 +649,7 @@
         }
     };
     
-    window.addEventListener('click', (e) => {
+    window.addEventListener('click', () => {
         document.querySelectorAll('[id^="menu-"]').forEach(menu => {
             if (menu && !menu.classList.contains('hidden')) {
                 menu.classList.add('hidden');
@@ -664,9 +658,6 @@
         const channelMenu = document.getElementById('channel-menu');
         if (channelMenu && !channelMenu.classList.contains('hidden')) {
             channelMenu.classList.add('hidden');
-        }
-        if (facetimeMenu && !facetimeMenu.contains(e.target) && e.target !== threeDotsButton) {
-            facetimeMenu.classList.add('hidden');
         }
     });
 
@@ -716,8 +707,8 @@
                 console.error("Re-authentication failed:", error);
                 showMessage(`Re-authentication failed: ${error.message}`);
             }
-        });
-    }
+          });
+      }
 
     if (cancelDeleteAccountButton) {
         cancelDeleteAccountButton.addEventListener('click', () => {
@@ -840,10 +831,12 @@
             const fetchedMessages = [];
             querySnapshot.docChanges().forEach((change) => {
                 const msg = { id: change.doc.id, ...change.doc.data() };
-                if (change.type === "added" && currentUser && msg.userId !== currentUser.uid && document.hidden) {
-                  const filteredText = profanityFilterToggle.checked ? filterProfanity(msg.text) : msg.text;
-                  const title = activeChatId === 'general' ? `New Message in Public Chat` : `New Message from ${msg.user}`;
-                  sendNotification(title, filteredText);
+                const isDM = activeChatId !== 'general';
+                if (change.type === "added" && currentUser && msg.userId !== currentUser.uid) {
+                    if (isDM && document.hidden) {
+                      const filteredText = profanityFilterToggle.checked ? filterProfanity(msg.text) : msg.text;
+                      sendNotification(msg.user, filteredText);
+                    }
                 }
             });
             querySnapshot.forEach((doc) => {
@@ -1046,7 +1039,7 @@
                   where('participants', 'array-contains', currentUser.uid)
               );
               const existingChats = await getDocs(q);
-              let existingChatId = null;
+              var existingChatId = null;
               existingChats.forEach(doc => {
                   const chatData = doc.data();
                   if (chatData.participants.length === 2 && chatData.participants.includes(selectedUsers[0].uid)) {
@@ -1083,23 +1076,9 @@
     window.onload = function() {
       if (!auth || !db) return; // Exit if Firebase is not initialized
       
-      onAuthStateChanged(auth, async (user) => {
+      onAuthStateChanged(auth, (user) => {
         currentUser = user;
         if (user) {
-          // Check if the user document exists in Firestore for social sign-ins
-          const userDocRef = doc(db, `artifacts/${appId}/public/data/users`, user.uid);
-          const userDoc = await getDoc(userDocRef);
-          if (!userDoc.exists()) {
-            // Create a new user document if one doesn't exist
-            await setDoc(userDocRef, {
-              displayName: user.displayName || user.email.split('@')[0],
-              email: user.email,
-              createdAt: serverTimestamp()
-            });
-            // Update the currentUser object with the new display name
-            currentUser.displayName = user.displayName || user.email.split('@')[0];
-          }
-          
           if (userIdDisplay) userIdDisplay.textContent = `User ID: ${user.uid}`;
           if (currentUserDisplay) currentUserDisplay.textContent = `You (${user.displayName || 'guest'})`;
           if (authModal) authModal.classList.add('hidden');
@@ -1136,7 +1115,7 @@
       if (messageForm) {
           messageForm.addEventListener('submit', async (e) => {
               e.preventDefault();
-              let messageText = messageInput.value.trim();
+              var messageText = messageInput.value.trim();
 
               if (!canSendMessage) {
                 showMessage("Please wait before sending another message.");
@@ -1182,15 +1161,14 @@
       
       if (messageInput) {
           messageInput.addEventListener('keydown', () => {
+            // Clear existing timeout to prevent it from firing
             clearTimeout(isTypingTimeout);
+            // Update typing status to true
             updateTypingStatus(true);
-          });
-      
-          messageInput.addEventListener('keyup', () => {
-            clearTimeout(isTypingTimeout);
+            // Set a new timeout to update typing status to false after 10 seconds
             isTypingTimeout = setTimeout(() => {
               updateTypingStatus(false);
-            }, 3000);
+            }, 10000); // 10 seconds
           });
       }
 
@@ -1282,37 +1260,21 @@
             }
           });
       }
-      
-      if (threeDotsButton) {
-          threeDotsButton.addEventListener('click', (e) => {
-              e.stopPropagation(); // Prevents the click from closing the menu immediately
-              facetimeMenu.classList.toggle('hidden');
-          });
+
+      if (menuToggle) {
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.remove('-translate-x-full');
+            menuToggle.classList.add('hidden');
+            closeMenuToggle.classList.remove('hidden');
+        });
       }
 
-      if (joinFacetimeButton) {
-          joinFacetimeButton.addEventListener('click', async () => {
-              if (!currentUser || !currentUser.displayName) {
-                  showMessage("You must be signed in to create a link.");
-                  return;
-              }
-              const meetingId = Math.random().toString(36).substring(2, 10);
-              const meetLink = `https://meet.google.com/lookup/${meetingId}`;
-              const messageText = `${currentUser.displayName} started a video call! Join now: <a href="${meetLink}" target="_blank" class="text-indigo-400 hover:underline">${meetLink}</a>`;;
-              try {
-                  await addDoc(collection(db, `artifacts/${appId}/chats/${activeChatId}/messages`), {
-                      text: messageText,
-                      userId: currentUser.uid,
-                      user: currentUser.displayName,
-                      timestamp: serverTimestamp()
-                  });
-                  showMessage("Video call link sent!");
-              } catch (error) {
-                  showMessage("Failed to send video call link.");
-                  console.error("Error sending video call link:", error);
-              }
-              facetimeMenu.classList.add('hidden'); // Hide the menu after clicking
-          });
+      if (closeMenuToggle) {
+        closeMenuToggle.addEventListener('click', () => {
+            sidebar.classList.add('-translate-x-full');
+            menuToggle.classList.remove('hidden');
+            closeMenuToggle.classList.add('hidden');
+        });
       }
     };
   </script>
