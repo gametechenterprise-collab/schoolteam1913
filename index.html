@@ -139,7 +139,7 @@
                 <div id="chat-header" class="bg-gray-800 p-4 border-b border-gray-700 flex items-center justify-between hidden">
                     <h2 id="chat-name" class="text-xl font-bold"></h2>
                     <div class="relative">
-                        <button id="chat-menu-toggle" class="p-2 text-gray-400 hover:text-white focus:outline-none hidden">
+                        <button id="chat-menu-toggle" class="p-2 text-gray-400 hover:text-white focus:outline-none">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
                         </button>
                         <div id="chat-menu" class="absolute right-0 mt-2 w-48 bg-gray-700 rounded-md shadow-lg py-1 z-10 hidden">
@@ -714,6 +714,7 @@
                         await reauthenticateWithCredential(currentUser, credential);
                         await deleteAccount();
                         if (deleteAccountModal) deleteAccountModal.classList.add('hidden');
+                        showMessage("Account deleted successfully.");
                     } else {
                         showMessage("Password is required to delete your account.");
                     }
@@ -795,20 +796,29 @@
                     user: currentUser.displayName,
                     isTyping: isTyping,
                     timestamp: serverTimestamp()
-                });
+                }, { merge: true });
             } catch (error) {
                 console.error("Error updating typing status:", error);
             }
         };
         
         const renderTypingStatus = (typingUsers) => {
-            const otherTypingUsers = typingUsers.filter(u => u.id !== (currentUser ? currentUser.uid : null));
+            const now = Date.now();
+            const otherTypingUsers = typingUsers.filter(u => 
+                u.id !== (currentUser ? currentUser.uid : null) &&
+                (now - u.timestamp.toMillis() < 12000) // 12 seconds
+            );
+
             if (otherTypingUsers.length > 0) {
                 const names = otherTypingUsers.map(u => u.user).join(', ');
-                if (typingStatusDisplay) typingStatusDisplay.textContent = `${names} is typing...`;
-                if (typingStatusDisplay) typingStatusDisplay.classList.remove('hidden');
+                if (typingStatusDisplay) {
+                    typingStatusDisplay.textContent = `${names} is typing...`;
+                    typingStatusDisplay.classList.remove('hidden');
+                }
             } else {
-                if (typingStatusDisplay) typingStatusDisplay.classList.add('hidden');
+                if (typingStatusDisplay) {
+                    typingStatusDisplay.classList.add('hidden');
+                }
             }
         };
 
@@ -877,7 +887,7 @@
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
                     if (data.isTyping && data.user) {
-                        typingUsers.push({ id: doc.id, user: data.user });
+                        typingUsers.push({ id: doc.id, user: data.user, timestamp: data.timestamp });
                     }
                 });
                 renderTypingStatus(typingUsers);
