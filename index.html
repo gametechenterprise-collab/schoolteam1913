@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -65,34 +66,6 @@
     .slider.round:before {
       border-radius: 50%;
     }
-
-    .tic-tac-toe-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 100px);
-      grid-template-rows: repeat(3, 100px);
-      gap: 5px;
-      background-color: #1F2937;
-    }
-    
-    .tic-tac-toe-cell {
-        width: 100px;
-        height: 100px;
-        background-color: #374151;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 3rem;
-        font-weight: bold;
-        cursor: pointer;
-        user-select: none;
-    }
-    
-    .pong-canvas {
-        background-color: #000;
-        border-radius: 0.5rem;
-        max-width: 100%;
-        height: auto;
-    }
   </style>
 </head>
 <body class="bg-gray-900 text-gray-100 h-screen flex flex-col transition-colors duration-300">
@@ -135,9 +108,6 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-gray-400 mr-2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
             <span id="current-user-display" class="text-sm">Connecting...</span>
           </div>
-          <div id="games-tab-link" class="p-4 border-t border-gray-700 cursor-pointer">
-              <h2 class="text-md font-semibold text-gray-400 mb-2">Games</h2>
-          </div>
           <h2 class="text-md font-semibold text-gray-400 mt-4 mb-2">Settings</h2>
           <button id="change-username-button" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
             Change Username
@@ -173,15 +143,12 @@
           <h2 id="chat-name" class="text-xl font-bold"></h2>
           <!-- Dropdown menu for chat actions -->
           <div class="relative">
-              <button id="chat-menu-toggle" class="p-2 text-gray-400 hover:text-white focus:outline-none">
+              <button id="chat-menu-toggle" class="p-2 text-gray-400 hover:text-white focus:outline-none hidden">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
               </button>
               <div id="chat-menu" class="absolute right-0 mt-2 w-48 bg-gray-700 rounded-md shadow-lg py-1 z-10 hidden">
                   <button id="add-person-to-chat" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-600 w-full text-left">
                       Add person to chat
-                  </button>
-                  <button id="start-game" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-600 w-full text-left">
-                      Start a Game
                   </button>
                   <button id="leave-chat" class="block px-4 py-2 text-sm text-red-400 hover:bg-gray-600 w-full text-left">
                       Leave chat
@@ -298,27 +265,45 @@
       </div>
     </div>
   </div>
-  
-  <!-- Games List Page -->
-  <div id="games-page" class="hidden flex-1 p-4 overflow-y-auto">
-      <h2 class="text-2xl font-bold text-white mb-4">Games</h2>
-      <div id="games-list-main" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div id="tic-tac-toe-button-main" class="p-4 bg-gray-800 rounded-lg shadow-lg cursor-pointer transition-colors duration-200 hover:bg-gray-700">
-              <h3 class="text-xl font-semibold">Tic-Tac-Toe</h3>
-              <p class="text-gray-400 mt-2">A classic game of strategy for two players.</p>
-          </div>
-          <div id="pong-button-main" class="p-4 bg-gray-800 rounded-lg shadow-lg cursor-pointer transition-colors duration-200 hover:bg-gray-700">
-              <h3 class="text-xl font-semibold">Pong</h3>
-              <p class="text-gray-400 mt-2">The classic arcade game of table tennis.</p>
-          </div>
-      </div>
+
+  <div id="create-chat-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
+    <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-lg">
+      <h2 id="create-chat-title" class="text-xl font-bold text-white mb-4">New Direct Message</h2>
+      <form id="create-chat-form">
+        <div id="user-search-container" class="mb-4">
+            <input
+              type="text"
+              id="user-search-input"
+              placeholder="Search for users"
+              class="w-full p-3 text-sm rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
+            />
+        </div>
+        <div id="group-chat-name-field" class="mb-4 hidden">
+            <input
+              type="text"
+              id="group-chat-name-input"
+              placeholder="Group chat name"
+              class="w-full p-3 text-sm rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
+            />
+        </div>
+        <div id="user-list-container" class="max-h-48 overflow-y-auto bg-gray-700 rounded-lg p-2 mb-4">
+          <p class="text-gray-400">Loading users...</p>
+        </div>
+        <div class="flex justify-end space-x-4">
+            <button type="button" id="cancel-create-chat" class="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-700">Cancel</button>
+            <button type="submit" id="create-chat-submit-button" class="px-4 py-2 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed">
+                Create Chat
+            </button>
+        </div>
+      </form>
+    </div>
   </div>
   
   <script type="module">
     // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, deleteUser, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, setDoc, doc, serverTimestamp, query, where, getDocs, onSnapshot, deleteDoc, orderBy, limit, arrayUnion, writeBatch, updateDoc, arrayRemove } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, setDoc, doc, serverTimestamp, query, where, getDocs, onSnapshot, deleteDoc, orderBy, limit, arrayUnion, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // Global variables from the environment
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -414,20 +399,14 @@
     const chatHeader = document.getElementById('chat-header');
     const chatNameDisplay = document.getElementById('chat-name');
     const channelsList = document.getElementById('channels-list');
-    const gamesList = document.getElementById('games-list');
-    const ticTacToeButton = document.getElementById('tic-tac-toe-button');
-    const pongButton = document.getElementById('pong-button');
+    const groupChatNameField = document.getElementById('group-chat-name-field');
+    const groupChatNameInput = document.getElementById('group-chat-name-input');
     const publicChatBanner = document.getElementById('public-chat-banner');
     const themeToggle = document.getElementById('theme-toggle');
     const profanityFilterToggle = document.getElementById('profanity-filter-toggle');
     const menuToggle = document.getElementById('menu-toggle');
     const closeMenuToggle = document.getElementById('close-menu-toggle');
     const sidebar = document.getElementById('sidebar');
-    const mainContentArea = document.getElementById('messages-container');
-    const addPersonModal = document.getElementById('add-person-modal');
-    const addPersonListContainer = document.getElementById('add-person-list-container');
-    const addPersonSubmitButton = document.getElementById('add-person-submit');
-    const cancelAddPersonButton = document.getElementById('cancel-add-person');
 
 
     var currentUser = null;
@@ -443,24 +422,6 @@
     var typingUnsubscribe = null;
     var canSendMessage = true;
     const cooldownPeriod = 2000; // 2 seconds in milliseconds
-
-    // Game state variables
-    let gameActive = false;
-    let currentPlayer = 'X';
-    let gameState = ["", "", "", "", "", "", "", "", ""];
-    const winningConditions = [
-        [0, 1, 2], [3, 4, 5], [6, 7, 8],
-        [0, 3, 6], [1, 4, 7], [2, 5, 8],
-        [0, 4, 8], [2, 4, 6]
-    ];
-    let gameUnsubscribe = null;
-
-    // Pong game variables
-    let pongCanvas, pongCtx;
-    let ball, player1, player2;
-    let isPlayer1 = false;
-    const paddleWidth = 10;
-    const paddleHeight = 100;
 
 
     // Show a custom message box
@@ -487,6 +448,7 @@
             });
         }
     }
+
 
     // Function to enable/disable message input and send button
     const setChatEnabled = (enabled) => {
@@ -708,9 +670,9 @@
                 menu.classList.add('hidden');
             }
         });
-        const chatMenu = document.getElementById('chat-menu');
-        if (chatMenu && !chatMenu.classList.contains('hidden')) {
-            chatMenu.classList.add('hidden');
+        const channelMenu = document.getElementById('channel-menu');
+        if (channelMenu && !channelMenu.classList.contains('hidden')) {
+            channelMenu.classList.add('hidden');
         }
     });
 
@@ -857,27 +819,20 @@
         
         if (chatNameDisplay) chatNameDisplay.textContent = chatName;
         
-        // Hide game-related buttons
-        if (chatMenuToggle) chatMenuToggle.classList.add('hidden');
-        if (gamesPage) gamesPage.classList.add('hidden');
-
         if (chatId === 'general') {
-            if (publicChatBanner) publicChatBanner.classList.remove('hidden');
-            if (chatHeader) chatHeader.classList.remove('hidden');
+            publicChatBanner.classList.remove('hidden');
         } else {
-            if (publicChatBanner) publicChatBanner.classList.add('hidden');
-            if (chatHeader) chatHeader.classList.remove('hidden');
-            if (chatMenuToggle) chatMenuToggle.classList.remove('hidden');
+            publicChatBanner.classList.add('hidden');
         }
 
-        // Show chat UI elements and hide game content
-        if (messagesContainer) messagesContainer.classList.remove('hidden');
+        if (messagesContainer) messagesContainer.innerHTML = `<div class="flex items-center justify-center h-full text-gray-400 text-lg">
+          Loading messages...
+        </div>`;
+        
+        if (chatHeader) chatHeader.classList.remove('hidden');
         if (messageForm) messageForm.classList.remove('hidden');
         if (typingStatusDisplay) typingStatusDisplay.classList.remove('hidden');
 
-        // Unsubscribe from any active game listener
-        if (gameUnsubscribe) gameUnsubscribe();
-        
         if (messagesUnsubscribe) {
             messagesUnsubscribe();
         }
@@ -891,8 +846,9 @@
             const fetchedMessages = [];
             querySnapshot.docChanges().forEach((change) => {
                 const msg = { id: change.doc.id, ...change.doc.data() };
+                const isDM = activeChatId !== 'general';
                 if (change.type === "added" && currentUser && msg.userId !== currentUser.uid) {
-                    if (activeChatId !== chatId || document.hidden) {
+                    if (isDM && document.hidden) {
                       const filteredText = profanityFilterToggle.checked ? filterProfanity(msg.text) : msg.text;
                       sendNotification(msg.user, filteredText);
                     }
@@ -923,353 +879,6 @@
         if (messageInput) messageInput.placeholder = `Message ${chatName}`;
     };
     
-    // This is the function to handle showing the game UI
-    const showGame = (gameName) => {
-        // Hide chat UI elements
-        if (messagesContainer) messagesContainer.classList.add('hidden');
-        if (messageForm) messageForm.classList.add('hidden');
-        if (typingStatusDisplay) typingStatusDisplay.classList.add('hidden');
-        if (chatHeader) chatHeader.classList.add('hidden');
-        if (publicChatBanner) publicChatBanner.classList.add('hidden');
-        
-        // Unsubscribe from any active chat/typing listeners
-        if(messagesUnsubscribe) messagesUnsubscribe();
-        if(typingUnsubscribe) typingUnsubscribe();
-        if(gameUnsubscribe) gameUnsubscribe();
-        
-        // Render game UI based on gameName
-        if (gameName === 'Tic-Tac-Toe') {
-            renderTicTacToe();
-        } else if (gameName === 'Pong') {
-            renderPongGame();
-        }
-    }
-    
-    const showGamesList = () => {
-        // Hide chat UI elements
-        if (messagesContainer) messagesContainer.classList.add('hidden');
-        if (messageForm) messageForm.classList.add('hidden');
-        if (typingStatusDisplay) typingStatusDisplay.classList.add('hidden');
-        if (chatHeader) chatHeader.classList.add('hidden');
-        if (publicChatBanner) publicChatBanner.classList.add('hidden');
-
-        // Unsubscribe from any active chat/typing listeners
-        if (messagesUnsubscribe) messagesUnsubscribe();
-        if (typingUnsubscribe) typingUnsubscribe();
-        
-        // Show games page
-        gamesPage.classList.remove('hidden');
-        const mainGamesList = document.getElementById('games-list-main');
-        if (mainGamesList) {
-            mainGamesList.innerHTML = `
-                <div id="tic-tac-toe-button-main" class="p-4 bg-gray-800 rounded-lg shadow-lg cursor-pointer transition-colors duration-200 hover:bg-gray-700">
-                    <h3 class="text-xl font-semibold">Tic-Tac-Toe</h3>
-                    <p class="text-gray-400 mt-2">A classic game of strategy for two players.</p>
-                </div>
-                <div id="pong-button-main" class="p-4 bg-gray-800 rounded-lg shadow-lg cursor-pointer transition-colors duration-200 hover:bg-gray-700">
-                    <h3 class="text-xl font-semibold">Pong</h3>
-                    <p class="text-gray-400 mt-2">The classic arcade game of table tennis.</p>
-                </div>
-            `;
-            document.getElementById('tic-tac-toe-button-main').addEventListener('click', () => showGame('Tic-Tac-Toe'));
-            document.getElementById('pong-button-main').addEventListener('click', () => showGame('Pong'));
-        }
-    };
-    
-    const renderPongGame = () => {
-        if (!mainContentArea) return;
-        mainContentArea.innerHTML = `
-            <div class="flex flex-col items-center justify-center h-full">
-                <div class="flex flex-row justify-between w-full max-w-lg mb-4 text-2xl font-bold">
-                    <span id="player-1-score">0</span>
-                    <span>:</span>
-                    <span id="player-2-score">0</span>
-                </div>
-                <canvas id="pong-canvas" width="600" height="400" class="pong-canvas"></canvas>
-                <button id="return-to-chat-button" class="mt-4 px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-700">Return to Chat</button>
-            </div>
-        `;
-
-        pongCanvas = document.getElementById('pong-canvas');
-        pongCtx = pongCanvas.getContext('2d');
-        pongCanvas.style.cursor = 'none';
-
-        const returnToChatButton = document.getElementById('return-to-chat-button');
-        if (returnToChatButton) {
-            returnToChatButton.addEventListener('click', () => {
-                const activeChatElement = document.querySelector('#channels-list > div.bg-gray-700');
-                if (activeChatElement) {
-                    const chatId = activeChatElement.id.replace('channel-', '');
-                    const chatName = activeChatElement.querySelector('span').textContent;
-                    switchChat(chatId, chatName);
-                } else {
-                    switchChat('general', 'Public');
-                }
-            });
-        }
-
-        // Initialize game state
-        player1 = {
-            x: 0,
-            y: (pongCanvas.height - paddleHeight) / 2,
-            width: paddleWidth,
-            height: paddleHeight,
-            score: 0,
-            id: null
-        };
-        player2 = {
-            x: pongCanvas.width - paddleWidth,
-            y: (pongCanvas.height - paddleHeight) / 2,
-            width: paddleWidth,
-            height: paddleHeight,
-            score: 0,
-            id: null
-        };
-        ball = {
-            x: pongCanvas.width / 2,
-            y: pongCanvas.height / 2,
-            radius: 7,
-            velocityX: 5,
-            velocityY: 5,
-            speed: 7
-        };
-        gameActive = true;
-
-        // Firebase listener for game state
-        gameUnsubscribe = onSnapshot(doc(db, `artifacts/${appId}/games`, activeChatId), (gameDoc) => {
-            if (gameDoc.exists() && gameDoc.data().gameType === 'Pong') {
-                const data = gameDoc.data();
-                player1.y = data.player1Y;
-                player2.y = data.player2Y;
-                ball.x = data.ballX;
-                ball.y = data.ballY;
-                player1.score = data.player1Score;
-                player2.score = data.player2Score;
-                isPlayer1 = data.player1Id === currentUser.uid;
-
-                if (data.status === 'finished') {
-                    gameActive = false;
-                    showMessage(`Game Over! ${data.winner} wins with a score of ${data.player1Score} - ${data.player2Score}.`);
-                }
-            }
-        });
-
-        // Event listener for mouse movement to control paddle
-        pongCanvas.addEventListener('mousemove', (e) => {
-            let rect = pongCanvas.getBoundingClientRect();
-            let root = document.documentElement;
-            let mouseY = e.clientY - rect.top - root.scrollTop;
-
-            if (isPlayer1) {
-                player1.y = mouseY - player1.height / 2;
-                updatePongState();
-            } else {
-                player2.y = mouseY - player2.height / 2;
-                updatePongState();
-            }
-        });
-        
-        const updatePongState = () => {
-            const gameRef = doc(db, `artifacts/${appId}/games`, activeChatId);
-            setDoc(gameRef, {
-                player1Y: player1.y,
-                player2Y: player2.y,
-                ballX: ball.x,
-                ballY: ball.y,
-                player1Score: player1.score,
-                player2Score: player2.score,
-                player1Id: player1.id,
-                player2Id: player2.id,
-                status: gameActive ? 'playing' : 'finished',
-                lastUpdated: serverTimestamp(),
-            }, { merge: true });
-        };
-
-        const drawRect = (x, y, w, h, color) => {
-            pongCtx.fillStyle = color;
-            pongCtx.fillRect(x, y, w, h);
-        };
-
-        const drawBall = (x, y, r, color) => {
-            pongCtx.fillStyle = color;
-            pongCtx.beginPath();
-            pongCtx.arc(x, y, r, 0, Math.PI * 2, false);
-            pongCtx.closePath();
-            pongCtx.fill();
-        };
-
-        const drawScore = (text, x, y) => {
-            pongCtx.fillStyle = '#fff';
-            pongCtx.font = '32px Inter';
-            pongCtx.fillText(text, x, y);
-        };
-
-        const resetBall = () => {
-            ball.x = pongCanvas.width / 2;
-            ball.y = pongCanvas.height / 2;
-            ball.velocityX = -ball.velocityX;
-            ball.speed = 7;
-        };
-
-        const updatePong = () => {
-            if (!gameActive || !isPlayer1) return;
-
-            ball.x += ball.velocityX;
-            ball.y += ball.velocityY;
-
-            // Simple AI for player2 if it's a single-player game
-            // if (!player2.id) {
-            //     let paddle2y = ball.y - player2.height / 2;
-            //     player2.y = paddle2y;
-            // }
-
-            // Wall collision
-            if (ball.y + ball.radius > pongCanvas.height || ball.y - ball.radius < 0) {
-                ball.velocityY = -ball.velocityY;
-            }
-
-            let player = (ball.x < pongCanvas.width / 2) ? player1 : player2;
-            if (isCollision(ball, player)) {
-                let collidePoint = ball.y - (player.y + player.height / 2);
-                collidePoint = collidePoint / (player.height / 2);
-                let angleRad = (Math.PI / 4) * collidePoint;
-                let direction = (ball.x < pongCanvas.width / 2) ? 1 : -1;
-                ball.velocityX = direction * ball.speed * Math.cos(angleRad);
-                ball.velocityY = ball.speed * Math.sin(angleRad);
-                ball.speed += 0.5;
-            }
-
-            // Update scores
-            if (ball.x - ball.radius < 0) {
-                player2.score++;
-                resetBall();
-            } else if (ball.x + ball.radius > pongCanvas.width) {
-                player1.score++;
-                resetBall();
-            }
-
-            updatePongState();
-        };
-
-        const renderPong = () => {
-            if (!pongCtx) return;
-            // Clear the canvas
-            pongCtx.fillStyle = '#1F2937';
-            pongCtx.fillRect(0, 0, pongCanvas.width, pongCanvas.height);
-
-            // Draw paddles and ball
-            drawRect(player1.x, player1.y, player1.width, player1.height, '#fff');
-            drawRect(player2.x, player2.y, player2.width, player2.height, '#fff');
-            drawBall(ball.x, ball.y, ball.radius, '#fff');
-
-            // Draw scores
-            drawScore(player1.score, pongCanvas.width / 4, pongCanvas.height / 5);
-            drawScore(player2.score, 3 * pongCanvas.width / 4, pongCanvas.height / 5);
-        };
-
-        const isCollision = (b, p) => {
-            b.top = b.y - b.radius;
-            b.bottom = b.y + b.radius;
-            b.left = b.x - b.radius;
-            b.right = b.x + b.radius;
-
-            p.top = p.y;
-            p.bottom = p.y + p.height;
-            p.left = p.x;
-            p.right = p.x + p.width;
-
-            return b.right > p.left && b.bottom > p.top && b.left < p.right && b.top < p.bottom;
-        };
-
-        const pongLoop = () => {
-            updatePong();
-            renderPong();
-            if (gameActive) {
-                requestAnimationFrame(pongLoop);
-            }
-        };
-
-        // Start the game loop
-        pongLoop();
-    };
-
-    const renderTicTacToe = () => {
-        if (!mainContentArea) return;
-        mainContentArea.innerHTML = `
-            <div class="flex flex-col items-center justify-center h-full">
-                <h3 class="text-2xl font-bold mb-4">Tic-Tac-Toe</h3>
-                <div id="game-status" class="text-xl mb-4">Player X's turn</div>
-                <div id="tic-tac-toe-board" class="tic-tac-toe-grid">
-                    <div class="tic-tac-toe-cell border-b-2 border-r-2 border-gray-500" data-index="0"></div>
-                    <div class="tic-tac-toe-cell border-b-2 border-r-2 border-l-2 border-gray-500" data-index="1"></div>
-                    <div class="tic-tac-toe-cell border-b-2 border-l-2 border-gray-500" data-index="2"></div>
-                    <div class="tic-tac-toe-cell border-t-2 border-r-2 border-b-2 border-gray-500" data-index="3"></div>
-                    <div class="tic-tac-toe-cell border-t-2 border-r-2 border-b-2 border-l-2 border-gray-500" data-index="4"></div>
-                    <div class="tic-tac-toe-cell border-t-2 border-b-2 border-l-2 border-gray-500" data-index="5"></div>
-                    <div class="tic-tac-toe-cell border-t-2 border-r-2 border-gray-500" data-index="6"></div>
-                    <div class="tic-tac-toe-cell border-t-2 border-r-2 border-l-2 border-gray-500" data-index="7"></div>
-                    <div class="tic-tac-toe-cell border-t-2 border-l-2 border-gray-500" data-index="8"></div>
-                </div>
-            </div>
-        `;
-        
-        const gameBoard = document.getElementById('tic-tac-toe-board');
-        const gameStatus = document.getElementById('game-status');
-
-        gameActive = true;
-        currentPlayer = 'X';
-        gameState = ["", "", "", "", "", "", "", "", ""];
-
-        const handleCellClick = (e) => {
-            const clickedCell = e.target;
-            const clickedCellIndex = parseInt(clickedCell.getAttribute('data-index'));
-
-            if (gameState[clickedCellIndex] !== "" || !gameActive) {
-                return;
-            }
-
-            gameState[clickedCellIndex] = currentPlayer;
-            clickedCell.textContent = currentPlayer;
-            checkWin();
-        };
-
-        const checkWin = () => {
-            let roundWon = false;
-            for (let i = 0; i < winningConditions.length; i++) {
-                const winCondition = winningConditions[i];
-                let a = gameState[winCondition[0]];
-                let b = gameState[winCondition[1]];
-                let c = gameState[winCondition[2]];
-
-                if (a === "" || b === "" || c === "") {
-                    continue;
-                }
-                if (a === b && b === c) {
-                    roundWon = true;
-                    break;
-                }
-            }
-
-            if (roundWon) {
-                gameStatus.textContent = `Player ${currentPlayer} has won!`;
-                gameActive = false;
-                return;
-            }
-
-            let roundDraw = !gameState.includes("");
-            if (roundDraw) {
-                gameStatus.textContent = "It's a draw!";
-                gameActive = false;
-                return;
-            }
-            
-            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-            gameStatus.textContent = `Player ${currentPlayer}'s turn`;
-        };
-
-        gameBoard.addEventListener('click', handleCellClick);
-    }
-
     const getAndRenderChats = () => {
       if (!currentUser) return;
       if (chatsUnsubscribe) {
@@ -1304,20 +913,6 @@
                   const otherUser = userList.find(u => u.uid === otherUserId);
                   chatName = otherUser ? otherUser.displayName : 'Direct Message';
               }
-              
-              // Handle game invites as special messages
-              const messagesRef = collection(db, `artifacts/${appId}/chats/${chatId}/messages`);
-              const qMessages = query(messagesRef, where('gameInvite.gameId', '!=', ''));
-              onSnapshot(qMessages, (msgSnap) => {
-                msgSnap.forEach(msgDoc => {
-                    const msgData = msgDoc.data();
-                    if (msgData.gameInvite && msgData.gameInvite.opponentId === currentUser.uid && msgData.gameInvite.status !== 'accepted') {
-                        // Show invitation to the recipient
-                        // A more robust solution would be to render a notification in the main UI
-                        showMessage(`You have been challenged to a game of ${msgData.gameInvite.gameType} by ${userList.find(u => u.uid === msgData.gameInvite.challengerId).displayName}!`);
-                    }
-                });
-              });
 
               const chatElement = document.createElement('div');
               chatElement.id = `channel-${chatId}`; // Add ID for updating highlight
@@ -1373,42 +968,6 @@
       });
     };
 
-    const renderAddPersonList = (users) => {
-        if (!addPersonListContainer) return;
-        addPersonListContainer.innerHTML = '';
-        
-        const chatDocRef = doc(db, `artifacts/${appId}/chats`, activeChatId);
-        getDoc(chatDocRef).then(chatDoc => {
-            if (!chatDoc.exists()) {
-                addPersonListContainer.innerHTML = '<p class="text-red-400">Please select a chat first.</p>';
-                return;
-            }
-            
-            const currentParticipants = chatDoc.data().participants;
-            const nonParticipants = userList.filter(user => !currentParticipants.includes(user.uid));
-
-            if (nonParticipants.length === 0) {
-                addPersonListContainer.innerHTML = '<p class="text-gray-400">No other users to add.</p>';
-                document.getElementById('add-person-submit').disabled = true;
-                return;
-            }
-            document.getElementById('add-person-submit').disabled = false;
-
-            nonParticipants.forEach(user => {
-                const userItem = document.createElement('div');
-                userItem.className = 'flex items-center p-2 rounded-md hover:bg-gray-600 cursor-pointer';
-                userItem.innerHTML = `
-                    <div class="flex items-center flex-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 text-gray-400 mr-2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                    <span class="text-gray-200">${user.displayName}</span>
-                    </div>
-                    <input type="checkbox" data-uid="${user.uid}" data-name="${user.displayName}" class="form-checkbox h-4 w-4 text-indigo-600 bg-gray-700 rounded border-gray-600 focus:ring-indigo-500">
-                `;
-                addPersonListContainer.appendChild(userItem);
-            });
-        });
-    }
-
     const fetchUsers = async () => {
       if (!currentUser) return;
       if (usersUnsubscribe) {
@@ -1449,120 +1008,6 @@
         setInterval(deletePublicMessages, 60 * 60 * 1000); // 1 hour
     };
 
-    // Game Invite Modals
-    const gameInviteModal = document.getElementById('game-invite-modal');
-    const gameInviteForm = document.getElementById('game-invite-form');
-    const gameSelect = document.getElementById('game-select');
-    const opponentSelect = document.getElementById('opponent-select');
-    const chatMenuToggle = document.getElementById('chat-menu-toggle');
-    const chatMenu = document.getElementById('chat-menu');
-    const gamesPage = document.getElementById('games-page');
-
-    const renderOpponentSelect = () => {
-        if (!opponentSelect || !currentUser) return;
-        opponentSelect.innerHTML = '';
-        const onlineUsers = userList.filter(user => user.uid !== currentUser.uid);
-        if (onlineUsers.length === 0) {
-            opponentSelect.innerHTML = '<option disabled>No other users online</option>';
-            document.getElementById('send-game-invite').disabled = true;
-        } else {
-            document.getElementById('send-game-invite').disabled = false;
-            onlineUsers.forEach(user => {
-                const option = document.createElement('option');
-                option.value = user.uid;
-                option.textContent = user.displayName;
-                opponentSelect.appendChild(option);
-            });
-        }
-    }
-
-    if (chatMenuToggle) {
-        chatMenuToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            chatMenu.classList.toggle('hidden');
-        });
-    }
-
-    if (document.getElementById('add-person-to-chat')) {
-        document.getElementById('add-person-to-chat').addEventListener('click', () => {
-            if (!activeChatId || activeChatId === 'general') {
-                showMessage("You can only add people to a direct or group chat.");
-                chatMenu.classList.add('hidden');
-                return;
-            }
-            renderAddPersonList(userList);
-            addPersonModal.classList.remove('hidden');
-            chatMenu.classList.add('hidden');
-        });
-    }
-
-    if (document.getElementById('start-game')) {
-        document.getElementById('start-game').addEventListener('click', () => {
-            if (!activeChatId || activeChatId === 'general') {
-                showMessage("You can only challenge a friend to a game in a direct message.");
-                chatMenu.classList.add('hidden');
-                return;
-            }
-            renderOpponentSelect();
-            gameInviteModal.classList.remove('hidden');
-            chatMenu.classList.add('hidden');
-        });
-    }
-    
-    if (cancelAddPersonButton) {
-        cancelAddPersonButton.addEventListener('click', () => {
-            addPersonModal.classList.add('hidden');
-        });
-    }
-
-    if (addPersonSubmitButton) {
-        addPersonSubmitButton.addEventListener('click', async (e) => {
-            e.preventDefault();
-            const checkboxes = addPersonListContainer.querySelectorAll('input[type="checkbox"]:checked');
-            const newParticipants = Array.from(checkboxes).map(cb => cb.dataset.uid);
-            
-            if (newParticipants.length === 0) {
-                showMessage("Please select at least one person to add.");
-                return;
-            }
-
-            try {
-                const chatRef = doc(db, `artifacts/${appId}/chats`, activeChatId);
-                await updateDoc(chatRef, {
-                    participants: arrayUnion(...newParticipants)
-                });
-                showMessage("Users added to chat successfully!");
-                addPersonModal.classList.add('hidden');
-            } catch (error) {
-                console.error("Error adding person to chat:", error);
-                showMessage("Failed to add person to chat. Please try again.");
-            }
-        });
-    }
-
-    if (document.getElementById('leave-chat')) {
-        document.getElementById('leave-chat').addEventListener('click', async () => {
-            if (!currentUser || activeChatId === 'general') {
-                showMessage("You cannot leave the public chat.");
-                chatMenu.classList.add('hidden');
-                return;
-            }
-            
-            const chatRef = doc(db, `artifacts/${appId}/chats`, activeChatId);
-            try {
-                await updateDoc(chatRef, {
-                    participants: arrayRemove(currentUser.uid)
-                });
-                showMessage("You have left the chat.");
-                chatMenu.classList.add('hidden');
-                // Switch back to public chat
-                switchChat('general', 'Public');
-            } catch (error) {
-                console.error("Error leaving chat:", error);
-                showMessage("Failed to leave chat. Please try again.");
-            }
-        });
-    }
 
     if (createChatButton) {
       createChatButton.addEventListener('click', () => {
@@ -1583,80 +1028,6 @@
             if (usersUnsubscribe) usersUnsubscribe();
             groupChatNameField.classList.add('hidden');
             if (groupChatNameInput) groupChatNameInput.value = '';
-        });
-    }
-    
-    if (document.getElementById('cancel-game-invite')) {
-        document.getElementById('cancel-game-invite').addEventListener('click', () => {
-            if (gameInviteModal) gameInviteModal.classList.add('hidden');
-        });
-    }
-
-    if (gameInviteForm) {
-        gameInviteForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!currentUser) return;
-            const gameType = gameSelect.value;
-            const opponentId = opponentSelect.value;
-            const opponentName = opponentSelect.options[opponentSelect.selectedIndex].text;
-            
-            const gameRef = doc(collection(db, `artifacts/${appId}/games`));
-            const gameId = gameRef.id;
-
-            const gameInviteMessage = {
-                text: `${currentUser.displayName} has challenged ${opponentName} to a game of ${gameType}. Click to join!`,
-                userId: currentUser.uid,
-                user: currentUser.displayName,
-                timestamp: serverTimestamp(),
-                gameInvite: {
-                    gameId: gameId,
-                    gameType: gameType,
-                    challengerId: currentUser.uid,
-                    opponentId: opponentId,
-                    status: 'pending'
-                }
-            };
-            
-            if (gameType === 'Pong') {
-                const initialPongState = {
-                    player1Y: 150,
-                    player2Y: 150,
-                    ballX: 300,
-                    ballY: 200,
-                    ballVX: 5,
-                    ballVY: 5,
-                    ballSpeed: 7,
-                    player1Score: 0,
-                    player2Score: 0,
-                    player1Id: currentUser.uid,
-                    player2Id: opponentId,
-                    status: 'pending',
-                    lastUpdated: serverTimestamp()
-                };
-                await setDoc(doc(db, `artifacts/${appId}/games`, gameId), initialPongState);
-            }
-            if (gameType === 'Tic-Tac-Toe') {
-                const initialTttState = {
-                    state: ["", "", "", "", "", "", "", "", ""],
-                    turn: currentUser.uid,
-                    status: 'pending',
-                    players: {
-                        [currentUser.uid]: currentUser.displayName,
-                        [opponentId]: opponentName
-                    },
-                    createdAt: serverTimestamp()
-                };
-                await setDoc(doc(db, `artifacts/${appId}/games`, gameId), initialTttState);
-            }
-
-            try {
-                await addDoc(collection(db, `artifacts/${appId}/chats/${activeChatId}/messages`), gameInviteMessage);
-                showMessage(`Game invite for ${gameType} sent to ${opponentName}!`);
-                gameInviteModal.classList.add('hidden');
-            } catch (error) {
-                console.error("Error sending game invite:", error);
-                showMessage("Failed to send game invite.");
-            }
         });
     }
 
@@ -1720,11 +1091,6 @@
     window.onload = function() {
       if (!auth || !db) return; // Exit if Firebase is not initialized
       
-      // Request notification permission on page load if not already granted/denied
-      if (Notification.permission === "default") {
-        Notification.requestPermission();
-      }
-
       onAuthStateChanged(auth, (user) => {
         currentUser = user;
         if (user) {
@@ -1771,7 +1137,7 @@
                 return;
               }
 
-              if (messageText.toLowerCase() === '/delete messages') {
+              if (messageText.toLowerCase() === '/deletemessages') {
                 e.target.reset();
                 if (allChatsConfirmationModal) allChatsConfirmationModal.classList.remove('hidden');
                 return;
@@ -1909,74 +1275,22 @@
             }
           });
       }
-      
-      // Toggle menu visibility
-      const toggleSidebar = () => {
-        const isSidebarHidden = sidebar.classList.contains('-translate-x-full');
-        if (isSidebarHidden) {
-          sidebar.classList.remove('-translate-x-full');
-          menuToggle.classList.add('hidden');
-          closeMenuToggle.classList.remove('hidden');
-        } else {
-          sidebar.classList.add('-translate-x-full');
-          menuToggle.classList.remove('hidden');
-          closeMenuToggle.classList.add('hidden');
-        }
-      };
 
       if (menuToggle) {
-        menuToggle.addEventListener('click', toggleSidebar);
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.remove('-translate-x-full');
+            menuToggle.classList.add('hidden');
+            closeMenuToggle.classList.remove('hidden');
+        });
       }
 
       if (closeMenuToggle) {
-        closeMenuToggle.addEventListener('click', toggleSidebar);
+        closeMenuToggle.addEventListener('click', () => {
+            sidebar.classList.add('-translate-x-full');
+            menuToggle.classList.remove('hidden');
+            closeMenuToggle.classList.add('hidden');
+        });
       }
-
-      // Games tab functionality
-      const mainContent = document.getElementById('messages-container');
-      const gamesPage = document.getElementById('games-page');
-      const chatContent = document.getElementById('chat-messages-content'); // A new container for chat messages
-      
-      const showChatUI = () => {
-        if(gamesPage) gamesPage.classList.add('hidden');
-        if(mainContent) mainContent.classList.remove('hidden');
-        if(messageForm) messageForm.classList.remove('hidden');
-        if(typingStatusDisplay) typingStatusDisplay.classList.remove('hidden');
-        if(chatHeader) chatHeader.classList.remove('hidden');
-        if(publicChatBanner) publicChatBanner.classList.remove('hidden');
-      }
-
-      const showGamesList = () => {
-          if (messagesUnsubscribe) messagesUnsubscribe();
-          if (typingUnsubscribe) typingUnsubscribe();
-
-          if(mainContent) mainContent.classList.add('hidden');
-          if(messageForm) messageForm.classList.add('hidden');
-          if(typingStatusDisplay) typingStatusDisplay.classList.add('hidden');
-          if(chatHeader) chatHeader.classList.add('hidden');
-          if(publicChatBanner) publicChatBanner.classList.add('hidden');
-
-          if(gamesPage) gamesPage.classList.remove('hidden');
-      };
-      
-      const gamesTabLink = document.getElementById('games-tab-link');
-      if (gamesTabLink) {
-          gamesTabLink.addEventListener('click', showGamesList);
-      }
-
-      if (gamesList) {
-          gamesList.addEventListener('click', (e) => {
-              const gameButton = e.target.closest('div');
-              if (!gameButton) return;
-              
-              if (gameButton.id === 'tic-tac-toe-button-main') {
-                  showGame('Tic-Tac-Toe');
-              } else if (gameButton.id === 'pong-button-main') {
-                  showGame('Pong');
-              }
-          });
-      }
-
     };
   </script>
 </body>
