@@ -261,6 +261,24 @@
             </div>
         </div>
     </div>
+    
+    <div id="mute-unmute-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-lg">
+            <h2 id="mute-modal-title" class="text-xl font-bold text-white mb-4">Mute Users</h2>
+            <form id="mute-unmute-form">
+                <div id="mute-unmute-list" class="max-h-48 overflow-y-auto bg-gray-700 rounded-lg p-2 mb-4">
+                    <p class="text-gray-400">Loading users...</p>
+                </div>
+                <div class="flex justify-end space-x-4">
+                    <button type="button" id="cancel-mute" class="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-700">Cancel</button>
+                    <button type="submit" id="confirm-mute-unmute" class="px-4 py-2 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed">
+                        Confirm
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 
     <div id="create-chat-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
         <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-lg">
@@ -405,6 +423,11 @@
         const addPersonToChatButton = document.getElementById('add-person-to-chat');
         const leaveChatButton = document.getElementById('leave-chat');
         const chatMenuToggle = document.getElementById('chat-menu-toggle');
+        const muteUnmuteModal = document.getElementById('mute-unmute-modal');
+        const muteModalTitle = document.getElementById('mute-modal-title');
+        const muteUnmuteList = document.getElementById('mute-unmute-list');
+        const confirmMuteUnmuteButton = document.getElementById('confirm-mute-unmute');
+        const cancelMuteButton = document.getElementById('cancel-mute');
 
         var currentUser = null;
         var authMode = 'signup'; // 'signup' or 'signin'
@@ -419,6 +442,7 @@
         var typingUnsubscribe = null;
         var canSendMessage = true;
         const cooldownPeriod = 2000; // 2 seconds in milliseconds
+        var mutedUsers = JSON.parse(localStorage.getItem('mutedUsers')) || {};
 
         // Show a custom message box
         function showMessage(msg) {
@@ -480,6 +504,14 @@
             messages.forEach(msg => {
                 // Skip rendering the message if its ID is in the hiddenMessages list
                 if (hiddenMessages.includes(msg.id)) {
+                    return;
+                }
+
+                // Check for muted users, but allow commands to bypass the mute filter
+                const isCommand = msg.text.startsWith('/');
+                const isMuted = mutedUsers[activeChatId] && mutedUsers[activeChatId].includes(msg.userId);
+                
+                if (isMuted && !isCommand) {
                     return;
                 }
 
@@ -714,7 +746,6 @@
                         await reauthenticateWithCredential(currentUser, credential);
                         await deleteAccount();
                         if (deleteAccountModal) deleteAccountModal.classList.add('hidden');
-                        showMessage("Account deleted successfully.");
                     } else {
                         showMessage("Password is required to delete your account.");
                     }
@@ -792,6 +823,7 @@
         const updateTypingStatus = async (isTyping) => {
             if (!currentUser || !currentUser.displayName) return;
             try {
+                // Use a timestamp to track recent activity
                 await setDoc(doc(db, `artifacts/${appId}/public/data/typing_status`, currentUser.uid), {
                     user: currentUser.displayName,
                     isTyping: isTyping,
@@ -806,7 +838,7 @@
             const now = Date.now();
             const otherTypingUsers = typingUsers.filter(u => 
                 u.id !== (currentUser ? currentUser.uid : null) &&
-                (now - u.timestamp.toMillis() < 12000) // 12 seconds
+                (u.timestamp && now - u.timestamp.toMillis() < 12000) // Check if timestamp exists and is recent
             );
 
             if (otherTypingUsers.length > 0) {
@@ -1209,6 +1241,87 @@
             });
         }
 
+        // Mute/Unmute Logic
+        let currentMuteAction = 'mute';
+
+        const openMuteUnmuteModal = async (action) => {
+            currentMuteAction = action;
+            if (muteUnmuteModal) muteUnmuteModal.classList.remove('hidden');
+            if (muteModalTitle) muteModalTitle.textContent = action === 'mute' ? 'Mute Users' : 'Unmute Users';
+            if (confirmMuteUnmuteButton) confirmMuteUnmuteButton.textContent = action === 'mute' ? 'Mute' : 'Unmute';
+
+            muteUnmuteList.innerHTML = '<p class="text-gray-400">Loading users...</p>';
+            
+            const chatRef = doc(db, `artifacts/${appId}/chats`, activeChatId);
+            const chatDoc = await getDoc(chatRef);
+            if (!chatDoc.exists()) {
+                muteUnmuteList.innerHTML = '<p class="text-red-400">Chat not found.</p>';
+                return;
+            }
+            const participants = chatDoc.data().participants;
+            const participantsDetails = userList.filter(u => participants.includes(u.uid));
+
+            const mutedForThisChat = mutedUsers[activeChatId] || [];
+
+            muteUnmuteList.innerHTML = '';
+            participantsDetails.forEach(user => {
+                if (user.uid === currentUser.uid) return;
+
+                const isMuted = mutedForThisChat.includes(user.uid);
+                const shouldDisplay = (action === 'mute' && !isMuted) || (action === 'unmute' && isMuted);
+                
+                if (shouldDisplay) {
+                    const userItem = document.createElement('div');
+                    userItem.className = 'flex items-center p-2 rounded-md hover:bg-gray-600 cursor-pointer';
+                    userItem.innerHTML = `
+                        <div class="flex items-center flex-1">
+                            <span class="text-gray-200">${user.displayName}</span>
+                        </div>
+                        <input type="checkbox" data-uid="${user.uid}" class="form-checkbox h-4 w-4 text-indigo-600 bg-gray-700 rounded border-gray-600 focus:ring-indigo-500">
+                    `;
+                    muteUnmuteList.appendChild(userItem);
+                }
+            });
+
+            if (muteUnmuteList.innerHTML === '') {
+                muteUnmuteList.innerHTML = action === 'mute' ? '<p class="text-gray-400">No users to mute.</p>' : '<p class="text-gray-400">No users are currently muted.</p>';
+            }
+        };
+
+        if (cancelMuteButton) {
+            cancelMuteButton.addEventListener('click', () => {
+                if (muteUnmuteModal) muteUnmuteModal.classList.add('hidden');
+            });
+        }
+        
+        if (confirmMuteUnmuteButton) {
+            confirmMuteUnmuteButton.addEventListener('click', () => {
+                const selectedUserIds = Array.from(muteUnmuteList.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.dataset.uid);
+                
+                if (!mutedUsers[activeChatId]) {
+                    mutedUsers[activeChatId] = [];
+                }
+
+                if (currentMuteAction === 'mute') {
+                    selectedUserIds.forEach(uid => {
+                        if (!mutedUsers[activeChatId].includes(uid)) {
+                            mutedUsers[activeChatId].push(uid);
+                        }
+                    });
+                    showMessage(`${selectedUserIds.length} users have been muted.`);
+                } else { // unmute
+                    mutedUsers[activeChatId] = mutedUsers[activeChatId].filter(uid => !selectedUserIds.includes(uid));
+                    showMessage(`${selectedUserIds.length} users have been unmuted.`);
+                }
+
+                localStorage.setItem('mutedUsers', JSON.stringify(mutedUsers));
+                if (muteUnmuteModal) muteUnmuteModal.classList.add('hidden');
+                // Re-render messages to apply the changes
+                switchChat(activeChatId, chatNameDisplay.textContent);
+            });
+        }
+
+
         // Main logic when the window loads
         window.onload = function() {
             if (!auth || !db) return; // Exit if Firebase is not initialized
@@ -1254,18 +1367,34 @@
                     e.preventDefault();
                     var messageText = messageInput.value.trim();
 
+                    if (messageText === '') {
+                        return;
+                    }
+
+                    // Handle commands
+                    if (messageText.startsWith('/')) {
+                        const command = messageText.split(' ')[0].toLowerCase();
+                        if (command === '/mute') {
+                            e.target.reset();
+                            openMuteUnmuteModal('mute');
+                            return;
+                        } else if (command === '/unmute') {
+                            e.target.reset();
+                            openMuteUnmuteModal('unmute');
+                            return;
+                        } else if (command === '/deletemessages') {
+                            e.target.reset();
+                            if (allChatsConfirmationModal) allChatsConfirmationModal.classList.remove('hidden');
+                            return;
+                        }
+                    }
+
                     if (!canSendMessage) {
                         showMessage("Please wait before sending another message.");
                         return;
                     }
-
-                    if (messageText.toLowerCase() === '/deletemessages') {
-                        e.target.reset();
-                        if (allChatsConfirmationModal) allChatsConfirmationModal.classList.remove('hidden');
-                        return;
-                    }
                     
-                    if (messageText === '' || !currentUser || !currentUser.displayName) {
+                    if (!currentUser || !currentUser.displayName) {
                         return;
                     }
                     
