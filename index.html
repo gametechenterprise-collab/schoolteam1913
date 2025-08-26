@@ -135,20 +135,8 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-gray-400 mr-2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
             <span id="current-user-display" class="text-sm">Connecting...</span>
           </div>
-          <h2 class="text-md font-semibold text-gray-400 mt-4 mb-2">Games</h2>
-          <div id="games-list" class="space-y-2">
-            <div id="tic-tac-toe-button" class="p-2 rounded-lg bg-gray-700 flex items-center justify-between cursor-pointer transition-colors duration-200 hover:bg-gray-600">
-                <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-gray-400 mr-2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z"></path></svg>
-                    <span class="text-sm">Tic-Tac-Toe</span>
-                </div>
-            </div>
-            <div id="pong-button" class="p-2 rounded-lg bg-gray-700 flex items-center justify-between cursor-pointer transition-colors duration-200 hover:bg-gray-600">
-                <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-gray-400 mr-2"><path d="M6 15l-3 3-3-3m0-6l3-3 3 3"></path><path d="M12 21v-6m0-6V3"></path><path d="M17 12l3-3 3 3m0 6l-3 3-3-3"></path><path d="M12 21a9 9 0 0 0 9-9h-9a9 9 0 0 0-9 9"></path></svg>
-                    <span class="text-sm">Pong</span>
-                </div>
-            </div>
+          <div id="games-tab-link" class="p-4 border-t border-gray-700 cursor-pointer">
+              <h2 class="text-md font-semibold text-gray-400 mb-2">Games</h2>
           </div>
           <h2 class="text-md font-semibold text-gray-400 mt-4 mb-2">Settings</h2>
           <button id="change-username-button" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -191,6 +179,9 @@
               <div id="chat-menu" class="absolute right-0 mt-2 w-48 bg-gray-700 rounded-md shadow-lg py-1 z-10 hidden">
                   <button id="add-person-to-chat" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-600 w-full text-left">
                       Add person to chat
+                  </button>
+                  <button id="start-game" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-600 w-full text-left">
+                      Start a Game
                   </button>
                   <button id="leave-chat" class="block px-4 py-2 text-sm text-red-400 hover:bg-gray-600 w-full text-left">
                       Leave chat
@@ -308,237 +299,26 @@
     </div>
   </div>
   
-  <!-- Game Invite Modal -->
-  <div id="game-invite-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
-    <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-sm">
-        <h2 class="text-xl font-bold text-white mb-4">Challenge a friend to a game</h2>
-        <form id="game-invite-form">
-            <div class="mb-4">
-                <label for="game-select" class="block text-sm font-medium text-gray-300 mb-2">Select a Game</label>
-                <select id="game-select" class="w-full p-3 text-sm rounded-lg bg-gray-700 text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <option value="Tic-Tac-Toe">Tic-Tac-Toe</option>
-                    <option value="Pong">Pong</option>
-                </select>
-            </div>
-            <div class="mb-4">
-                <label for="opponent-select" class="block text-sm font-medium text-gray-300 mb-2">Select an Opponent</label>
-                <select id="opponent-select" class="w-full p-3 text-sm rounded-lg bg-gray-700 text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <!-- User list will be populated here -->
-                </select>
-            </div>
-            <div class="flex justify-end space-x-4">
-                <button type="button" id="cancel-game-invite" class="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-700">Cancel</button>
-                <button type="submit" id="send-game-invite" class="px-4 py-2 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600">Send Invite</button>
-            </div>
-        </form>
-    </div>
-  </div>
-
-  <div id="add-person-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
-    <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-lg">
-      <h2 class="text-xl font-bold text-white mb-4">Add a person to this chat</h2>
-      <form id="add-person-form">
-        <div id="add-person-list-container" class="max-h-48 overflow-y-auto bg-gray-700 rounded-lg p-2 mb-4">
-          <p class="text-gray-400">Loading users...</p>
-        </div>
-        <div class="flex justify-end space-x-4">
-            <button type="button" id="cancel-add-person" class="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-700">Cancel</button>
-            <button type="submit" id="add-person-submit" class="px-4 py-2 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed">
-                Add Person
-            </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <div id="create-chat-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
-    <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-lg">
-      <h2 id="create-chat-title" class="text-xl font-bold text-white mb-4">New Direct Message</h2>
-      <form id="create-chat-form">
-        <div id="user-search-container" class="mb-4">
-            <input
-              type="text"
-              id="user-search-input"
-              placeholder="Search for users"
-              class="w-full p-3 text-sm rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
-            />
-        </div>
-        <div id="group-chat-name-field" class="mb-4 hidden">
-            <input
-              type="text"
-              id="group-chat-name-input"
-              placeholder="Group chat name"
-              class="w-full p-3 text-sm rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
-            />
-        </div>
-        <div id="user-list-container" class="max-h-48 overflow-y-auto bg-gray-700 rounded-lg p-2 mb-4">
-          <p class="text-gray-400">Loading users...</p>
-        </div>
-        <div class="flex justify-end space-x-4">
-            <button type="button" id="cancel-create-chat" class="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-700">Cancel</button>
-            <button type="submit" id="create-chat-submit-button" class="px-4 py-2 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed">
-                Create Chat
-            </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <div id="message-box" class="hidden fixed bottom-4 right-4 bg-red-600 text-white p-4 rounded-lg shadow-lg z-50">
-    <p id="message-text"></p>
-  </div>
-
-  <div id="confirmation-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
-    <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-sm">
-      <h2 class="text-xl font-bold text-white mb-4">Confirm Deletion</h2>
-      <p class="text-gray-300 mb-6">Are you sure you want to delete this message? This action cannot be undone.</p>
-      <div class="flex justify-end space-x-4">
-        <button id="cancel-delete" class="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-700">Cancel</button>
-        <button id="confirm-delete" class="px-4 py-2 bg-red-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-red-700">Delete</button>
+  <!-- Games List Page -->
+  <div id="games-page" class="hidden flex-1 p-4 overflow-y-auto">
+      <h2 class="text-2xl font-bold text-white mb-4">Games</h2>
+      <div id="games-list-main" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div id="tic-tac-toe-button-main" class="p-4 bg-gray-800 rounded-lg shadow-lg cursor-pointer transition-colors duration-200 hover:bg-gray-700">
+              <h3 class="text-xl font-semibold">Tic-Tac-Toe</h3>
+              <p class="text-gray-400 mt-2">A classic game of strategy for two players.</p>
+          </div>
+          <div id="pong-button-main" class="p-4 bg-gray-800 rounded-lg shadow-lg cursor-pointer transition-colors duration-200 hover:bg-gray-700">
+              <h3 class="text-xl font-semibold">Pong</h3>
+              <p class="text-gray-400 mt-2">The classic arcade game of table tennis.</p>
+          </div>
       </div>
-    </div>
-  </div>
-
-  <div id="all-chats-confirmation-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
-    <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-sm">
-      <h2 class="text-xl font-bold text-white mb-4">Confirm Deletion of All Chats</h2>
-      <p class="text-gray-300 mb-6">Are you sure you want to delete all of your messages? This action cannot be undone.</p>
-      <div class="flex justify-end space-x-4">
-        <button id="cancel-all-delete" class="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-700">Cancel</button>
-        <button id="confirm-all-delete" class="px-4 py-2 bg-red-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-red-700">Delete All</button>
-      </div>
-    </div>
-  </div>
-  
-  <div id="delete-account-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
-    <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-sm">
-      <h2 class="text-xl font-bold text-white mb-4">Delete Account</h2>
-      <p class="text-gray-300 mb-6">Are you absolutely sure you want to delete your account? This action is permanent and cannot be undone. All your messages will be deleted.</p>
-      <div class="flex justify-end space-x-4">
-        <button id="cancel-delete-account" class="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-700">Cancel</button>
-        <button id="confirm-delete-account" class="px-4 py-2 bg-red-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-red-700">Delete My Account</button>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Game Invite Modal -->
-  <div id="game-invite-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
-    <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-sm">
-        <h2 class="text-xl font-bold text-white mb-4">Challenge a friend to a game</h2>
-        <form id="game-invite-form">
-            <div class="mb-4">
-                <label for="game-select" class="block text-sm font-medium text-gray-300 mb-2">Select a Game</label>
-                <select id="game-select" class="w-full p-3 text-sm rounded-lg bg-gray-700 text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <option value="Tic-Tac-Toe">Tic-Tac-Toe</option>
-                    <option value="Pong">Pong</option>
-                </select>
-            </div>
-            <div class="mb-4">
-                <label for="opponent-select" class="block text-sm font-medium text-gray-300 mb-2">Select an Opponent</label>
-                <select id="opponent-select" class="w-full p-3 text-sm rounded-lg bg-gray-700 text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <!-- User list will be populated here -->
-                </select>
-            </div>
-            <div class="flex justify-end space-x-4">
-                <button type="button" id="cancel-game-invite" class="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-700">Cancel</button>
-                <button type="submit" id="send-game-invite" class="px-4 py-2 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600">Send Invite</button>
-            </div>
-        </form>
-    </div>
-  </div>
-
-  <div id="add-person-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
-    <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-lg">
-      <h2 class="text-xl font-bold text-white mb-4">Add a person to this chat</h2>
-      <form id="add-person-form">
-        <div id="add-person-list-container" class="max-h-48 overflow-y-auto bg-gray-700 rounded-lg p-2 mb-4">
-          <p class="text-gray-400">Loading users...</p>
-        </div>
-        <div class="flex justify-end space-x-4">
-            <button type="button" id="cancel-add-person" class="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-700">Cancel</button>
-            <button type="submit" id="add-person-submit" class="px-4 py-2 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed">
-                Add Person
-            </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <div id="create-chat-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
-    <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-lg">
-      <h2 id="create-chat-title" class="text-xl font-bold text-white mb-4">New Direct Message</h2>
-      <form id="create-chat-form">
-        <div id="user-search-container" class="mb-4">
-            <input
-              type="text"
-              id="user-search-input"
-              placeholder="Search for users"
-              class="w-full p-3 text-sm rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
-            />
-        </div>
-        <div id="group-chat-name-field" class="mb-4 hidden">
-            <input
-              type="text"
-              id="group-chat-name-input"
-              placeholder="Group chat name"
-              class="w-full p-3 text-sm rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
-            />
-        </div>
-        <div id="user-list-container" class="max-h-48 overflow-y-auto bg-gray-700 rounded-lg p-2 mb-4">
-          <p class="text-gray-400">Loading users...</p>
-        </div>
-        <div class="flex justify-end space-x-4">
-            <button type="button" id="cancel-create-chat" class="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-700">Cancel</button>
-            <button type="submit" id="create-chat-submit-button" class="px-4 py-2 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed">
-                Create Chat
-            </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <div id="message-box" class="hidden fixed bottom-4 right-4 bg-red-600 text-white p-4 rounded-lg shadow-lg z-50">
-    <p id="message-text"></p>
-  </div>
-
-  <div id="confirmation-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
-    <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-sm">
-      <h2 class="text-xl font-bold text-white mb-4">Confirm Deletion</h2>
-      <p class="text-gray-300 mb-6">Are you sure you want to delete this message? This action cannot be undone.</p>
-      <div class="flex justify-end space-x-4">
-        <button id="cancel-delete" class="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-700">Cancel</button>
-        <button id="confirm-delete" class="px-4 py-2 bg-red-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-red-700">Delete</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="all-chats-confirmation-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
-    <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-sm">
-      <h2 class="text-xl font-bold text-white mb-4">Confirm Deletion of All Chats</h2>
-      <p class="text-gray-300 mb-6">Are you sure you want to delete all of your messages? This action cannot be undone.</p>
-      <div class="flex justify-end space-x-4">
-        <button id="cancel-all-delete" class="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-700">Cancel</button>
-        <button id="confirm-all-delete" class="px-4 py-2 bg-red-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-red-700">Delete All</button>
-      </div>
-    </div>
-  </div>
-  
-  <div id="delete-account-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
-    <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-sm">
-      <h2 class="text-xl font-bold text-white mb-4">Delete Account</h2>
-      <p class="text-gray-300 mb-6">Are you absolutely sure you want to delete your account? This action is permanent and cannot be undone. All your messages will be deleted.</p>
-      <div class="flex justify-end space-x-4">
-        <button id="cancel-delete-account" class="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-700">Cancel</button>
-        <button id="confirm-delete-account" class="px-4 py-2 bg-red-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-red-700">Delete My Account</button>
-      </div>
-    </div>
   </div>
   
   <script type="module">
     // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, deleteUser, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, setDoc, doc, serverTimestamp, query, where, getDocs, onSnapshot, deleteDoc, orderBy, limit, arrayUnion, writeBatch, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, setDoc, doc, serverTimestamp, query, where, getDocs, onSnapshot, deleteDoc, orderBy, limit, arrayUnion, writeBatch, updateDoc, arrayRemove } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // Global variables from the environment
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -1079,6 +859,7 @@
         
         // Hide game-related buttons
         if (chatMenuToggle) chatMenuToggle.classList.add('hidden');
+        if (gamesPage) gamesPage.classList.add('hidden');
 
         if (chatId === 'general') {
             if (publicChatBanner) publicChatBanner.classList.remove('hidden');
@@ -1090,9 +871,7 @@
         }
 
         // Show chat UI elements and hide game content
-        if (messagesContainer) messagesContainer.innerHTML = `<div class="flex items-center justify-center h-full text-gray-400 text-lg">
-          Loading messages...
-        </div>`;
+        if (messagesContainer) messagesContainer.classList.remove('hidden');
         if (messageForm) messageForm.classList.remove('hidden');
         if (typingStatusDisplay) typingStatusDisplay.classList.remove('hidden');
 
@@ -1147,7 +926,7 @@
     // This is the function to handle showing the game UI
     const showGame = (gameName) => {
         // Hide chat UI elements
-        if (messagesContainer) messagesContainer.innerHTML = '';
+        if (messagesContainer) messagesContainer.classList.add('hidden');
         if (messageForm) messageForm.classList.add('hidden');
         if (typingStatusDisplay) typingStatusDisplay.classList.add('hidden');
         if (chatHeader) chatHeader.classList.add('hidden');
@@ -1165,6 +944,37 @@
             renderPongGame();
         }
     }
+    
+    const showGamesList = () => {
+        // Hide chat UI elements
+        if (messagesContainer) messagesContainer.classList.add('hidden');
+        if (messageForm) messageForm.classList.add('hidden');
+        if (typingStatusDisplay) typingStatusDisplay.classList.add('hidden');
+        if (chatHeader) chatHeader.classList.add('hidden');
+        if (publicChatBanner) publicChatBanner.classList.add('hidden');
+
+        // Unsubscribe from any active chat/typing listeners
+        if (messagesUnsubscribe) messagesUnsubscribe();
+        if (typingUnsubscribe) typingUnsubscribe();
+        
+        // Show games page
+        gamesPage.classList.remove('hidden');
+        const mainGamesList = document.getElementById('games-list-main');
+        if (mainGamesList) {
+            mainGamesList.innerHTML = `
+                <div id="tic-tac-toe-button-main" class="p-4 bg-gray-800 rounded-lg shadow-lg cursor-pointer transition-colors duration-200 hover:bg-gray-700">
+                    <h3 class="text-xl font-semibold">Tic-Tac-Toe</h3>
+                    <p class="text-gray-400 mt-2">A classic game of strategy for two players.</p>
+                </div>
+                <div id="pong-button-main" class="p-4 bg-gray-800 rounded-lg shadow-lg cursor-pointer transition-colors duration-200 hover:bg-gray-700">
+                    <h3 class="text-xl font-semibold">Pong</h3>
+                    <p class="text-gray-400 mt-2">The classic arcade game of table tennis.</p>
+                </div>
+            `;
+            document.getElementById('tic-tac-toe-button-main').addEventListener('click', () => showGame('Tic-Tac-Toe'));
+            document.getElementById('pong-button-main').addEventListener('click', () => showGame('Pong'));
+        }
+    };
     
     const renderPongGame = () => {
         if (!mainContentArea) return;
@@ -1566,30 +1376,36 @@
     const renderAddPersonList = (users) => {
         if (!addPersonListContainer) return;
         addPersonListContainer.innerHTML = '';
-        const currentChatDoc = document.getElementById(`channel-${activeChatId}`);
-        if (!currentChatDoc) {
-            addPersonListContainer.innerHTML = '<p class="text-red-400">Please select a chat first.</p>';
-            return;
-        }
-
-        const participants = userList.filter(user => user.uid !== currentUser.uid);
         
-        if (participants.length === 0) {
-            addPersonListContainer.innerHTML = '<p class="text-gray-400">No other users to add.</p>';
-            return;
-        }
+        const chatDocRef = doc(db, `artifacts/${appId}/chats`, activeChatId);
+        getDoc(chatDocRef).then(chatDoc => {
+            if (!chatDoc.exists()) {
+                addPersonListContainer.innerHTML = '<p class="text-red-400">Please select a chat first.</p>';
+                return;
+            }
+            
+            const currentParticipants = chatDoc.data().participants;
+            const nonParticipants = userList.filter(user => !currentParticipants.includes(user.uid));
 
-        participants.forEach(user => {
-          const userItem = document.createElement('div');
-          userItem.className = 'flex items-center p-2 rounded-md hover:bg-gray-600 cursor-pointer';
-          userItem.innerHTML = `
-            <div class="flex items-center flex-1">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 text-gray-400 mr-2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-              <span class="text-gray-200">${user.displayName}</span>
-            </div>
-            <input type="checkbox" data-uid="${user.uid}" data-name="${user.displayName}" class="form-checkbox h-4 w-4 text-indigo-600 bg-gray-700 rounded border-gray-600 focus:ring-indigo-500">
-          `;
-          addPersonListContainer.appendChild(userItem);
+            if (nonParticipants.length === 0) {
+                addPersonListContainer.innerHTML = '<p class="text-gray-400">No other users to add.</p>';
+                document.getElementById('add-person-submit').disabled = true;
+                return;
+            }
+            document.getElementById('add-person-submit').disabled = false;
+
+            nonParticipants.forEach(user => {
+                const userItem = document.createElement('div');
+                userItem.className = 'flex items-center p-2 rounded-md hover:bg-gray-600 cursor-pointer';
+                userItem.innerHTML = `
+                    <div class="flex items-center flex-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 text-gray-400 mr-2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    <span class="text-gray-200">${user.displayName}</span>
+                    </div>
+                    <input type="checkbox" data-uid="${user.uid}" data-name="${user.displayName}" class="form-checkbox h-4 w-4 text-indigo-600 bg-gray-700 rounded border-gray-600 focus:ring-indigo-500">
+                `;
+                addPersonListContainer.appendChild(userItem);
+            });
         });
     }
 
@@ -1640,6 +1456,7 @@
     const opponentSelect = document.getElementById('opponent-select');
     const chatMenuToggle = document.getElementById('chat-menu-toggle');
     const chatMenu = document.getElementById('chat-menu');
+    const gamesPage = document.getElementById('games-page');
 
     const renderOpponentSelect = () => {
         if (!opponentSelect || !currentUser) return;
@@ -1724,10 +1541,26 @@
     }
 
     if (document.getElementById('leave-chat')) {
-        document.getElementById('leave-chat').addEventListener('click', () => {
-            // Placeholder for leaving a chat
-            showMessage("Leave chat functionality is not yet implemented.");
-            chatMenu.classList.add('hidden');
+        document.getElementById('leave-chat').addEventListener('click', async () => {
+            if (!currentUser || activeChatId === 'general') {
+                showMessage("You cannot leave the public chat.");
+                chatMenu.classList.add('hidden');
+                return;
+            }
+            
+            const chatRef = doc(db, `artifacts/${appId}/chats`, activeChatId);
+            try {
+                await updateDoc(chatRef, {
+                    participants: arrayRemove(currentUser.uid)
+                });
+                showMessage("You have left the chat.");
+                chatMenu.classList.add('hidden');
+                // Switch back to public chat
+                switchChat('general', 'Public');
+            } catch (error) {
+                console.error("Error leaving chat:", error);
+                showMessage("Failed to leave chat. Please try again.");
+            }
         });
     }
 
@@ -2100,22 +1933,50 @@
       }
 
       // Games tab functionality
+      const mainContent = document.getElementById('messages-container');
+      const gamesPage = document.getElementById('games-page');
+      const chatContent = document.getElementById('chat-messages-content'); // A new container for chat messages
+      
+      const showChatUI = () => {
+        if(gamesPage) gamesPage.classList.add('hidden');
+        if(mainContent) mainContent.classList.remove('hidden');
+        if(messageForm) messageForm.classList.remove('hidden');
+        if(typingStatusDisplay) typingStatusDisplay.classList.remove('hidden');
+        if(chatHeader) chatHeader.classList.remove('hidden');
+        if(publicChatBanner) publicChatBanner.classList.remove('hidden');
+      }
+
+      const showGamesList = () => {
+          if (messagesUnsubscribe) messagesUnsubscribe();
+          if (typingUnsubscribe) typingUnsubscribe();
+
+          if(mainContent) mainContent.classList.add('hidden');
+          if(messageForm) messageForm.classList.add('hidden');
+          if(typingStatusDisplay) typingStatusDisplay.classList.add('hidden');
+          if(chatHeader) chatHeader.classList.add('hidden');
+          if(publicChatBanner) publicChatBanner.classList.add('hidden');
+
+          if(gamesPage) gamesPage.classList.remove('hidden');
+      };
+      
+      const gamesTabLink = document.getElementById('games-tab-link');
+      if (gamesTabLink) {
+          gamesTabLink.addEventListener('click', showGamesList);
+      }
+
       if (gamesList) {
           gamesList.addEventListener('click', (e) => {
               const gameButton = e.target.closest('div');
               if (!gameButton) return;
               
-              // Unsubscribe from chat-related listeners
-              if (messagesUnsubscribe) messagesUnsubscribe();
-              if (typingUnsubscribe) typingUnsubscribe();
-              
-              if (gameButton.id === 'tic-tac-toe-button') {
+              if (gameButton.id === 'tic-tac-toe-button-main') {
                   showGame('Tic-Tac-Toe');
-              } else if (gameButton.id === 'pong-button') {
+              } else if (gameButton.id === 'pong-button-main') {
                   showGame('Pong');
               }
           });
       }
+
     };
   </script>
 </body>
