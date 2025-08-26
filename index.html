@@ -261,7 +261,7 @@
             </div>
         </div>
     </div>
-    
+
     <div id="mute-unmute-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
         <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-lg">
             <h2 id="mute-modal-title" class="text-xl font-bold text-white mb-4">Mute Users</h2>
@@ -278,7 +278,6 @@
             </form>
         </div>
     </div>
-
 
     <div id="create-chat-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
         <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-lg">
@@ -429,6 +428,7 @@
         const confirmMuteUnmuteButton = document.getElementById('confirm-mute-unmute');
         const cancelMuteButton = document.getElementById('cancel-mute');
 
+
         var currentUser = null;
         var authMode = 'signup'; // 'signup' or 'signin'
         var isTypingTimeout = null;
@@ -507,9 +507,11 @@
                     return;
                 }
 
-                // Check for muted users, but allow commands to bypass the mute filter
-                const isCommand = msg.text.startsWith('/');
+                // Check for muted users
                 const isMuted = mutedUsers[activeChatId] && mutedUsers[activeChatId].includes(msg.userId);
+                
+                // Allow commands to bypass the mute filter
+                const isCommand = msg.text.startsWith('/');
                 
                 if (isMuted && !isCommand) {
                     return;
@@ -1249,7 +1251,7 @@
             if (muteUnmuteModal) muteUnmuteModal.classList.remove('hidden');
             if (muteModalTitle) muteModalTitle.textContent = action === 'mute' ? 'Mute Users' : 'Unmute Users';
             if (confirmMuteUnmuteButton) confirmMuteUnmuteButton.textContent = action === 'mute' ? 'Mute' : 'Unmute';
-
+            
             muteUnmuteList.innerHTML = '<p class="text-gray-400">Loading users...</p>';
             
             const chatRef = doc(db, `artifacts/${appId}/chats`, activeChatId);
@@ -1320,7 +1322,6 @@
                 switchChat(activeChatId, chatNameDisplay.textContent);
             });
         }
-
 
         // Main logic when the window loads
         window.onload = function() {
