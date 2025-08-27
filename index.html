@@ -1,4 +1,4 @@
-/<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -64,6 +64,38 @@
 
         .slider.round:before {
             border-radius: 50%;
+        }
+
+        /* Tic-Tac-Toe specific styles */
+        .tic-tac-toe-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 300px;
+            height: 300px;
+        }
+
+        .tic-tac-toe-cell {
+            background-color: #374151;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .tic-tac-toe-cell.x {
+            color: #6366F1;
+        }
+
+        .tic-tac-toe-cell.o {
+            color: #D1D5DB;
+        }
+
+        .tic-tac-toe-cell:not(.x):not(.o):hover {
+            background-color: #4B5563;
         }
 
         /* Wordle specific styles */
@@ -449,7 +481,9 @@
         const chatPage = document.getElementById('chat-page');
         const gamesPage = document.getElementById('games-page');
         const gamesTabButton = document.getElementById('games-tab-button');
+        const ticTacToeButton = document.getElementById('tic-tac-toe-button');
         const wordleButton = document.getElementById('wordle-button');
+        const ticTacToeContainer = document.getElementById('tic-tac-toe-container');
         const wordleContainer = document.getElementById('wordle-container');
         const messageForm = document.getElementById('message-form');
         const messageInput = document.getElementById('message-input');
@@ -516,10 +550,6 @@
         const userSearchInputGames = document.getElementById('user-search-input');
         const userListContainerGames = document.getElementById('user-list-container');
         const inviteGameSubmitButton = document.getElementById('create-chat-submit-button');
-        const wordleGrid = document.getElementById('wordle-grid');
-        const wordleStatus = document.getElementById('wordle-status');
-        const wordleKeyboard = document.getElementById('wordle-keyboard');
-        const wordleNewGameBtn = document.getElementById('wordle-new-game');
 
 
         var currentUser = null;
@@ -538,6 +568,13 @@
         var mutedUsers = JSON.parse(localStorage.getItem('mutedUsers')) || {};
 
         // Game states
+        let ticTacToeBoard = ['', '', '', '', '', '', '', '', ''];
+        let ticTacToeCurrentPlayer = 'x';
+        let ticTacToeGameActive = false;
+        let ticTacToeOpponentId = null;
+        let ticTacToeGameRef = null;
+        let ticTacToeGameUnsubscribe = null;
+
         const words = ['apple', 'grape', 'house', 'plane', 'ocean', 'river', 'stone', 'music', 'train', 'world'];
         let wordleSolution = '';
         let wordleGridState = [];
@@ -1044,7 +1081,7 @@
                 const publicChatElement = document.createElement('div');
                 publicChatElement.id = 'channel-general'; // Add ID for updating highlight
                 publicChatElement.className = `rounded-lg p-2 flex items-center justify-between cursor-pointer transition-colors duration-200 hover:bg-gray-600 mb-2 ${activeChatId === 'general' ? 'bg-gray-700' : ''}`;
-                publicChatElement.onclick = () => showChatPage(switchChat('general', 'Public'));
+                publicChatElement.onclick = () => switchChat('general', 'Public');
                 publicChatElement.innerHTML = `
                     <div class="flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-gray-400 mr-2"><line x1="4" x2="20" y1="9" y2="9"></line><line x1="4" x2="20" y1="15" y2="15"></line><line x1="10" x2="14" y1="3" y2="21"></line><line x1="10" x2="14" y1="3" y2="21"></line></svg>
@@ -1066,7 +1103,7 @@
                     const chatElement = document.createElement('div');
                     chatElement.id = `channel-${chatId}`; // Add ID for updating highlight
                     chatElement.className = `rounded-lg p-2 flex items-center justify-between cursor-pointer transition-colors duration-200 hover:bg-gray-600 mb-2 ${activeChatId === chatId ? 'bg-gray-700' : ''}`;
-                    chatElement.onclick = () => showChatPage(switchChat(chatId, chatName));
+                    chatElement.onclick = () => switchChat(chatId, chatName);
                     chatElement.innerHTML = `
                         <div class="flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-gray-400 mr-2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
@@ -1433,8 +1470,6 @@
             chatPage.classList.remove('hidden');
             gamesPage.classList.add('hidden');
             if (gamesTabButton) gamesTabButton.classList.remove('bg-indigo-500');
-            // Re-render chat on return
-            switchChat(activeChatId, chatNameDisplay.textContent);
         };
 
         const showGamesPage = () => {
@@ -1447,10 +1482,151 @@
             gamesTabButton.addEventListener('click', showGamesPage);
         }
 
-        const wordleStatus = document.getElementById('wordle-status');
-        const wordleGrid = document.getElementById('wordle-grid');
-        const wordleKeyboard = document.getElementById('wordle-keyboard');
-        const wordleNewGameBtn = document.getElementById('wordle-new-game');
+        const ticTacToeStatus = document.getElementById('tic-tac-toe-status');
+        const ticTacToeBoardEl = document.getElementById('tic-tac-toe-board');
+        const ticTacToeResetBtn = document.getElementById('tic-tac-toe-reset');
+        const ticTacToeVsAiBtn = document.getElementById('tic-tac-toe-vs-ai');
+        const ticTacToeVsHumanLocalBtn = document.getElementById('tic-tac-toe-vs-human-local');
+        const ticTacToeVsHumanOnlineBtn = document.getElementById('tic-tac-toe-vs-human-online');
+
+        // Tic-Tac-Toe Game Logic
+        const winPatterns = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],
+            [0, 4, 8], [2, 4, 6]
+        ];
+
+        const checkWin = () => {
+            for (let pattern of winPatterns) {
+                const [a, b, c] = pattern;
+                if (ticTacToeBoard[a] && ticTacToeBoard[a] === ticTacToeBoard[b] && ticTacToeBoard[a] === ticTacToeBoard[c]) {
+                    ticTacToeGameActive = false;
+                    ticTacToeStatus.textContent = `${ticTacToeBoard[a].toUpperCase()} wins!`;
+                    if (ticTacToeResetBtn) ticTacToeResetBtn.classList.remove('hidden');
+                    return true;
+                }
+            }
+            if (!ticTacToeBoard.includes('')) {
+                ticTacToeGameActive = false;
+                ticTacToeStatus.textContent = 'Draw!';
+                if (ticTacToeResetBtn) ticTacToeResetBtn.classList.remove('hidden');
+                return true;
+            }
+            return false;
+        };
+
+        const aiMove = () => {
+            if (!ticTacToeGameActive) return;
+            let bestMove;
+            let bestScore = -Infinity;
+
+            for (let i = 0; i < 9; i++) {
+                if (ticTacToeBoard[i] === '') {
+                    ticTacToeBoard[i] = 'o';
+                    let score = minimax(ticTacToeBoard, 0, false);
+                    ticTacToeBoard[i] = '';
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestMove = i;
+                    }
+                }
+            }
+
+            if (bestMove !== undefined) {
+                makeMove(bestMove);
+            }
+        };
+
+        const minimax = (board, depth, isMaximizing) => {
+            if (checkWin()) {
+                const winner = ticTacToeBoard.find((cell) => cell !== '');
+                if (winner === 'x') return -1;
+                if (winner === 'o') return 1;
+                return 0; // Draw
+            }
+            if (!ticTacToeBoard.includes('')) return 0;
+
+            if (isMaximizing) {
+                let bestScore = -Infinity;
+                for (let i = 0; i < 9; i++) {
+                    if (board[i] === '') {
+                        board[i] = 'o';
+                        let score = minimax(board, depth + 1, false);
+                        board[i] = '';
+                        bestScore = Math.max(score, bestScore);
+                    }
+                }
+                return bestScore;
+            } else {
+                let bestScore = Infinity;
+                for (let i = 0; i < 9; i++) {
+                    if (board[i] === '') {
+                        board[i] = 'x';
+                        let score = minimax(board, depth + 1, true);
+                        board[i] = '';
+                        bestScore = Math.min(score, bestScore);
+                    }
+                }
+                return bestScore;
+            }
+        };
+
+        const makeMove = (index, player = ticTacToeCurrentPlayer) => {
+            if (ticTacToeBoard[index] === '' && ticTacToeGameActive) {
+                ticTacToeBoard[index] = player;
+                renderTicTacToeBoard();
+                if (!checkWin()) {
+                    ticTacToeCurrentPlayer = (ticTacToeCurrentPlayer === 'x') ? 'o' : 'x';
+                    ticTacToeStatus.textContent = `Player ${ticTacToeCurrentPlayer.toUpperCase()}'s turn`;
+                    if (ticTacToeOpponentId === 'ai' && ticTacToeCurrentPlayer === 'o') {
+                        setTimeout(aiMove, 500);
+                    }
+                }
+            }
+        };
+
+        const renderTicTacToeBoard = () => {
+            ticTacToeBoardEl.innerHTML = '';
+            ticTacToeBoard.forEach((cell, index) => {
+                const cellEl = document.createElement('div');
+                cellEl.classList.add('tic-tac-toe-cell');
+                cellEl.textContent = cell;
+                if (cell) {
+                    cellEl.classList.add(cell);
+                    cellEl.style.cursor = 'not-allowed';
+                } else {
+                    cellEl.addEventListener('click', () => makeMove(index));
+                }
+                ticTacToeBoardEl.appendChild(cellEl);
+            });
+        };
+
+        const resetTicTacToe = () => {
+            ticTacToeBoard = ['', '', '', '', '', '', '', '', ''];
+            ticTacToeCurrentPlayer = 'x';
+            ticTacToeGameActive = true;
+            ticTacToeStatus.textContent = "Player X's turn";
+            if (ticTacToeResetBtn) ticTacToeResetBtn.classList.add('hidden');
+            renderTicTacToeBoard();
+        };
+
+        if (ticTacToeButton) {
+            ticTacToeButton.addEventListener('click', () => {
+                showGamesPage();
+                ticTacToeContainer.classList.remove('hidden');
+                wordleContainer.classList.add('hidden');
+                resetTicTacToe();
+            });
+        }
+        if (ticTacToeResetBtn) ticTacToeResetBtn.addEventListener('click', resetTicTacToe);
+        if (ticTacToeVsAiBtn) ticTacToeVsAiBtn.addEventListener('click', () => {
+            ticTacToeOpponentId = 'ai';
+            resetTicTacToe();
+        });
+        if (ticTacToeVsHumanLocalBtn) ticTacToeVsHumanLocalBtn.addEventListener('click', () => {
+            ticTacToeOpponentId = null; // No opponent ID for local play
+            resetTicTacToe();
+        });
 
         // Wordle Game Logic
         const renderWordleGrid = () => {
@@ -1471,73 +1647,6 @@
                 wordleGrid.appendChild(rowEl);
             }
         };
-        
-        const processWordleGuess = (guess) => {
-            if (wordleGameOver || guess.length !== 5) return;
-        
-            const newRow = [];
-            const solutionLetters = wordleSolution.split('');
-            const guessedLetters = guess.split('');
-            
-            // First pass for correct letters
-            for (let i = 0; i < 5; i++) {
-                if (guessedLetters[i] === solutionLetters[i]) {
-                    newRow.push({ letter: guessedLetters[i], status: 'correct' });
-                    solutionLetters[i] = null; // Mark as used
-                } else {
-                    newRow.push({ letter: guessedLetters[i], status: '' });
-                }
-            }
-            
-            // Second pass for present and absent letters
-            for (let i = 0; i < 5; i++) {
-                if (newRow[i].status === 'correct') continue;
-                
-                const presentIndex = solutionLetters.indexOf(guessedLetters[i]);
-                if (presentIndex > -1) {
-                    newRow[i].status = 'present';
-                    solutionLetters[presentIndex] = null;
-                } else {
-                    newRow[i].status = 'absent';
-                }
-            }
-        
-            wordleGridState[wordleCurrentRow] = newRow;
-            wordleCurrentRow++;
-            renderWordleGrid();
-            wordleCurrentGuess = '';
-        
-            if (guess === wordleSolution) {
-                wordleStatus.textContent = 'You win!';
-                wordleGameOver = true;
-                if (wordleNewGameBtn) wordleNewGameBtn.classList.remove('hidden');
-            } else if (wordleCurrentRow === 6) {
-                wordleStatus.textContent = `You lose! The word was ${wordleSolution}`;
-                wordleGameOver = true;
-                if (wordleNewGameBtn) wordleNewGameBtn.classList.remove('hidden');
-            }
-        };
-
-        const handleWordleKey = (key) => {
-            if (wordleGameOver) return;
-        
-            if (key === 'ENTER') {
-                if (wordleCurrentGuess.length === 5) {
-                    processWordleGuess(wordleCurrentGuess);
-                }
-            } else if (key === 'BACKSPACE') {
-                wordleCurrentGuess = wordleCurrentGuess.slice(0, -1);
-            } else if (wordleCurrentGuess.length < 5 && key.match(/^[a-zA-Z]$/)) {
-                wordleCurrentGuess += key.toUpperCase();
-            }
-        
-            if (wordleGridState[wordleCurrentRow]) {
-                for (let i = 0; i < 5; i++) {
-                    wordleGridState[wordleCurrentRow][i] = { letter: wordleCurrentGuess[i] || '', status: '' };
-                }
-            }
-            renderWordleGrid();
-        };
 
         const newWordleGame = () => {
             wordleSolution = words[Math.floor(Math.random() * words.length)].toUpperCase();
@@ -1545,8 +1654,6 @@
             wordleCurrentGuess = '';
             wordleCurrentRow = 0;
             wordleGameOver = false;
-            wordleStatus.textContent = '';
-            if (wordleNewGameBtn) wordleNewGameBtn.classList.add('hidden');
             renderWordleGrid();
         };
 
@@ -1554,17 +1661,10 @@
             wordleButton.addEventListener('click', () => {
                 showGamesPage();
                 wordleContainer.classList.remove('hidden');
+                ticTacToeContainer.classList.add('hidden');
                 newWordleGame();
             });
         }
-        if (wordleNewGameBtn) {
-            wordleNewGameBtn.addEventListener('click', newWordleGame);
-        }
-
-        window.addEventListener('keydown', (e) => {
-            if (!gamesPage || gamesPage.classList.contains('hidden') || wordleContainer.classList.contains('hidden')) return;
-            handleWordleKey(e.key.toUpperCase());
-        });
 
         // Main logic when the window loads
         window.onload = function() {
