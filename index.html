@@ -1349,6 +1349,26 @@
                 }
             });
 
+            // Event listener for the 3-dot chat menu toggle
+            if (chatMenuToggle) {
+                chatMenuToggle.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const chatMenu = document.getElementById('chat-menu');
+                    if (chatMenu) {
+                        chatMenu.classList.toggle('hidden');
+                    }
+                });
+            }
+
+            // Global click listener to close menus
+            window.addEventListener('click', () => {
+                const chatMenu = document.getElementById('chat-menu');
+                if (chatMenu && !chatMenu.classList.contains('hidden')) {
+                    chatMenu.classList.add('hidden');
+                }
+            });
+
+
             onAuthStateChanged(auth, (user) => {
                 currentUser = user;
                 if (user) {
