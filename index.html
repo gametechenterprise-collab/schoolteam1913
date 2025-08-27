@@ -1,4 +1,4 @@
-/<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -869,12 +869,13 @@
             }
             
             // Show or hide the chat menu
-            const chatMenu = document.getElementById('chat-menu');
-            if (chatId === 'general') {
-                chatMenuToggle.classList.add('hidden');
-                if (chatMenu) chatMenu.classList.add('hidden');
-            } else {
-                chatMenuToggle.classList.remove('hidden');
+            if (chatMenuToggle) {
+                if (chatId === 'general') {
+                    chatMenuToggle.classList.add('hidden');
+                    document.getElementById('chat-menu').classList.add('hidden');
+                } else {
+                    chatMenuToggle.classList.remove('hidden');
+                }
             }
 
             if (messagesContainer) messagesContainer.innerHTML = `<div class="flex items-center justify-center h-full text-gray-400 text-lg">
@@ -1254,14 +1255,22 @@
             
             muteUnmuteList.innerHTML = '<p class="text-gray-400">Loading users...</p>';
             
-            const chatRef = doc(db, `artifacts/${appId}/chats`, activeChatId);
-            const chatDoc = await getDoc(chatRef);
-            if (!chatDoc.exists()) {
-                muteUnmuteList.innerHTML = '<p class="text-red-400">Chat not found.</p>';
-                return;
+            let participantsDetails = [];
+
+            if (activeChatId === 'general') {
+                // For public chat, get all users in the system
+                participantsDetails = userList;
+            } else {
+                // For private chats, get participants from the chat document
+                const chatRef = doc(db, `artifacts/${appId}/chats`, activeChatId);
+                const chatDoc = await getDoc(chatRef);
+                if (!chatDoc.exists()) {
+                    muteUnmuteList.innerHTML = '<p class="text-red-400">Chat not found.</p>';
+                    return;
+                }
+                const participants = chatDoc.data().participants;
+                participantsDetails = userList.filter(u => participants.includes(u.uid));
             }
-            const participants = chatDoc.data().participants;
-            const participantsDetails = userList.filter(u => participants.includes(u.uid));
 
             const mutedForThisChat = mutedUsers[activeChatId] || [];
 
@@ -1327,6 +1336,19 @@
         window.onload = function() {
             if (!auth || !db) return; // Exit if Firebase is not initialized
             
+            // Check and create 'general' chat document if it doesn't exist
+            const generalChatRef = doc(db, `artifacts/${appId}/chats`, 'general');
+            getDoc(generalChatRef).then(docSnapshot => {
+                if (!docSnapshot.exists()) {
+                    setDoc(generalChatRef, {
+                        participants: [], // Public chat doesn't need a participant list
+                        type: 'public',
+                        name: 'Public',
+                        createdAt: serverTimestamp()
+                    });
+                }
+            });
+
             onAuthStateChanged(auth, (user) => {
                 currentUser = user;
                 if (user) {
