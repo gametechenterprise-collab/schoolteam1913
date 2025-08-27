@@ -65,6 +65,80 @@
         .slider.round:before {
             border-radius: 50%;
         }
+
+        /* Tic-Tac-Toe specific styles */
+        .tic-tac-toe-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 300px;
+            height: 300px;
+        }
+
+        .tic-tac-toe-cell {
+            background-color: #374151;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .tic-tac-toe-cell.x {
+            color: #6366F1;
+        }
+
+        .tic-tac-toe-cell.o {
+            color: #D1D5DB;
+        }
+
+        .tic-tac-toe-cell:not(.x):not(.o):hover {
+            background-color: #4B5563;
+        }
+
+        /* Wordle specific styles */
+        .wordle-grid {
+            display: grid;
+            grid-template-rows: repeat(6, 1fr);
+            gap: 5px;
+            width: 300px;
+            height: 350px;
+        }
+
+        .wordle-row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+        }
+
+        .wordle-cell {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #374151;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .wordle-cell.correct {
+            background-color: #10B981; /* Green */
+            border-color: #10B981;
+        }
+        
+        .wordle-cell.present {
+            background-color: #FBBF24; /* Yellow */
+            border-color: #FBBF24;
+        }
+        
+        .wordle-cell.absent {
+            background-color: #6B7280; /* Gray */
+            border-color: #6B7280;
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-gray-100 h-screen flex flex-col transition-colors duration-300">
@@ -104,6 +178,11 @@
                     <div class="rounded-lg p-2 flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-gray-400 mr-2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                         <span id="current-user-display" class="text-sm">Connecting...</span>
+                    </div>
+                    <div class="p-4 border-t border-gray-700">
+                        <button id="games-tab-button" class="w-full px-4 py-2 bg-gray-700 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                            Games
+                        </button>
                     </div>
                     <h2 class="text-md font-semibold text-gray-400 mt-4 mb-2">Settings</h2>
                     <button id="change-username-button" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -152,30 +231,61 @@
                         </div>
                     </div>
                 </div>
-                <div id="messages-container" class="flex-1 p-4 overflow-y-auto space-y-4">
-                    <div class="flex items-center justify-center h-full text-gray-400 text-lg">
-                        Select a chat to begin.
-                    </div>
-                </div>
                 
-                <div id="typing-status" class="p-2 text-sm text-gray-400 bg-gray-800 border-t border-gray-700 hidden"></div>
+                <div id="chat-page" class="flex-1 flex flex-col">
+                    <div id="messages-container" class="flex-1 p-4 overflow-y-auto space-y-4">
+                        <div class="flex items-center justify-center h-full text-gray-400 text-lg">
+                            Select a chat to begin.
+                        </div>
+                    </div>
+                    <div id="typing-status" class="p-2 text-sm text-gray-400 bg-gray-800 border-t border-gray-700 hidden"></div>
+                    <form id="message-form" class="p-4 border-t border-gray-700 bg-gray-800 hidden">
+                        <div class="flex items-end space-x-2">
+                            <input
+                                id="message-input"
+                                type="text"
+                                placeholder="Message"
+                                class="flex-1 p-3 text-sm rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
+                            />
+                            <button
+                                type="submit"
+                                class="px-4 py-3 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Send
+                            </button>
+                        </div>
+                    </form>
+                </div>
 
-                <form id="message-form" class="p-4 border-t border-gray-700 bg-gray-800 hidden">
-                    <div class="flex items-end space-x-2">
-                        <input
-                            id="message-input"
-                            type="text"
-                            placeholder="Message"
-                            class="flex-1 p-3 text-sm rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
-                        />
-                        <button
-                            type="submit"
-                            class="px-4 py-3 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            Send
+                <div id="games-page" class="flex-1 flex-col items-center justify-center p-8 hidden">
+                    <h2 class="text-3xl font-bold mb-8">Games</h2>
+                    <div class="flex space-x-4 mb-8">
+                        <button id="tic-tac-toe-button" class="px-6 py-3 bg-gray-700 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-600">
+                            Tic-Tac-Toe
+                        </button>
+                        <button id="wordle-button" class="px-6 py-3 bg-gray-700 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-600">
+                            Wordle Unlimited
                         </button>
                     </div>
-                </form>
+
+                    <div id="tic-tac-toe-container" class="flex flex-col items-center justify-center space-y-4 hidden">
+                        <h3 class="text-xl font-bold" id="tic-tac-toe-status"></h3>
+                        <div class="flex space-x-2">
+                            <button id="tic-tac-toe-vs-ai" class="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600">vs. AI</button>
+                            <button id="tic-tac-toe-vs-human-local" class="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600">vs. Human (local)</button>
+                            <button id="tic-tac-toe-vs-human-online" class="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600">vs. Human (online)</button>
+                        </div>
+                        <div id="tic-tac-toe-board" class="tic-tac-toe-board"></div>
+                        <button id="tic-tac-toe-reset" class="px-4 py-2 bg-red-600 text-white rounded-lg hidden">Reset Game</button>
+                    </div>
+
+                    <div id="wordle-container" class="flex flex-col items-center justify-center space-y-4 hidden">
+                        <h3 class="text-xl font-bold" id="wordle-status"></h3>
+                        <div id="wordle-grid" class="wordle-grid"></div>
+                        <div id="wordle-keyboard" class="mt-4"></div>
+                        <button id="wordle-new-game" class="px-4 py-2 bg-indigo-500 text-white rounded-lg hidden">New Wordle</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -316,7 +426,7 @@
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, deleteUser, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, setDoc, doc, serverTimestamp, query, where, getDocs, onSnapshot, deleteDoc, orderBy, limit, arrayUnion, writeBatch, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, setDoc, doc, serverTimestamp, query, where, getDocs, onSnapshot, deleteDoc, orderBy, limit, arrayUnion, writeBatch, updateDoc, getDoc, getDocFromCache, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Global variables from the environment
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -368,6 +478,13 @@
         }
 
         // DOM elements
+        const chatPage = document.getElementById('chat-page');
+        const gamesPage = document.getElementById('games-page');
+        const gamesTabButton = document.getElementById('games-tab-button');
+        const ticTacToeButton = document.getElementById('tic-tac-toe-button');
+        const wordleButton = document.getElementById('wordle-button');
+        const ticTacToeContainer = document.getElementById('tic-tac-toe-container');
+        const wordleContainer = document.getElementById('wordle-container');
         const messageForm = document.getElementById('message-form');
         const messageInput = document.getElementById('message-input');
         const messagesContainer = document.getElementById('messages-container');
@@ -427,6 +544,12 @@
         const muteUnmuteList = document.getElementById('mute-unmute-list');
         const confirmMuteUnmuteButton = document.getElementById('confirm-mute-unmute');
         const cancelMuteButton = document.getElementById('cancel-mute');
+        const inviteGameModal = document.getElementById('create-chat-modal'); // Re-using the chat creation modal
+        const inviteGameForm = document.getElementById('create-chat-form'); // Re-using the chat creation form
+        const gamesTitle = document.getElementById('create-chat-title');
+        const userSearchInputGames = document.getElementById('user-search-input');
+        const userListContainerGames = document.getElementById('user-list-container');
+        const inviteGameSubmitButton = document.getElementById('create-chat-submit-button');
 
 
         var currentUser = null;
@@ -443,6 +566,21 @@
         var canSendMessage = true;
         const cooldownPeriod = 2000; // 2 seconds in milliseconds
         var mutedUsers = JSON.parse(localStorage.getItem('mutedUsers')) || {};
+
+        // Game states
+        let ticTacToeBoard = ['', '', '', '', '', '', '', '', ''];
+        let ticTacToeCurrentPlayer = 'x';
+        let ticTacToeGameActive = false;
+        let ticTacToeOpponentId = null;
+        let ticTacToeGameRef = null;
+        let ticTacToeGameUnsubscribe = null;
+
+        const words = ['apple', 'grape', 'house', 'plane', 'ocean', 'river', 'stone', 'music', 'train', 'world'];
+        let wordleSolution = '';
+        let wordleGridState = [];
+        let wordleCurrentGuess = '';
+        let wordleCurrentRow = 0;
+        let wordleGameOver = false;
 
         // Show a custom message box
         function showMessage(msg) {
@@ -693,20 +831,15 @@
             }
         };
         
-        window.addEventListener('click', () => {
-            document.querySelectorAll('[id^="menu-"]').forEach(menu => {
-                if (menu && !menu.classList.contains('hidden')) {
+        window.addEventListener('click', (e) => {
+            // Close all menus unless the click is inside a menu
+            document.querySelectorAll('.relative').forEach(container => {
+                const menu = container.querySelector('[id$="-menu"]');
+                const button = container.querySelector('[id$="-toggle"]');
+                if (menu && button && !menu.classList.contains('hidden') && !container.contains(e.target)) {
                     menu.classList.add('hidden');
                 }
             });
-            const chatMenu = document.getElementById('chat-menu');
-            if (chatMenu && !chatMenu.classList.contains('hidden')) {
-                chatMenu.classList.add('hidden');
-            }
-            const channelMenu = document.getElementById('channel-menu');
-            if (channelMenu && !channelMenu.classList.contains('hidden')) {
-                channelMenu.classList.add('hidden');
-            }
         });
 
         if (confirmDeleteButton) {
@@ -1332,6 +1465,207 @@
             });
         }
 
+        // Game state management
+        const showChatPage = () => {
+            chatPage.classList.remove('hidden');
+            gamesPage.classList.add('hidden');
+            if (gamesTabButton) gamesTabButton.classList.remove('bg-indigo-500');
+        };
+
+        const showGamesPage = () => {
+            chatPage.classList.add('hidden');
+            gamesPage.classList.remove('hidden');
+            if (gamesTabButton) gamesTabButton.classList.add('bg-indigo-500');
+        };
+
+        if (gamesTabButton) {
+            gamesTabButton.addEventListener('click', showGamesPage);
+        }
+
+        const ticTacToeStatus = document.getElementById('tic-tac-toe-status');
+        const ticTacToeBoardEl = document.getElementById('tic-tac-toe-board');
+        const ticTacToeResetBtn = document.getElementById('tic-tac-toe-reset');
+        const ticTacToeVsAiBtn = document.getElementById('tic-tac-toe-vs-ai');
+        const ticTacToeVsHumanLocalBtn = document.getElementById('tic-tac-toe-vs-human-local');
+        const ticTacToeVsHumanOnlineBtn = document.getElementById('tic-tac-toe-vs-human-online');
+
+        // Tic-Tac-Toe Game Logic
+        const winPatterns = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],
+            [0, 4, 8], [2, 4, 6]
+        ];
+
+        const checkWin = () => {
+            for (let pattern of winPatterns) {
+                const [a, b, c] = pattern;
+                if (ticTacToeBoard[a] && ticTacToeBoard[a] === ticTacToeBoard[b] && ticTacToeBoard[a] === ticTacToeBoard[c]) {
+                    ticTacToeGameActive = false;
+                    ticTacToeStatus.textContent = `${ticTacToeBoard[a].toUpperCase()} wins!`;
+                    if (ticTacToeResetBtn) ticTacToeResetBtn.classList.remove('hidden');
+                    return true;
+                }
+            }
+            if (!ticTacToeBoard.includes('')) {
+                ticTacToeGameActive = false;
+                ticTacToeStatus.textContent = 'Draw!';
+                if (ticTacToeResetBtn) ticTacToeResetBtn.classList.remove('hidden');
+                return true;
+            }
+            return false;
+        };
+
+        const aiMove = () => {
+            if (!ticTacToeGameActive) return;
+            let bestMove;
+            let bestScore = -Infinity;
+
+            for (let i = 0; i < 9; i++) {
+                if (ticTacToeBoard[i] === '') {
+                    ticTacToeBoard[i] = 'o';
+                    let score = minimax(ticTacToeBoard, 0, false);
+                    ticTacToeBoard[i] = '';
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestMove = i;
+                    }
+                }
+            }
+
+            if (bestMove !== undefined) {
+                makeMove(bestMove);
+            }
+        };
+
+        const minimax = (board, depth, isMaximizing) => {
+            if (checkWin()) {
+                const winner = ticTacToeBoard.find((cell) => cell !== '');
+                if (winner === 'x') return -1;
+                if (winner === 'o') return 1;
+                return 0; // Draw
+            }
+            if (!ticTacToeBoard.includes('')) return 0;
+
+            if (isMaximizing) {
+                let bestScore = -Infinity;
+                for (let i = 0; i < 9; i++) {
+                    if (board[i] === '') {
+                        board[i] = 'o';
+                        let score = minimax(board, depth + 1, false);
+                        board[i] = '';
+                        bestScore = Math.max(score, bestScore);
+                    }
+                }
+                return bestScore;
+            } else {
+                let bestScore = Infinity;
+                for (let i = 0; i < 9; i++) {
+                    if (board[i] === '') {
+                        board[i] = 'x';
+                        let score = minimax(board, depth + 1, true);
+                        board[i] = '';
+                        bestScore = Math.min(score, bestScore);
+                    }
+                }
+                return bestScore;
+            }
+        };
+
+        const makeMove = (index, player = ticTacToeCurrentPlayer) => {
+            if (ticTacToeBoard[index] === '' && ticTacToeGameActive) {
+                ticTacToeBoard[index] = player;
+                renderTicTacToeBoard();
+                if (!checkWin()) {
+                    ticTacToeCurrentPlayer = (ticTacToeCurrentPlayer === 'x') ? 'o' : 'x';
+                    ticTacToeStatus.textContent = `Player ${ticTacToeCurrentPlayer.toUpperCase()}'s turn`;
+                    if (ticTacToeOpponentId === 'ai' && ticTacToeCurrentPlayer === 'o') {
+                        setTimeout(aiMove, 500);
+                    }
+                }
+            }
+        };
+
+        const renderTicTacToeBoard = () => {
+            ticTacToeBoardEl.innerHTML = '';
+            ticTacToeBoard.forEach((cell, index) => {
+                const cellEl = document.createElement('div');
+                cellEl.classList.add('tic-tac-toe-cell');
+                cellEl.textContent = cell;
+                if (cell) {
+                    cellEl.classList.add(cell);
+                    cellEl.style.cursor = 'not-allowed';
+                } else {
+                    cellEl.addEventListener('click', () => makeMove(index));
+                }
+                ticTacToeBoardEl.appendChild(cellEl);
+            });
+        };
+
+        const resetTicTacToe = () => {
+            ticTacToeBoard = ['', '', '', '', '', '', '', '', ''];
+            ticTacToeCurrentPlayer = 'x';
+            ticTacToeGameActive = true;
+            ticTacToeStatus.textContent = "Player X's turn";
+            if (ticTacToeResetBtn) ticTacToeResetBtn.classList.add('hidden');
+            renderTicTacToeBoard();
+        };
+
+        if (ticTacToeButton) {
+            ticTacToeButton.addEventListener('click', () => {
+                showGamesPage();
+                ticTacToeContainer.classList.remove('hidden');
+                wordleContainer.classList.add('hidden');
+                resetTicTacToe();
+            });
+        }
+        if (ticTacToeResetBtn) ticTacToeResetBtn.addEventListener('click', resetTicTacToe);
+        if (ticTacToeVsAiBtn) ticTacToeVsAiBtn.addEventListener('click', () => {
+            ticTacToeOpponentId = 'ai';
+            resetTicTacToe();
+        });
+        if (ticTacToeVsHumanLocalBtn) ticTacToeVsHumanLocalBtn.addEventListener('click', () => {
+            ticTacToeOpponentId = null; // No opponent ID for local play
+            resetTicTacToe();
+        });
+
+        // Wordle Game Logic
+        const renderWordleGrid = () => {
+            if (!wordleContainer) return;
+            wordleGrid.innerHTML = '';
+            for (let r = 0; r < 6; r++) {
+                const rowEl = document.createElement('div');
+                rowEl.classList.add('wordle-row');
+                for (let c = 0; c < 5; c++) {
+                    const cellEl = document.createElement('div');
+                    cellEl.classList.add('wordle-cell');
+                    if (wordleGridState[r] && wordleGridState[r][c]) {
+                         cellEl.textContent = wordleGridState[r][c].letter;
+                         cellEl.classList.add(wordleGridState[r][c].status);
+                    }
+                    rowEl.appendChild(cellEl);
+                }
+                wordleGrid.appendChild(rowEl);
+            }
+        };
+
+        const newWordleGame = () => {
+            wordleSolution = words[Math.floor(Math.random() * words.length)].toUpperCase();
+            wordleGridState = Array(6).fill().map(() => Array(5).fill({ letter: '', status: '' }));
+            wordleCurrentGuess = '';
+            wordleCurrentRow = 0;
+            wordleGameOver = false;
+            renderWordleGrid();
+        };
+
+        if (wordleButton) {
+            wordleButton.addEventListener('click', () => {
+                showGamesPage();
+                wordleContainer.classList.remove('hidden');
+                ticTacToeContainer.classList.add('hidden');
+                newWordleGame();
+            });
+        }
+
         // Main logic when the window loads
         window.onload = function() {
             if (!auth || !db) return; // Exit if Firebase is not initialized
@@ -1361,13 +1695,15 @@
             }
 
             // Global click listener to close menus
-            window.addEventListener('click', () => {
+            window.addEventListener('click', (e) => {
                 const chatMenu = document.getElementById('chat-menu');
                 if (chatMenu && !chatMenu.classList.contains('hidden')) {
-                    chatMenu.classList.add('hidden');
+                    const isClickInsideMenu = chatMenu.contains(e.target) || chatMenuToggle.contains(e.target);
+                    if (!isClickInsideMenu) {
+                        chatMenu.classList.add('hidden');
+                    }
                 }
             });
-
 
             onAuthStateChanged(auth, (user) => {
                 currentUser = user;
