@@ -1420,6 +1420,7 @@
             if (authForm) {
                 authForm.addEventListener('submit', async (e) => {
                     e.preventDefault();
+                    console.log("Authentication form submitted.");
                     const email = authEmailInput.value;
                     const password = authPasswordInput.value;
                     const username = authUsernameInput.value;
