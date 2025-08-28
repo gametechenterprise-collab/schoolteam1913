@@ -177,45 +177,15 @@
                         </div>
                     </form>
                 </div>
-
-                <div id="games-page" class="flex-1 flex-col items-center justify-center p-8 hidden">
-                    <h2 class="text-3xl font-bold mb-8">Games</h2>
-                    <div class="flex space-x-4 mb-8">
-                        <button id="tic-tac-toe-button" class="px-6 py-3 bg-gray-700 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-600">
-                            Tic-Tac-Toe
-                        </button>
-                        <button id="wordle-button" class="px-6 py-3 bg-gray-700 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-600">
-                            Wordle Unlimited
-                        </button>
-                    </div>
-
-                    <div id="tic-tac-toe-container" class="flex flex-col items-center justify-center space-y-4 hidden">
-                        <h3 class="text-xl font-bold" id="tic-tac-toe-status"></h3>
-                        <div class="flex space-x-2">
-                            <button id="tic-tac-toe-vs-ai" class="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600">vs. AI</button>
-                            <button id="tic-tac-toe-vs-human-local" class="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600">vs. Human (local)</button>
-                            <button id="tic-tac-toe-vs-human-online" class="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600">vs. Human (online)</button>
-                        </div>
-                        <div id="tic-tac-toe-board" class="tic-tac-toe-board"></div>
-                        <button id="tic-tac-toe-reset" class="px-4 py-2 bg-red-600 text-white rounded-lg hidden">Reset Game</button>
-                    </div>
-
-                    <div id="wordle-container" class="flex flex-col items-center justify-center space-y-4 hidden">
-                        <h3 class="text-xl font-bold" id="wordle-status"></h3>
-                        <div id="wordle-grid" class="wordle-grid"></div>
-                        <div id="wordle-keyboard" class="mt-4"></div>
-                        <button id="wordle-new-game" class="px-4 py-2 bg-indigo-500 text-white rounded-lg hidden">New Wordle</button>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
 
     <div id="auth-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
         <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-sm">
-            <h2 id="auth-title" class="text-xl font-bold text-white mb-4">Create Account</h2>
+            <h2 id="auth-title" class="text-xl font-bold text-white mb-4">Sign In</h2>
             <form id="auth-form">
-                <div id="username-field" class="mb-4">
+                <div id="username-field" class="mb-4 hidden">
                     <input
                         type="text"
                         id="auth-username-input"
@@ -247,11 +217,11 @@
                     id="auth-submit-button"
                     class="w-full px-4 py-3 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
-                    Sign Up
+                    Sign In
                 </button>
             </form>
             <div class="text-center mt-4">
-                <button id="toggle-auth-mode" class="text-sm text-indigo-400 hover:underline">Already have an account? Sign In</button>
+                <button id="toggle-auth-mode" class="text-sm text-indigo-400 hover:underline">Need an account? Sign Up</button>
             </div>
         </div>
     </div>
@@ -465,7 +435,7 @@
         const cancelMuteButton = document.getElementById('cancel-mute');
 
         var currentUser = null;
-        var authMode = 'signup'; // 'signup' or 'signin'
+        var authMode = 'signin'; // 'signin' or 'signup'
         var isTypingTimeout = null;
         var messageToDeleteId = null;
         var activeChatId = 'general';
@@ -981,7 +951,7 @@
                 const publicChatElement = document.createElement('div');
                 publicChatElement.id = 'channel-general'; // Add ID for updating highlight
                 publicChatElement.className = `rounded-lg p-2 flex items-center justify-between cursor-pointer transition-colors duration-200 hover:bg-gray-600 mb-2 ${activeChatId === 'general' ? 'bg-gray-700' : ''}`;
-                publicChatElement.onclick = () => { showChatPage(); switchChat('general', 'Public'); };
+                publicChatElement.onclick = () => switchChat('general', 'Public');
                 publicChatElement.innerHTML = `
                     <div class="flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-gray-400 mr-2"><line x1="4" x2="20" y1="9" y2="9"></line><line x1="4" x2="20" y1="15" y2="15"></line><line x1="10" x2="14" y1="3" y2="21"></line><line x1="10" x2="14" y1="3" y2="21"></line></svg>
@@ -1003,7 +973,7 @@
                     const chatElement = document.createElement('div');
                     chatElement.id = `channel-${chatId}`; // Add ID for updating highlight
                     chatElement.className = `rounded-lg p-2 flex items-center justify-between cursor-pointer transition-colors duration-200 hover:bg-gray-600 mb-2 ${activeChatId === chatId ? 'bg-gray-700' : ''}`;
-                    chatElement.onclick = () => { showChatPage(); switchChat(chatId, chatName); };
+                    chatElement.onclick = () => switchChat(chatId, chatName);
                     chatElement.innerHTML = `
                         <div class="flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-gray-400 mr-2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
@@ -1446,127 +1416,6 @@
                     deleteDoc(doc(db, `artifacts/${appId}/public/data/typing_status`, currentUser.uid));
                 }
             });
-
-            if (messageForm) {
-                messageForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    var messageText = messageInput.value.trim();
-
-                    if (messageText === '') {
-                        return;
-                    }
-
-                    // Handle commands
-                    if (messageText.startsWith('/')) {
-                        const command = messageText.split(' ')[0].toLowerCase();
-                        if (command === '/mute') {
-                            e.target.reset();
-                            openMuteUnmuteModal('mute');
-                            return;
-                        } else if (command === '/unmute') {
-                            e.target.reset();
-                            openMuteUnmuteModal('unmute');
-                            return;
-                        } else if (command === '/deletemessages') {
-                            e.target.reset();
-                            if (allChatsConfirmationModal) allChatsConfirmationModal.classList.remove('hidden');
-                            return;
-                        }
-                    }
-
-                    if (!canSendMessage) {
-                        showMessage("Please wait before sending another message.");
-                        return;
-                    }
-                    
-                    if (!currentUser || !currentUser.displayName) {
-                        return;
-                    }
-                    
-                    const isProfanityFilterEnabled = profanityFilterToggle.checked;
-                    if (isProfanityFilterEnabled) {
-                        messageText = filterProfanity(messageText);
-                    }
-                    
-                    try {
-                        await addDoc(collection(db, `artifacts/${appId}/chats/${activeChatId}/messages`), {
-                            text: messageText,
-                            userId: currentUser.uid,
-                            user: currentUser.displayName,
-                            timestamp: serverTimestamp()
-                        });
-                        messageInput.value = '';
-                        await updateTypingStatus(false);
-                        
-                        // Start cooldown
-                        canSendMessage = false;
-                        setTimeout(() => {
-                            canSendMessage = true;
-                        }, cooldownPeriod);
-
-                    } catch (error) {
-                        showMessage("Failed to send message. Please try again.");
-                    }
-                });
-            }
-            
-            if (messageInput) {
-                messageInput.addEventListener('keydown', () => {
-                    // Clear existing timeout to prevent it from firing
-                    clearTimeout(isTypingTimeout);
-                    // Update typing status to true
-                    updateTypingStatus(true);
-                    // Set a new timeout to update typing status to false after 10 seconds
-                    isTypingTimeout = setTimeout(() => {
-                        updateTypingStatus(false);
-                    }, 10000); // 10 seconds
-                });
-            }
-
-            if (signOutButton) {
-                signOutButton.addEventListener('click', async () => {
-                    try {
-                        await signOut(auth);
-                    } catch (error) {
-                        showMessage("Failed to sign out. Please try again.");
-                    }
-                });
-            }
-
-            if (deleteAccountButton) {
-                deleteAccountButton.addEventListener('click', () => {
-                    if (currentUser) {
-                        if (deleteAccountModal) deleteAccountModal.classList.remove('hidden');
-                    } else {
-                        showMessage("You must be signed in to delete your account.");
-                    }
-                });
-            }
-
-            if (confirmDeleteAccountButton) {
-                confirmDeleteAccountButton.addEventListener('click', async () => {
-                    try {
-                        const password = prompt("Please enter your password to confirm account deletion.");
-                        if (password) {
-                            const credential = EmailAuthProvider.credential(currentUser.email, password);
-                            await reauthenticateWithCredential(currentUser, credential);
-                            await deleteAccount();
-                            if (deleteAccountModal) deleteAccountModal.classList.add('hidden');
-                        } else {
-                            showMessage("Password is required to delete your account.");
-                        }
-                    } catch (error) {
-                        console.error("Re-authentication failed:", error);
-                        showMessage(`Re-authentication failed: ${error.message}`);
-                    }
-                });
-            }
-
-            if (cancelDeleteAccountButton) {
-                cancelDeleteAccountButton.addEventListener('click', () => {
-                    if (deleteAccountModal) deleteAccountModal.classList.add('hidden');
-                });
-            }
 
             if (authForm) {
                 authForm.addEventListener('submit', async (e) => {
