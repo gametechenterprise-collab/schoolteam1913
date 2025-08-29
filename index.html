@@ -251,7 +251,7 @@
             </div>
         </div>
     </div>
-    
+    
     <div id="delete-account-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
         <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-sm">
             <h2 class="text-xl font-bold text-white mb-4">Delete Account</h2>
@@ -472,7 +472,7 @@
                 messageBox.classList.add('hidden');
             }, 5000); // Hide after 5 seconds
         }
-        
+        
         // Function to handle desktop notifications
         function sendNotification(title, body) {
             if (!("Notification" in window)) {
@@ -504,19 +504,19 @@
             document.querySelectorAll('#channels-list > div').forEach(element => {
                 element.classList.remove('bg-gray-700');
             });
-            
+            
             // Add 'bg-gray-700' to the newly selected channel
             const newActiveChannel = document.getElementById(`channel-${newChatId}`);
             if (newActiveChannel) {
                 newActiveChannel.classList.add('bg-gray-700');
             }
         };
-        
+        
         // Function to render messages to the DOM
         const renderMessages = (messages) => {
             // Get the list of hidden message IDs from local storage
             const hiddenMessages = JSON.parse(localStorage.getItem('hiddenMessages')) || [];
-            
+            
             if (!messagesContainer) return;
             const isScrolledToBottom = messagesContainer.scrollHeight - messagesContainer.clientHeight <= messagesContainer.scrollTop + 100;
 
@@ -529,10 +529,10 @@
 
                 // Check for muted users
                 const isMuted = mutedUsers[activeChatId] && mutedUsers[activeChatId].includes(msg.userId);
-                
+                
                 // Allow commands to bypass the mute filter
                 const isCommand = msg.text.startsWith('/');
-                
+                
                 if (isMuted && !isCommand) {
                     return;
                 }
@@ -540,15 +540,15 @@
                 const messageElement = document.createElement('div');
                 messageElement.id = `message-${msg.id}`; // Add an ID to the message element
                 messageElement.className = "flex items-start group relative";
-                
+                
                 const avatarChar = msg.user ? msg.user.charAt(0).toUpperCase() : 'U';
                 const timestamp = msg.timestamp?.toDate().toLocaleString() || "Sending...";
-                
+                
                 const isSelf = currentUser && msg.userId === currentUser.uid;
                 const messageContainerClass = isSelf ? "flex-row-reverse" : "";
                 const messageBubbleClass = isSelf ? "bg-indigo-600 text-white" : "bg-gray-700 text-gray-300";
                 const messageMarginClass = isSelf ? "ml-3 mr-3 max-w-3/4" : "ml-3 mr-3 max-w-3/4";
-                
+                
                 messageElement.innerHTML = `
                     <div class="flex ${messageContainerClass} items-start w-full">
                         <div class="flex-shrink-0 w-8 h-8 rounded-full ${messageAvatarClass} flex items-center justify-center text-sm font-bold">
@@ -587,7 +587,7 @@
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
             }
         };
-        
+        
         // Global functions to be called from inline HTML
         window.toggleMenu = (event, msgId, isSelf) => {
             event.stopPropagation();
@@ -616,7 +616,7 @@
                 }
             });
         };
-        
+        
         // Function to hide a message from the user's view
         window.hideMessageForUser = (msgId) => {
             // Get existing hidden messages, or an empty array if none exist
@@ -643,7 +643,7 @@
                 showMessage("Failed to delete message. Please try again.");
             }
         };
-        
+        
         // Function to delete all messages in the current chat
         const deleteAllMessagesInChat = async () => {
             try {
@@ -676,7 +676,7 @@
                 if (allChatsConfirmationModal) allChatsConfirmationModal.classList.add('hidden');
             });
         }
-        
+        
         window.deleteAccount = async () => {
             if (!currentUser) {
                 showMessage("You must be signed in to delete your account.");
@@ -695,9 +695,9 @@
                 const userChatsRef = collection(db, `artifacts/${appId}/chats`);
                 const qChats = query(userChatsRef, where('participants', 'array-contains', currentUser.uid));
                 const chatsSnapshot = await getDocs(qChats);
-                
+                
                 const deletionPromises = [];
-                
+                
                 for (const chatDoc of chatsSnapshot.docs) {
                     const messagesRef = collection(db, `artifacts/${appId}/chats/${chatDoc.id}/messages`);
                     const qMessages = query(messagesRef);
@@ -717,7 +717,7 @@
                 };
 
                 await Promise.all(deletionPromises);
-                
+                
                 // Delete the user's public user data and the user account itself
                 await deleteDoc(doc(db, `artifacts/${appId}/public/data/users`, currentUser.uid));
                 await deleteUser(currentUser);
@@ -727,7 +727,7 @@
                 showMessage(`Failed to delete account. Please try again: ${error.message}`);
             }
         };
-        
+        
         window.addEventListener('click', (e) => {
             // Close all menus unless the click is inside a menu
             document.querySelectorAll('.relative').forEach(container => {
@@ -768,7 +768,7 @@
                 if (allChatsConfirmationModal) allChatsConfirmationModal.classList.add('hidden');
             });
         }
-        
+        
         if (confirmDeleteAccountButton) {
             confirmDeleteAccountButton.addEventListener('click', async () => {
                 try {
@@ -827,12 +827,12 @@
 
                     // Update username in the users collection
                     await setDoc(doc(db, `artifacts/${appId}/public/data/users`, currentUser.uid), { displayName: newUsername }, { merge: true });
-                    
+                    
                     // Update messages with the old username to the new one
                     const messagesRef = collection(db, `artifacts/${appId}/chats/general/messages`);
                     const q = query(messagesRef, where('userId', '==', currentUser.uid));
                     const messagesSnapshot = await getDocs(q);
-                    
+                    
                     const batch = writeBatch(db);
                     messagesSnapshot.forEach(doc => {
                         batch.update(doc.ref, { user: newUsername });
@@ -865,7 +865,7 @@
                 }
             });
         }
-        
+        
         // Profanity filter toggle logic
         if (profanityFilterToggle) {
             profanityFilterToggle.addEventListener('change', () => {
@@ -886,10 +886,10 @@
                 console.error("Error updating typing status:", error);
             }
         };
-        
+        
         const renderTypingStatus = (typingUsers) => {
             const now = Date.now();
-            const otherTypingUsers = typingUsers.filter(u => 
+            const otherTypingUsers = typingUsers.filter(u => 
                 u.id !== (currentUser ? currentUser.uid : null) &&
                 (u.timestamp && now - u.timestamp.toMillis() < 12000) // Check if timestamp exists and is recent
             );
@@ -910,15 +910,15 @@
         const switchChat = (chatId, chatName) => {
             activeChatId = chatId;
             updateChannelUI(chatId);
-            
+            
             if (chatNameDisplay) chatNameDisplay.textContent = chatName;
-            
+            
             if (chatId === 'general') {
                 publicChatBanner.classList.remove('hidden');
             } else {
                 publicChatBanner.classList.add('hidden');
             }
-            
+            
             // Show or hide the chat menu
             if (chatMenuToggle) {
                 if (chatId === 'general') {
@@ -932,7 +932,7 @@
             if (messagesContainer) messagesContainer.innerHTML = `<div class="flex items-center justify-center h-full text-gray-400 text-lg">
                 Loading messages...
             </div>`;
-            
+            
             if (chatHeader) chatHeader.classList.remove('hidden');
             if (messageForm) messageForm.classList.remove('hidden');
             if (typingStatusDisplay) typingStatusDisplay.classList.remove('hidden');
@@ -982,7 +982,7 @@
             });
             if (messageInput) messageInput.placeholder = `Message ${chatName}`;
         };
-        
+        
         const getAndRenderChats = () => {
             if (!currentUser) return;
             if (chatsUnsubscribe) {
@@ -991,11 +991,11 @@
 
             const chatsCollectionRef = collection(db, `artifacts/${appId}/chats`);
             const qChats = query(chatsCollectionRef, where('participants', 'array-contains', currentUser.uid));
-            
+            
             chatsUnsubscribe = onSnapshot(qChats, (querySnapshot) => {
                 if (!channelsList) return;
                 channelsList.innerHTML = '';
-                
+                
                 const publicChatElement = document.createElement('div');
                 publicChatElement.id = 'channel-general'; // Add ID for updating highlight
                 publicChatElement.className = `rounded-lg p-2 flex items-center justify-between cursor-pointer transition-colors duration-200 hover:bg-gray-600 mb-2 ${activeChatId === 'general' ? 'bg-gray-700' : ''}`;
@@ -1089,14 +1089,14 @@
                 userListContainer.innerHTML = '<p class="text-red-400">Failed to load users.</p>';
             }
         };
-        
+        
         // Set up hourly message deletion for the public chat
         const setupHourlyDeletion = () => {
             const deletePublicMessages = async () => {
                 const messagesRef = collection(db, `artifacts/${appId}/chats/general/messages`);
                 const q = query(messagesRef);
                 const querySnapshot = await getDocs(q);
-                
+                
                 if (!querySnapshot.empty) {
                     const batch = writeBatch(db);
                     querySnapshot.forEach((doc) => {
@@ -1134,7 +1134,7 @@
                 if (groupChatNameInput) groupChatNameInput.value = '';
             });
         }
-        
+        
         // Add person to chat button logic
         if (addPersonToChatButton) {
             addPersonToChatButton.addEventListener('click', async () => {
@@ -1151,7 +1151,7 @@
                 }
 
                 const currentParticipants = chatDoc.data().participants;
-                
+                
                 // Fetch all users and filter out those already in the chat
                 const allUsers = await getDocs(collection(db, `artifacts/${appId}/public/data/users`));
                 const availableUsers = allUsers.docs.filter(doc => !currentParticipants.includes(doc.id)).map(doc => ({ uid: doc.id, displayName: doc.data().displayName }));
@@ -1173,7 +1173,7 @@
                 // Change modal title and submit button text
                 document.getElementById('create-chat-title').textContent = 'Add Person to Chat';
                 document.getElementById('create-chat-submit-button').textContent = 'Add to Chat';
-                
+                
                 // Show the modal
                 createChatModal.classList.remove('hidden');
 
@@ -1251,7 +1251,7 @@
                     showMessage("Please enter a name for the group chat.");
                     return;
                 }
-                
+                
                 const participants = [currentUser.uid, ...selectedUsers.map(u => u.uid)];
                 const chatType = selectedUsers.length === 1 ? 'direct_message' : 'group';
                 const chatName = chatType === 'group' ? groupChatNameInput.value.trim() : null;
@@ -1259,7 +1259,7 @@
                 // Check if a DM chat already exists
                 if (chatType === 'direct_message') {
                     const chatsRef = collection(db, `artifacts/${appId}/chats`);
-                    const q = query(chatsRef, 
+                    const q = query(chatsRef, 
                         where('participants', 'array-contains', currentUser.uid)
                     );
                     const existingChats = await getDocs(q);
@@ -1303,9 +1303,9 @@
             if (muteUnmuteModal) muteUnmuteModal.classList.remove('hidden');
             if (muteModalTitle) muteModalTitle.textContent = action === 'mute' ? 'Mute Users' : 'Unmute Users';
             if (confirmMuteUnmuteButton) confirmMuteUnmuteButton.textContent = action === 'mute' ? 'Mute' : 'Unmute';
-            
+            
             muteUnmuteList.innerHTML = '<p class="text-gray-400">Loading users...</p>';
-            
+            
             let participantsDetails = [];
 
             if (activeChatId === 'general') {
@@ -1331,7 +1331,7 @@
 
                 const isMuted = mutedForThisChat.includes(user.uid);
                 const shouldDisplay = (action === 'mute' && !isMuted) || (action === 'unmute' && isMuted);
-                
+                
                 if (shouldDisplay) {
                     const userItem = document.createElement('div');
                     userItem.className = 'flex items-center p-2 rounded-md hover:bg-gray-600 cursor-pointer';
@@ -1355,11 +1355,11 @@
                 if (muteUnmuteModal) muteUnmuteModal.classList.add('hidden');
             });
         }
-        
+        
         if (confirmMuteUnmuteButton) {
             confirmMuteUnmuteButton.addEventListener('click', () => {
                 const selectedUserIds = Array.from(muteUnmuteList.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.dataset.uid);
-                
+                
                 if (!mutedUsers[activeChatId]) {
                     mutedUsers[activeChatId] = [];
                 }
@@ -1434,7 +1434,7 @@
                         // Force a UI update to reflect the new username
                         currentUser.displayName = user.displayName || 'Anonymous';
                     }
-                    
+                    
                     if (userIdDisplay) userIdDisplay.textContent = `User ID: ${user.uid}`;
                     if (currentUserDisplay) currentUserDisplay.textContent = `You (${user.displayName || 'guest'})`;
                     if (authModal) authModal.classList.add('hidden');
@@ -1458,7 +1458,7 @@
                     if (typingStatusDisplay) typingStatusDisplay.classList.add('hidden');
                 }
             });
-            
+            
             window.addEventListener('beforeunload', () => {
                 if (currentUser) {
                     deleteDoc(doc(db, `artifacts/${appId}/public/data/typing_status`, currentUser.uid));
@@ -1490,7 +1490,7 @@
                     }
                 });
             }
-            
+            
             if (toggleAuthModeButton) {
                 toggleAuthModeButton.addEventListener('click', () => {
                     if (authMode === 'signup') {
