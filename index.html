@@ -416,7 +416,7 @@
         const deleteAccountModal = document.getElementById('delete-account-modal');
         const confirmDeleteAccountButton = document.getElementById('confirm-delete-account');
         const cancelDeleteAccountButton = document.getElementById('cancel-delete-account');
-        const reauthPasswordInput = document.getElementById('reauth-password-input'); // Added new password input
+        const reauthPasswordInput = document.getElementById('reauth-password-input');
         const createChatButton = document.getElementById('create-chat-button');
         const createChatModal = document.getElementById('create-chat-modal');
         const createChatForm = document.getElementById('create-chat-form');
@@ -443,6 +443,10 @@
         const muteUnmuteList = document.getElementById('mute-unmute-list');
         const confirmMuteUnmuteButton = document.getElementById('confirm-mute-unmute');
         const cancelMuteButton = document.getElementById('cancel-mute');
+        const changeUsernameModal = document.getElementById('change-username-modal');
+        const changeUsernameForm = document.getElementById('change-username-form');
+        const newUsernameInput = document.getElementById('new-username-input');
+        const changeUsernamePasswordInput = document.getElementById('change-username-password-input');
 
         var currentUser = null;
         var authMode = 'signin'; // 'signin' or 'signup'
@@ -774,6 +778,8 @@
                         showMessage("Please enter your password to confirm.");
                         return;
                     }
+                    const credential = EmailAuthProvider.credential(currentUser.email, password);
+                    await reauthenticateWithCredential(currentUser, credential);
                     await deleteAccount();
                     if (deleteAccountModal) deleteAccountModal.classList.add('hidden');
                 } catch (error) {
@@ -795,40 +801,59 @@
                     showMessage("You must be signed in to change your username.");
                     return;
                 }
-                const newUsername = prompt("Enter your new username:");
-                if (newUsername && newUsername.trim() !== '') {
-                    try {
-                        // Update username in the users collection
-                        await setDoc(doc(db, `artifacts/${appId}/public/data/users`, currentUser.uid), { displayName: newUsername }, { merge: true });
-                        
-                        // Update messages with the old username to the new one
-                        const messagesRef = collection(db, `artifacts/${appId}/chats/general/messages`);
-                        const q = query(messagesRef, where('userId', '==', currentUser.uid));
-                        const messagesSnapshot = await getDocs(q);
-                        
-                        const batch = writeBatch(db);
-                        messagesSnapshot.forEach(doc => {
-                            batch.update(doc.ref, { user: newUsername });
-                        });
-                        await batch.commit();
+                // Hide all other menus before showing the new modal
+                document.querySelectorAll('.relative [id$="-menu"]').forEach(menu => menu.classList.add('hidden'));
+                // Show change username modal
+                changeUsernameModal.classList.remove('hidden');
+                newUsernameInput.value = currentUser.displayName;
+            });
+        }
 
-                        // Update the display name in Firebase Auth
-                        await updateProfile(currentUser, { displayName: newUsername });
-                        
-                        showMessage("Username updated successfully!");
-                        // Update UI
-                        if (currentUserDisplay) currentUserDisplay.textContent = `You (${newUsername})`;
-                        fetchUsers();
-                    } catch (error) {
-                        console.error("Error changing username:", error);
-                        showMessage(`Failed to change username. Please try again: ${error.message}`);
-                    }
-                } else if (newUsername !== null) {
-                    showMessage("Username cannot be empty.");
+        // New Event Listener for the Change Username Form
+        if (changeUsernameForm) {
+            changeUsernameForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const newUsername = newUsernameInput.value.trim();
+                const password = changeUsernamePasswordInput.value;
+
+                if (newUsername === '' || password === '') {
+                    showMessage("New username and password are required.");
+                    return;
+                }
+
+                try {
+                    // Re-authenticate
+                    const credential = EmailAuthProvider.credential(currentUser.email, password);
+                    await reauthenticateWithCredential(currentUser, credential);
+
+                    // Update username in the users collection
+                    await setDoc(doc(db, `artifacts/${appId}/public/data/users`, currentUser.uid), { displayName: newUsername }, { merge: true });
+                    
+                    // Update messages with the old username to the new one
+                    const messagesRef = collection(db, `artifacts/${appId}/chats/general/messages`);
+                    const q = query(messagesRef, where('userId', '==', currentUser.uid));
+                    const messagesSnapshot = await getDocs(q);
+                    
+                    const batch = writeBatch(db);
+                    messagesSnapshot.forEach(doc => {
+                        batch.update(doc.ref, { user: newUsername });
+                    });
+                    await batch.commit();
+
+                    // Update the display name in Firebase Auth
+                    await updateProfile(currentUser, { displayName: newUsername });
+                    showMessage("Username updated successfully!");
+                    currentUser.displayName = newUsername; // Update the local user object
+                    if (currentUserDisplay) currentUserDisplay.textContent = `You (${newUsername})`;
+                    fetchUsers();
+                    changeUsernameModal.classList.add('hidden');
+                } catch (error) {
+                    console.error("Error changing username:", error);
+                    showMessage(`Failed to change username. Please try again: ${error.message}`);
                 }
             });
         }
-        
+
         // Theme toggle logic
         if (themeToggle) {
             themeToggle.addEventListener('change', () => {
