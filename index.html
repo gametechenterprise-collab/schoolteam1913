@@ -1,1525 +1,1530 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Schoolchats</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 15a2 2 0 0 1-2 2H7l-4 4V3a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z'%3E%3C/path%3E%3C/svg%3E">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/lucide@latest"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schoolchats</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 15a2 2 0 0 1-2 2H7l-4 4V3a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z'%3E%3C/path%3E%3C/svg%3E">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
 
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 40px;
-            height: 24px;
-        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 24px;
+        }
 
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
 
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #4B5563;
-            transition: .4s;
-        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #4B5563;
+            transition: .4s;
+        }
 
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 16px;
-            width: 16px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+        }
 
-        input:checked + .slider {
-            background-color: #6366F1;
-        }
+        input:checked + .slider {
+            background-color: #6366F1;
+        }
 
-        input:checked + .slider:before {
-            transform: translateX(16px);
-        }
+        input:checked + .slider:before {
+            transform: translateX(16px);
+        }
 
-        .slider.round {
-            border-radius: 24px;
-        }
+        .slider.round {
+            border-radius: 24px;
+        }
 
-        .slider.round:before {
-            border-radius: 50%;
-        }
-    </style>
+        .slider.round:before {
+            border-radius: 50%;
+        }
+    </style>
 </head>
 <body class="bg-gray-900 text-gray-100 h-screen flex flex-col transition-colors duration-300">
 
-    <div class="flex flex-col h-screen bg-gray-900 text-gray-100 font-inter">
-        <div class="bg-gray-800 p-4 border-b border-gray-700 flex items-center justify-between">
-            <div class="flex items-center">
-                <div id="menu-icons-container" class="relative mr-2 md:hidden">
-                    <button id="menu-toggle" class="p-2 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="6" x2="20" y2="6"></line><line x1="4" y1="18" x2="20" y2="18"></line></svg>
-                    </button>
-                    <button id="close-menu-toggle" class="p-2 text-gray-400 hover:text-white focus:outline-none hidden absolute top-0 left-0">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                    </button>
-                </div>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6 text-indigo-400 mr-2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V3a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                <h1 class="text-xl font-bold">Schoolchats</h1>
-            </div>
-            <div id="user-id-display" class="text-xs text-gray-500 rounded-full px-3 py-1 bg-gray-700">
-                User ID: Connecting...
-            </div>
-        </div>
-
-        <div class="flex flex-1 overflow-hidden">
-            <div id="sidebar" class="bg-gray-800 w-64 flex-shrink-0 border-r border-gray-700 overflow-y-auto z-40 transition-transform duration-300 ease-in-out md:block md:relative md:transform-none fixed inset-y-0 left-0 transform -translate-x-full">
-                
-                <div class="p-4">
-                    <h2 class="text-md font-semibold text-gray-400 mb-2">Channels</h2>
-                    <div id="channels-list">
-                    </div>
-                    <button id="create-chat-button" class="mt-4 w-full px-4 py-2 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        + New Chat
-                    </button>
-                </div>
-                <div class="p-4 border-t border-gray-700">
-                    <h2 class="text-md font-semibold text-gray-400 mb-2">Users</h2>
-                    <div class="rounded-lg p-2 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-gray-400 mr-2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                        <span id="current-user-display" class="text-sm">Connecting...</span>
-                    </div>
-                    <h2 class="text-md font-semibold text-gray-400 mt-4 mb-2">Settings</h2>
-                    <button id="change-username-button" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        Change Username
-                    </button>
-                    <div class="mt-2 p-2 rounded-lg bg-gray-700 flex items-center justify-between">
-                        <span>Dark Mode</span>
-                        <label class="switch">
-                            <input type="checkbox" id="theme-toggle">
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-                    <div class="mt-2 p-2 rounded-lg bg-gray-700 flex items-center justify-between">
-                        <span>Profanity Filter</span>
-                        <label class="switch">
-                            <input type="checkbox" id="profanity-filter-toggle" checked>
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-                    <button id="delete-account-button" class="mt-2 w-full px-4 py-2 bg-red-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
-                        Delete Account
-                    </button>
-                    <button id="sign-out-button" class="mt-2 w-full px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
-                        Sign Out
-                    </button>
-                </div>
-            </div>
-
-            <div class="flex-1 flex flex-col">
-                <div id="public-chat-banner" class="bg-yellow-500 text-yellow-900 p-2 text-center text-sm font-semibold hidden">
-                    This is a public chat. All messages are deleted every hour.
-                </div>
-                <div id="chat-header" class="bg-gray-800 p-4 border-b border-gray-700 flex items-center justify-between hidden">
-                    <h2 id="chat-name" class="text-xl font-bold"></h2>
-                    <div class="relative">
-                        <button id="chat-menu-toggle" class="p-2 text-gray-400 hover:text-white focus:outline-none">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
-                        </button>
-                        <div id="chat-menu" class="absolute right-0 mt-2 w-48 bg-gray-700 rounded-md shadow-lg py-1 z-10 hidden">
-                            <button id="add-person-to-chat" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-600 w-full text-left">
-                                Add person to chat
-                            </button>
-                            <button id="leave-chat" class="block px-4 py-2 text-sm text-red-400 hover:bg-gray-600 w-full text-left">
-                                Leave chat
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="chat-page" class="flex-1 flex flex-col h-full">
-                    <div id="messages-container" class="flex-1 p-4 overflow-y-auto space-y-4">
-                        <div class="flex items-center justify-center h-full text-gray-400 text-lg">
-                            Select a chat to begin.
-                        </div>
-                    </div>
-                    <div id="typing-status" class="p-2 text-sm text-gray-400 bg-gray-800 border-t border-gray-700 hidden"></div>
-                    <form id="message-form" class="p-4 border-t border-gray-700 bg-gray-800 hidden">
-                        <div class="flex items-end space-x-2">
-                            <input
-                                id="message-input"
-                                type="text"
-                                placeholder="Message"
-                                class="flex-1 p-3 text-sm rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
-                            />
-                            <button
-                                type="submit"
-                                class="px-4 py-3 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                Send
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="auth-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
-        <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-sm">
-            <h2 id="auth-title" class="text-xl font-bold text-white mb-4">Sign In</h2>
-            <form id="auth-form">
-                <div id="username-field" class="mb-4 hidden">
-                    <input
-                        type="text"
-                        id="auth-username-input"
-                        placeholder="Username"
-                        class="w-full p-3 text-sm rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
-                        required
-                    />
-                </div>
-                <div class="mb-4">
-                    <input
-                        type="email"
-                        id="auth-email-input"
-                        placeholder="Email"
-                        class="w-full p-3 text-sm rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
-                        required
-                    />
-                </div>
-                <div class="mb-6">
-                    <input
-                        type="password"
-                        id="auth-password-input"
-                        placeholder="Password"
-                        class="w-full p-3 text-sm rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
-                        required
-                    />
-                </div>
-                <button
-                    type="submit"
-                    id="auth-submit-button"
-                    class="w-full px-4 py-3 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                >
-                    Sign In
-                </button>
-            </form>
-            <div class="text-center mt-4">
-                <button id="toggle-auth-mode" class="text-sm text-indigo-400 hover:underline">Need an account? Sign Up</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="message-box" class="hidden fixed bottom-4 right-4 bg-red-600 text-white p-4 rounded-lg shadow-lg z-50">
-        <p id="message-text"></p>
-    </div>
-
-    <div id="confirmation-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
-        <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-sm">
-            <h2 class="text-xl font-bold text-white mb-4">Confirm Deletion</h2>
-            <p class="text-gray-300 mb-6">Are you sure you want to delete this message? This action cannot be undone.</p>
-            <div class="flex justify-end space-x-4">
-                <button id="cancel-delete" class="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-700">Cancel</button>
-                <button id="confirm-delete" class="px-4 py-2 bg-red-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-red-700">Delete</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="all-chats-confirmation-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
-        <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-sm">
-            <h2 class="text-xl font-bold text-white mb-4">Confirm Deletion of All Chats</h2>
-            <p class="text-gray-300 mb-6">Are you sure you want to delete all of your messages? This action cannot be undone.</p>
-            <div class="flex justify-end space-x-4">
-                <button id="cancel-all-delete" class="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-700">Cancel</button>
-                <button id="confirm-all-delete" class="px-4 py-2 bg-red-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-red-700">Delete All</button>
-            </div>
-        </div>
-    </div>
-    
-    <div id="delete-account-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
-        <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-sm">
-            <h2 class="text-xl font-bold text-white mb-4">Delete Account</h2>
-            <p class="text-gray-300 mb-6">Are you absolutely sure you want to delete your account? This action is permanent and cannot be undone. All your messages will be deleted.</p>
-            <div class="mb-4">
-                <input
-                    type="password"
-                    id="reauth-password-input"
-                    placeholder="Enter password to confirm"
-                    class="w-full p-3 text-sm rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
-                    required
-                />
-            </div>
-            <div class="flex justify-end space-x-4">
-                <button id="cancel-delete-account" class="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-700">Cancel</button>
-                <button id="confirm-delete-account" class="px-4 py-2 bg-red-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-red-700">Delete My Account</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="mute-unmute-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
-        <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-lg">
-            <h2 id="mute-modal-title" class="text-xl font-bold text-white mb-4">Mute Users</h2>
-            <form id="mute-unmute-form">
-                <div id="mute-unmute-list" class="max-h-48 overflow-y-auto bg-gray-700 rounded-lg p-2 mb-4">
-                    <p class="text-gray-400">Loading users...</p>
-                </div>
-                <div class="flex justify-end space-x-4">
-                    <button type="button" id="cancel-mute" class="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-700">Cancel</button>
-                    <button type="submit" id="confirm-mute-unmute" class="px-4 py-2 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed">
-                        Confirm
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div id="create-chat-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
-        <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-lg">
-            <h2 id="create-chat-title" class="text-xl font-bold text-white mb-4">New Direct Message</h2>
-            <form id="create-chat-form">
-                <div id="user-search-container" class="mb-4">
-                    <input
-                        type="text"
-                        id="user-search-input"
-                        placeholder="Search for users"
-                        class="w-full p-3 text-sm rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
-                    />
-                </div>
-                <div id="group-chat-name-field" class="mb-4 hidden">
-                    <input
-                        type="text"
-                        id="group-chat-name-input"
-                        placeholder="Group chat name"
-                        class="w-full p-3 text-sm rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
-                    />
-                </div>
-                <div id="user-list-container" class="max-h-48 overflow-y-auto bg-gray-700 rounded-lg p-2 mb-4">
-                    <p class="text-gray-400">Loading users...</p>
-                </div>
-                <div class="flex justify-end space-x-4">
-                    <button type="button" id="cancel-create-chat" class="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-700">Cancel</button>
-                    <button type="submit" id="create-chat-submit-button" class="px-4 py-2 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed">
-                        Create Chat
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-    
-    <script type="module">
-        // Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, deleteUser, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, setDoc, doc, serverTimestamp, query, where, getDocs, onSnapshot, deleteDoc, orderBy, limit, arrayUnion, writeBatch, updateDoc, getDoc, getDocFromCache, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Global variables from the environment
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-
-        // Your web app's Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBGos4EjPNou4fnArQ4aAXNizNoe9nw-QE",
-            authDomain: "main-chat-app-5e845.firebaseapp.com",
-            databaseURL: "https://main-chat-app-5e845-default-rtdb.firebaseio.com",
-            projectId: "main-chat-app-5e845",
-            storageBucket: "main-chat-app-5e845.firebasestorage.app",
-            messagingSenderId: "663520599356",
-            appId: "1:663520599356:web:85ba7c1d8fb2bb2394d239"
-        };
-
-        // Profanity list for filtering
-        const profanityList = [
-            'fuck', 'shit', 'cunt', 'bitch', 'asshole', 'bastard', 'dick', 'pussy', 'whore',
-            'nigga', 'nigger', 'cuck', 'slut', 'fucking', 'fucker', 'retard', 'faggot', 'chink', 'gook', 'kike',
-            'ass', 'fag', 'chink', 'hitler', 'nazi'
-        ];
-        
-        // Function to create a more flexible regex pattern for a single word
-        function createProfanityRegex(word) {
-            // Create a pattern that allows one or more of each character
-            const pattern = word.split('').map(char => `${char}+`).join('');
-            return new RegExp(pattern, 'gi');
-        }
-
-        // Function to filter out profanity
-        function filterProfanity(message) {
-            let filteredMessage = message;
-            profanityList.forEach(profanity => {
-                const pattern = createProfanityRegex(profanity);
-                filteredMessage = filteredMessage.replace(pattern, '****');
-            });
-            return filteredMessage;
-        }
-
-        // Firebase Initialization
-        var app, auth, db;
-        try {
-            app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
-        } catch (error) {
-            showMessage("Failed to initialize Firebase. Check your console for details.");
-            console.error("Firebase initialization failed:", error);
-        }
-
-        // DOM elements
-        const chatPage = document.getElementById('chat-page');
-        const gamesPage = document.getElementById('games-page');
-        const gamesTabButton = document.getElementById('games-tab-button');
-        const wordleButton = document.getElementById('wordle-button');
-        const wordleContainer = document.getElementById('wordle-container');
-        const messageForm = document.getElementById('message-form');
-        const messageInput = document.getElementById('message-input');
-        const messagesContainer = document.getElementById('messages-container');
-        const userIdDisplay = document.getElementById('user-id-display');
-        const currentUserDisplay = document.getElementById('current-user-display');
-        const authModal = document.getElementById('auth-modal');
-        const authForm = document.getElementById('auth-form');
-        const authTitle = document.getElementById('auth-title');
-        const authEmailInput = document.getElementById('auth-email-input');
-        const authPasswordInput = document.getElementById('auth-password-input');
-        const authUsernameInput = document.getElementById('auth-username-input');
-        const authSubmitButton = document.getElementById('auth-submit-button');
-        const usernameField = document.getElementById('username-field');
-        const toggleAuthModeButton = document.getElementById('toggle-auth-mode');
-        const typingStatusDisplay = document.getElementById('typing-status');
-        const sendButton = messageForm.querySelector('button[type="submit"]');
-        const signOutButton = document.getElementById('sign-out-button');
-        const deleteAccountButton = document.getElementById('delete-account-button');
-        const changeUsernameButton = document.getElementById('change-username-button');
-        const messageBox = document.getElementById('message-box');
-        const messageText = document.getElementById('message-text');
-        const confirmationModal = document.getElementById('confirmation-modal');
-        const confirmDeleteButton = document.getElementById('confirm-delete');
-        const cancelDeleteButton = document.getElementById('cancel-delete');
-        const allChatsConfirmationModal = document.getElementById('all-chats-confirmation-modal');
-        const confirmAllDeleteButton = document.getElementById('confirm-all-delete');
-        const cancelAllDeleteButton = document.getElementById('cancel-all-delete');
-        const deleteOtherMessagesButton = document.getElementById('delete-other-messages-button');
-        const deleteMyChatsButton = document.getElementById('delete-my-chats-button');
-        const channelMenu = document.getElementById('channel-menu');
-        const deleteAccountModal = document.getElementById('delete-account-modal');
-        const confirmDeleteAccountButton = document.getElementById('confirm-delete-account');
-        const cancelDeleteAccountButton = document.getElementById('cancel-delete-account');
-        const reauthPasswordInput = document.getElementById('reauth-password-input');
-        const createChatButton = document.getElementById('create-chat-button');
-        const createChatModal = document.getElementById('create-chat-modal');
-        const createChatForm = document.getElementById('create-chat-form');
-        const userSearchInput = document.getElementById('user-search-input');
-        const userListContainer = document.getElementById('user-list-container');
-        const createChatSubmitButton = document.getElementById('create-chat-submit-button');
-        const cancelCreateChatButton = document.getElementById('cancel-create-chat');
-        const chatHeader = document.getElementById('chat-header');
-        const chatNameDisplay = document.getElementById('chat-name');
-        const channelsList = document.getElementById('channels-list');
-        const groupChatNameField = document.getElementById('group-chat-name-field');
-        const groupChatNameInput = document.getElementById('group-chat-name-input');
-        const publicChatBanner = document.getElementById('public-chat-banner');
-        const themeToggle = document.getElementById('theme-toggle');
-        const profanityFilterToggle = document.getElementById('profanity-filter-toggle');
-        const menuToggle = document.getElementById('menu-toggle');
-        const closeMenuToggle = document.getElementById('close-menu-toggle');
-        const sidebar = document.getElementById('sidebar');
-        const addPersonToChatButton = document.getElementById('add-person-to-chat');
-        const leaveChatButton = document.getElementById('leave-chat');
-        const chatMenuToggle = document.getElementById('chat-menu-toggle');
-        const muteUnmuteModal = document.getElementById('mute-unmute-modal');
-        const muteModalTitle = document.getElementById('mute-modal-title');
-        const muteUnmuteList = document.getElementById('mute-unmute-list');
-        const confirmMuteUnmuteButton = document.getElementById('confirm-mute-unmute');
-        const cancelMuteButton = document.getElementById('cancel-mute');
-        const changeUsernameModal = document.getElementById('change-username-modal');
-        const changeUsernameForm = document.getElementById('change-username-form');
-        const newUsernameInput = document.getElementById('new-username-input');
-        const changeUsernamePasswordInput = document.getElementById('change-username-password-input');
-
-        var currentUser = null;
-        var authMode = 'signin'; // 'signin' or 'signup'
-        var isTypingTimeout = null;
-        var messageToDeleteId = null;
-        var activeChatId = 'general';
-        var userList = [];
-        var selectedUsers = [];
-        var usersUnsubscribe = null;
-        var chatsUnsubscribe = null;
-        var messagesUnsubscribe = null;
-        var typingUnsubscribe = null;
-        var canSendMessage = true;
-        const cooldownPeriod = 2000; // 2 seconds in milliseconds
-        var mutedUsers = JSON.parse(localStorage.getItem('mutedUsers')) || {};
-
-        // Show a custom message box
-        function showMessage(msg) {
-            if (!messageText || !messageBox) return;
-            messageText.textContent = msg;
-            messageBox.classList.remove('hidden');
-            setTimeout(() => {
-                messageBox.classList.add('hidden');
-            }, 5000); // Hide after 5 seconds
-        }
-        
-        // Function to handle desktop notifications
-        function sendNotification(title, body) {
-            if (!("Notification" in window)) {
-                console.log("This browser does not support desktop notification");
-            } else if (Notification.permission === "granted") {
-                const notification = new Notification(title, { body: body, icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%3E%3Cpath d="M21 15a2 2 0 0 1-2 2H7l-4 4V3a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"%3E%3C/path%3E%3C/svg%3E' });
-            } else if (Notification.permission !== "denied") {
-                Notification.requestPermission().then(permission => {
-                    if (permission === "granted") {
-                        const notification = new Notification(title, { body: body, icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%3E%3Cpath d="M21 15a2 2 0 0 1-2 2H7l-4 4V3a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"%3E%3C/path%3E%3C/svg%3E' });
-                    }
-                });
-            }
-        }
-
-        // Function to enable/disable message input and send button
-        const setChatEnabled = (enabled) => {
-            if (messageInput) messageInput.disabled = !enabled;
-            if (sendButton) sendButton.disabled = !enabled;
-            if (enabled) {
-                if (messageInput) messageInput.placeholder = "Message #general";
-            } else {
-                if (messageInput) messageInput.placeholder = "Please sign in to chat...";
-            }
-        };
-
-        const updateChannelUI = (newChatId) => {
-            // Remove 'bg-gray-700' from all channel elements
-            document.querySelectorAll('#channels-list > div').forEach(element => {
-                element.classList.remove('bg-gray-700');
-            });
-            
-            // Add 'bg-gray-700' to the newly selected channel
-            const newActiveChannel = document.getElementById(`channel-${newChatId}`);
-            if (newActiveChannel) {
-                newActiveChannel.classList.add('bg-gray-700');
-            }
-        };
-        
-        // Function to render messages to the DOM
-        const renderMessages = (messages) => {
-            // Get the list of hidden message IDs from local storage
-            const hiddenMessages = JSON.parse(localStorage.getItem('hiddenMessages')) || [];
-            
-            if (!messagesContainer) return;
-            const isScrolledToBottom = messagesContainer.scrollHeight - messagesContainer.clientHeight <= messagesContainer.scrollTop + 100;
-
-            messagesContainer.innerHTML = '';
-            messages.forEach(msg => {
-                // Skip rendering the message if its ID is in the hiddenMessages list
-                if (hiddenMessages.includes(msg.id)) {
-                    return;
-                }
-
-                // Check for muted users
-                const isMuted = mutedUsers[activeChatId] && mutedUsers[activeChatId].includes(msg.userId);
-                
-                // Allow commands to bypass the mute filter
-                const isCommand = msg.text.startsWith('/');
-                
-                if (isMuted && !isCommand) {
-                    return;
-                }
-
-                const messageElement = document.createElement('div');
-                messageElement.id = `message-${msg.id}`; // Add an ID to the message element
-                messageElement.className = "flex items-start group relative";
-                
-                const avatarChar = msg.user ? msg.user.charAt(0).toUpperCase() : 'U';
-                const timestamp = msg.timestamp?.toDate().toLocaleString() || "Sending...";
-                
-                const isSelf = currentUser && msg.userId === currentUser.uid;
-                const messageContainerClass = isSelf ? "flex-row-reverse" : "";
-                const messageBubbleClass = isSelf ? "bg-indigo-600 text-white" : "bg-gray-700 text-gray-300";
-                const messageAvatarClass = isSelf ? "bg-indigo-500" : "bg-gray-500";
-                const messageMarginClass = isSelf ? "ml-3 mr-3 max-w-3/4" : "ml-3 mr-3 max-w-3/4";
-                
-                messageElement.innerHTML = `
-                    <div class="flex ${messageContainerClass} items-start w-full">
-                        <div class="flex-shrink-0 w-8 h-8 rounded-full ${messageAvatarClass} flex items-center justify-center text-sm font-bold">
-                            ${avatarChar}
-                        </div>
-                        <div class="${messageMarginClass} flex flex-col ${isSelf ? "items-end" : "items-start"}">
-                            <div class="flex items-baseline ${isSelf ? "flex-row-reverse" : ""}">
-                                <span class="font-semibold text-white">${msg.user}</span>
-                                <span class="ml-2 mr-2 text-xs text-gray-500">${timestamp}</span>
-                            </div>
-                            <p class="text-sm rounded-xl px-3 py-2 ${messageBubbleClass} break-words mt-1">${msg.text}</p>
-                        </div>
-                        <div class="absolute inset-y-0 ${isSelf ? 'left-0' : 'right-0'} flex items-center pr-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <div class="relative">
-                                <button class="flex items-center text-gray-400 hover:text-white focus:outline-none" onclick="toggleMenu(event, '${msg.id}', ${isSelf})">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
-                                </button>
-                                <div id="menu-${msg.id}" class="absolute ${isSelf ? 'left-6' : 'right-6'} top-1/2 -translate-y-1/2 w-48 bg-gray-700 rounded-md shadow-lg py-1 z-10 hidden">
-                                    ${isSelf ? `
-                                        <button class="block px-4 py-2 text-sm text-red-400 hover:bg-gray-600 w-full text-left" onclick="showConfirmationModal('${msg.id}')">
-                                            Remove my words
-                                        </button>
-                                    ` : ''}
-                                    <button class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-600 w-full text-left" onclick="hideMessageForUser('${msg.id}')">
-                                        Hide from my view
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                messagesContainer.appendChild(messageElement);
-            });
-            // Scroll to the bottom of the chat container
-            if (isScrolledToBottom) {
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            }
-        };
-        
-        // Global functions to be called from inline HTML
-        window.toggleMenu = (event, msgId, isSelf) => {
-            event.stopPropagation();
-            const menu = document.getElementById(`menu-${msgId}`);
-            if (menu) {
-                menu.classList.toggle('hidden');
-            }
-        };
-
-        window.toggleChannelMenu = (event) => {
-            event.stopPropagation();
-            if (channelMenu) {
-                channelMenu.classList.toggle('hidden');
-            }
-        };
-
-        window.showConfirmationModal = (msgId) => {
-            messageToDeleteId = msgId;
-            if (confirmationModal) {
-                confirmationModal.classList.remove('hidden');
-            }
-            // Hide all other menus
-            document.querySelectorAll('[id^="menu-"]').forEach(menu => {
-                if (!menu.classList.contains('hidden')) {
-                    menu.classList.add('hidden');
-                }
-            });
-        };
-        
-        // Function to hide a message from the user's view
-        window.hideMessageForUser = (msgId) => {
-            // Get existing hidden messages, or an empty array if none exist
-            const hiddenMessages = JSON.parse(localStorage.getItem('hiddenMessages')) || [];
-            // Add the new message ID to the list
-            hiddenMessages.push(msgId);
-            // Save the updated list to local storage
-            localStorage.setItem('hiddenMessages', JSON.stringify(hiddenMessages));
-            // Remove the message element from the DOM
-            const messageElement = document.getElementById(`message-${msgId}`);
-            if (messageElement) {
-                messageElement.remove();
-            }
-            showMessage("Message hidden from your view.");
-        };
-
-        window.deleteMessage = async (msgId) => {
-            try {
-                const messageRef = doc(db, `artifacts/${appId}/chats/${activeChatId}/messages`, msgId);
-                await deleteDoc(messageRef);
-                showMessage("Message deleted successfully.");
-            } catch (error) {
-                console.error("Error deleting message:", error);
-                showMessage("Failed to delete message. Please try again.");
-            }
-        };
-        
-        // Function to delete all messages in the current chat
-        const deleteAllMessagesInChat = async () => {
-            try {
-                const messagesRef = collection(db, `artifacts/${appId}/chats/${activeChatId}/messages`);
-                const q = query(messagesRef);
-                const querySnapshot = await getDocs(q);
-
-                const batch = writeBatch(db);
-                querySnapshot.forEach((doc) => {
-                    batch.delete(doc.ref);
-                });
-
-                await batch.commit();
-                showMessage("All messages in this chat have been deleted.");
-            } catch (error) {
-                console.error("Error deleting all messages:", error);
-                showMessage("Failed to delete all messages. Please try again.");
-            }
-        };
-
-        if (confirmAllDeleteButton) {
-            confirmAllDeleteButton.addEventListener('click', () => {
-                deleteAllMessagesInChat();
-                if (allChatsConfirmationModal) allChatsConfirmationModal.classList.add('hidden');
-            });
-        }
-
-        if (cancelAllDeleteButton) {
-            cancelAllDeleteButton.addEventListener('click', () => {
-                if (allChatsConfirmationModal) allChatsConfirmationModal.classList.add('hidden');
-            });
-        }
-        
-        window.deleteAccount = async () => {
-            if (!currentUser) {
-                showMessage("You must be signed in to delete your account.");
-                return;
-            }
-            try {
-                // Re-authenticate the user first.
-                const password = reauthPasswordInput.value;
-                if (!password) {
-                    showMessage("Password is required to delete your account.");
-                    return;
-                }
-                const credential = EmailAuthProvider.credential(currentUser.email, password);
-                await reauthenticateWithCredential(currentUser, credential);
-
-                const userChatsRef = collection(db, `artifacts/${appId}/chats`);
-                const qChats = query(userChatsRef, where('participants', 'array-contains', currentUser.uid));
-                const chatsSnapshot = await getDocs(qChats);
-                
-                const deletionPromises = [];
-                
-                for (const chatDoc of chatsSnapshot.docs) {
-                    const messagesRef = collection(db, `artifacts/${appId}/chats/${chatDoc.id}/messages`);
-                    const qMessages = query(messagesRef);
-                    const messagesSnapshot = await getDocs(qMessages);
-                    messagesSnapshot.forEach(messageDoc => {
-                        deletionPromises.push(deleteDoc(messageDoc.ref));
-                    });
-                    // Delete the chat document itself if the user is the last participant
-                    const chatData = chatDoc.data();
-                    if (chatData.participants.length <= 1) {
-                        deletionPromises.push(deleteDoc(chatDoc.ref));
-                    } else {
-                        // Otherwise, just remove the user from the participants list
-                        const newParticipants = chatData.participants.filter(uid => uid !== currentUser.uid);
-                        deletionPromises.push(updateDoc(chatDoc.ref, { participants: newParticipants }));
-                    }
-                };
-
-                await Promise.all(deletionPromises);
-                
-                // Delete the user's public user data and the user account itself
-                await deleteDoc(doc(db, `artifacts/${appId}/public/data/users`, currentUser.uid));
-                await deleteUser(currentUser);
-                showMessage("Account and all associated data deleted successfully.");
-            } catch (error) {
-                console.error("Error deleting account:", error);
-                showMessage(`Failed to delete account. Please try again: ${error.message}`);
-            }
-        };
-        
-        window.addEventListener('click', (e) => {
-            // Close all menus unless the click is inside a menu
-            document.querySelectorAll('.relative').forEach(container => {
-                const menu = container.querySelector('[id$="-menu"]');
-                const button = container.querySelector('[id$="-toggle"]');
-                if (menu && button && !menu.classList.contains('hidden') && !container.contains(e.target)) {
-                    menu.classList.add('hidden');
-                }
-            });
-        });
-
-        if (confirmDeleteButton) {
-            confirmDeleteButton.addEventListener('click', () => {
-                if (messageToDeleteId) {
-                    deleteMessage(messageToDeleteId);
-                    messageToDeleteId = null;
-                }
-                if (confirmationModal) confirmationModal.classList.add('hidden');
-            });
-        }
-
-        if (cancelDeleteButton) {
-            cancelDeleteButton.addEventListener('click', () => {
-                messageToDeleteId = null;
-                if (confirmationModal) confirmationModal.classList.add('hidden');
-            });
-        }
-
-        if (confirmAllDeleteButton) {
-            confirmAllDeleteButton.addEventListener('click', () => {
-                deleteAllMessagesInChat();
-                if (allChatsConfirmationModal) allChatsConfirmationModal.classList.add('hidden');
-            });
-        }
-
-        if (cancelAllDeleteButton) {
-            cancelAllDeleteButton.addEventListener('click', () => {
-                if (allChatsConfirmationModal) allChatsConfirmationModal.classList.add('hidden');
-            });
-        }
-        
-        if (confirmDeleteAccountButton) {
-            confirmDeleteAccountButton.addEventListener('click', async () => {
-                try {
-                    const password = reauthPasswordInput.value;
-                    if (!password) {
-                        showMessage("Please enter your password to confirm.");
-                        return;
-                    }
-                    const credential = EmailAuthProvider.credential(currentUser.email, password);
-                    await reauthenticateWithCredential(currentUser, credential);
-                    await deleteAccount();
-                    if (deleteAccountModal) deleteAccountModal.classList.add('hidden');
-                } catch (error) {
-                    console.error("Account deletion failed:", error);
-                    showMessage(`Account deletion failed: ${error.message}`);
-                }
-            });
-        }
-
-        if (cancelDeleteAccountButton) {
-            cancelDeleteAccountButton.addEventListener('click', () => {
-                if (deleteAccountModal) deleteAccountModal.classList.add('hidden');
-            });
-        }
-
-        if (changeUsernameButton) {
-            changeUsernameButton.addEventListener('click', async () => {
-                if (!currentUser) {
-                    showMessage("You must be signed in to change your username.");
-                    return;
-                }
-                // Hide all other menus before showing the new modal
-                document.querySelectorAll('.relative [id$="-menu"]').forEach(menu => menu.classList.add('hidden'));
-                // Show change username modal
-                changeUsernameModal.classList.remove('hidden');
-                newUsernameInput.value = currentUser.displayName;
-            });
-        }
-
-        // New Event Listener for the Change Username Form
-        if (changeUsernameForm) {
-            changeUsernameForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const newUsername = newUsernameInput.value.trim();
-                const password = changeUsernamePasswordInput.value;
-
-                if (newUsername === '' || password === '') {
-                    showMessage("New username and password are required.");
-                    return;
-                }
-
-                try {
-                    // Re-authenticate
-                    const credential = EmailAuthProvider.credential(currentUser.email, password);
-                    await reauthenticateWithCredential(currentUser, credential);
-
-                    // Update username in the users collection
-                    await setDoc(doc(db, `artifacts/${appId}/public/data/users`, currentUser.uid), { displayName: newUsername }, { merge: true });
-                    
-                    // Update messages with the old username to the new one
-                    const messagesRef = collection(db, `artifacts/${appId}/chats/general/messages`);
-                    const q = query(messagesRef, where('userId', '==', currentUser.uid));
-                    const messagesSnapshot = await getDocs(q);
-                    
-                    const batch = writeBatch(db);
-                    messagesSnapshot.forEach(doc => {
-                        batch.update(doc.ref, { user: newUsername });
-                    });
-                    await batch.commit();
-
-                    // Update the display name in Firebase Auth
-                    await updateProfile(currentUser, { displayName: newUsername });
-                    showMessage("Username updated successfully!");
-                    currentUser.displayName = newUsername; // Update the local user object
-                    if (currentUserDisplay) currentUserDisplay.textContent = `You (${newUsername})`;
-                    fetchUsers();
-                    changeUsernameModal.classList.add('hidden');
-                } catch (error) {
-                    console.error("Error changing username:", error);
-                    showMessage(`Failed to change username. Please try again: ${error.message}`);
-                }
-            });
-        }
-
-        // Theme toggle logic
-        if (themeToggle) {
-            themeToggle.addEventListener('change', () => {
-                if (themeToggle.checked) {
-                    document.body.classList.remove('bg-gray-900', 'text-gray-100');
-                    document.body.classList.add('bg-gray-100', 'text-gray-900');
-                } else {
-                    document.body.classList.remove('bg-gray-100', 'text-gray-900');
-                    document.body.classList.add('bg-gray-900', 'text-gray-100');
-                }
-            });
-        }
-        
-        // Profanity filter toggle logic
-        if (profanityFilterToggle) {
-            profanityFilterToggle.addEventListener('change', () => {
-                // This is handled by the `filterProfanity` function, which checks this state.
-            });
-        }
-
-        const updateTypingStatus = async (isTyping) => {
-            if (!currentUser || !currentUser.displayName) return;
-            try {
-                // Use a timestamp to track recent activity
-                await setDoc(doc(db, `artifacts/${appId}/public/data/typing_status`, currentUser.uid), {
-                    user: currentUser.displayName,
-                    isTyping: isTyping,
-                    timestamp: serverTimestamp()
-                }, { merge: true });
-            } catch (error) {
-                console.error("Error updating typing status:", error);
-            }
-        };
-        
-        const renderTypingStatus = (typingUsers) => {
-            const now = Date.now();
-            const otherTypingUsers = typingUsers.filter(u => 
-                u.id !== (currentUser ? currentUser.uid : null) &&
-                (u.timestamp && now - u.timestamp.toMillis() < 12000) // Check if timestamp exists and is recent
-            );
-
-            if (otherTypingUsers.length > 0) {
-                const names = otherTypingUsers.map(u => u.user).join(', ');
-                if (typingStatusDisplay) {
-                    typingStatusDisplay.textContent = `${names} is typing...`;
-                    typingStatusDisplay.classList.remove('hidden');
-                }
-            } else {
-                if (typingStatusDisplay) {
-                    typingStatusDisplay.classList.add('hidden');
-                }
-            }
-        };
-
-        const switchChat = (chatId, chatName) => {
-            activeChatId = chatId;
-            updateChannelUI(chatId);
-            
-            if (chatNameDisplay) chatNameDisplay.textContent = chatName;
-            
-            if (chatId === 'general') {
-                publicChatBanner.classList.remove('hidden');
-            } else {
-                publicChatBanner.classList.add('hidden');
-            }
-            
-            // Show or hide the chat menu
-            if (chatMenuToggle) {
-                if (chatId === 'general') {
-                    chatMenuToggle.classList.add('hidden');
-                    document.getElementById('chat-menu').classList.add('hidden');
-                } else {
-                    chatMenuToggle.classList.remove('hidden');
-                }
-            }
-
-            if (messagesContainer) messagesContainer.innerHTML = `<div class="flex items-center justify-center h-full text-gray-400 text-lg">
-                Loading messages...
-            </div>`;
-            
-            if (chatHeader) chatHeader.classList.remove('hidden');
-            if (messageForm) messageForm.classList.remove('hidden');
-            if (typingStatusDisplay) typingStatusDisplay.classList.remove('hidden');
-
-            if (messagesUnsubscribe) {
-                messagesUnsubscribe();
-            }
-            if (typingUnsubscribe) {
-                typingUnsubscribe();
-            }
-
-            const messagesCollectionRef = collection(db, `artifacts/${appId}/chats/${chatId}/messages`);
-            const qMessages = query(messagesCollectionRef, orderBy('timestamp'));
-            messagesUnsubscribe = onSnapshot(qMessages, (querySnapshot) => {
-                const fetchedMessages = [];
-                querySnapshot.docChanges().forEach((change) => {
-                    const msg = { id: change.doc.id, ...change.doc.data() };
-                    const isDM = activeChatId !== 'general';
-                    if (change.type === "added" && currentUser && msg.userId !== currentUser.uid) {
-                        if (isDM && document.hidden) {
-                            const filteredText = profanityFilterToggle.checked ? filterProfanity(msg.text) : msg.text;
-                            sendNotification(msg.user, filteredText);
-                        }
-                    }
-                });
-                querySnapshot.forEach((doc) => {
-                    fetchedMessages.push({ id: doc.id, ...doc.data() });
-                });
-                renderMessages(fetchedMessages);
-            }, (error) => {
-                console.error("Error fetching messages for chat:", error);
-                showMessage("Failed to load chat messages. Check your internet connection.");
-            });
-
-            const typingStatusCollectionRef = collection(db, `artifacts/${appId}/public/data/typing_status`);
-            typingUnsubscribe = onSnapshot(typingStatusCollectionRef, (querySnapshot) => {
-                const typingUsers = [];
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    if (data.isTyping && data.user) {
-                        typingUsers.push({ id: doc.id, user: data.user, timestamp: data.timestamp });
-                    }
-                });
-                renderTypingStatus(typingUsers);
-            }, (error) => {
-                console.error("Error fetching typing status:", error);
-            });
-            if (messageInput) messageInput.placeholder = `Message ${chatName}`;
-        };
-        
-        const getAndRenderChats = () => {
-            if (!currentUser) return;
-            if (chatsUnsubscribe) {
-                chatsUnsubscribe();
-            }
-
-            const chatsCollectionRef = collection(db, `artifacts/${appId}/chats`);
-            const qChats = query(chatsCollectionRef, where('participants', 'array-contains', currentUser.uid));
-            
-            chatsUnsubscribe = onSnapshot(qChats, (querySnapshot) => {
-                if (!channelsList) return;
-                channelsList.innerHTML = '';
-                
-                const publicChatElement = document.createElement('div');
-                publicChatElement.id = 'channel-general'; // Add ID for updating highlight
-                publicChatElement.className = `rounded-lg p-2 flex items-center justify-between cursor-pointer transition-colors duration-200 hover:bg-gray-600 mb-2 ${activeChatId === 'general' ? 'bg-gray-700' : ''}`;
-                publicChatElement.onclick = () => { switchChat('general', 'Public'); };
-                publicChatElement.innerHTML = `
-                    <div class="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-gray-400 mr-2"><line x1="4" x2="20" y1="9" y2="9"></line><line x1="4" x2="20" y1="15" y2="15"></line><line x1="10" x2="14" y1="3" y2="21"></line><line x1="10" x2="14" y1="3" y2="21"></line></svg>
-                        <span class="text-sm">Public</span>
-                    </div>
-                `;
-                channelsList.appendChild(publicChatElement);
-
-                querySnapshot.forEach(doc => {
-                    const chat = doc.data();
-                    const chatId = doc.id;
-                    let chatName = chat.name || 'Group Chat';
-                    if (chat.type === 'direct_message' && chat.participants.length === 2) {
-                        const otherUserId = chat.participants.find(uid => uid !== currentUser.uid);
-                        const otherUser = userList.find(u => u.uid === otherUserId);
-                        chatName = otherUser ? otherUser.displayName : 'Direct Message';
-                    }
-
-                    const chatElement = document.createElement('div');
-                    chatElement.id = `channel-${chatId}`; // Add ID for updating highlight
-                    chatElement.className = `rounded-lg p-2 flex items-center justify-between cursor-pointer transition-colors duration-200 hover:bg-gray-600 mb-2 ${activeChatId === chatId ? 'bg-gray-700' : ''}`;
-                    chatElement.onclick = () => switchChat(chatId, chatName);
-                    chatElement.innerHTML = `
-                        <div class="flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-gray-400 mr-2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                            <span class="text-sm">${chatName}</span>
-                        </div>
-                    `;
-                    channelsList.appendChild(chatElement);
-                });
-            }, (error) => {
-                console.error("Error fetching chats:", error);
-                showMessage("Failed to load your chats.");
-            });
-        };
-
-        const renderUserList = (users) => {
-            userListContainer.innerHTML = '';
-            if (users.length === 0) {
-                userListContainer.innerHTML = '<p class="text-gray-400">No users found.</p>';
-                return;
-            }
-            users.forEach(user => {
-                if (user.uid === currentUser.uid) return;
-                const userItem = document.createElement('div');
-                userItem.className = 'flex items-center p-2 rounded-md hover:bg-gray-600 cursor-pointer';
-                userItem.innerHTML = `
-                    <div class="flex items-center flex-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 text-gray-400 mr-2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                        <span class="text-gray-200">${user.displayName}</span>
-                    </div>
-                    <input type="checkbox" data-uid="${user.uid}" data-name="${user.displayName}" class="form-checkbox h-4 w-4 text-indigo-600 bg-gray-700 rounded border-gray-600 focus:ring-indigo-500">
-                `;
-                userItem.querySelector('input[type="checkbox"]').addEventListener('change', (e) => {
-                    const uid = e.target.dataset.uid;
-                    const name = e.target.dataset.name;
-                    if (e.target.checked) {
-                        selectedUsers.push({ uid, displayName: name });
-                    } else {
-                        selectedUsers = selectedUsers.filter(u => u.uid !== uid);
-                    }
-                    // Logic to show group name field
-                    if (selectedUsers.length > 1) {
-                        groupChatNameField.classList.remove('hidden');
-                    } else {
-                        groupChatNameField.classList.add('hidden');
-                    }
-                });
-                userListContainer.appendChild(userItem);
-            });
-        };
-
-        const fetchUsers = async () => {
-            if (!currentUser) return;
-            if (usersUnsubscribe) {
-                usersUnsubscribe();
-            }
-            userListContainer.innerHTML = '<p class="text-gray-400">Loading users...</p>';
-            const usersCollectionRef = collection(db, `artifacts/${appId}/public/data/users`);
-            try {
-                const querySnapshot = await getDocs(usersCollectionRef);
-                userList = querySnapshot.docs.map(doc => ({ uid: doc.id, displayName: doc.data().displayName }));
-                renderUserList(userList);
-                getAndRenderChats();
-            } catch (error) {
-                console.error("Error fetching users:", error);
-                userListContainer.innerHTML = '<p class="text-red-400">Failed to load users.</p>';
-            }
-        };
-        
-        // Set up hourly message deletion for the public chat
-        const setupHourlyDeletion = () => {
-            const deletePublicMessages = async () => {
-                const messagesRef = collection(db, `artifacts/${appId}/chats/general/messages`);
-                const q = query(messagesRef);
-                const querySnapshot = await getDocs(q);
-                
-                if (!querySnapshot.empty) {
-                    const batch = writeBatch(db);
-                    querySnapshot.forEach((doc) => {
-                        batch.delete(doc.ref);
-                    });
-                    await batch.commit();
-                    console.log("Public chat messages deleted.");
-                }
-            };
-
-            // Run immediately and then every hour
-            deletePublicMessages();
-            setInterval(deletePublicMessages, 60 * 60 * 1000); // 1 hour
-        };
-
-
-        if (createChatButton) {
-            createChatButton.addEventListener('click', () => {
-                if (!currentUser) {
-                    showMessage("You must be signed in to create a chat.");
-                    return;
-                }
-                selectedUsers = [];
-                if (createChatModal) createChatModal.classList.remove('hidden');
-                fetchUsers();
-            });
-        }
-
-        if (cancelCreateChatButton) {
-            cancelCreateChatButton.addEventListener('click', () => {
-                if (createChatModal) createChatModal.classList.add('hidden');
-                selectedUsers = [];
-                if (usersUnsubscribe) usersUnsubscribe();
-                groupChatNameField.classList.add('hidden');
-                if (groupChatNameInput) groupChatNameInput.value = '';
-            });
-        }
-        
-        // Add person to chat button logic
-        if (addPersonToChatButton) {
-            addPersonToChatButton.addEventListener('click', async () => {
-                if (!currentUser || !activeChatId || activeChatId === 'general') {
-                    showMessage("You can't add people to the public chat.");
-                    return;
-                }
-
-                const chatRef = doc(db, `artifacts/${appId}/chats`, activeChatId);
-                const chatDoc = await getDoc(chatRef);
-                if (!chatDoc.exists()) {
-                    showMessage("Chat not found.");
-                    return;
-                }
-
-                const currentParticipants = chatDoc.data().participants;
-                
-                // Fetch all users and filter out those already in the chat
-                const allUsers = await getDocs(collection(db, `artifacts/${appId}/public/data/users`));
-                const availableUsers = allUsers.docs.filter(doc => !currentParticipants.includes(doc.id)).map(doc => ({ uid: doc.id, displayName: doc.data().displayName }));
-
-                // Dynamically render the user list for the modal
-                userListContainer.innerHTML = '';
-                availableUsers.forEach(user => {
-                    const userItem = document.createElement('div');
-                    userItem.className = 'flex items-center p-2 rounded-md hover:bg-gray-600 cursor-pointer';
-                    userItem.innerHTML = `
-                        <div class="flex items-center flex-1">
-                            <span class="text-gray-200">${user.displayName}</span>
-                        </div>
-                        <input type="checkbox" data-uid="${user.uid}" data-name="${user.displayName}" class="form-checkbox h-4 w-4 text-indigo-600 bg-gray-700 rounded border-gray-600 focus:ring-indigo-500">
-                    `;
-                    userListContainer.appendChild(userItem);
-                });
-
-                // Change modal title and submit button text
-                document.getElementById('create-chat-title').textContent = 'Add Person to Chat';
-                document.getElementById('create-chat-submit-button').textContent = 'Add to Chat';
-                
-                // Show the modal
-                createChatModal.classList.remove('hidden');
-
-                // Handle form submission for adding users
-                createChatForm.onsubmit = async (e) => {
-                    e.preventDefault();
-                    const selectedUsers = Array.from(userListContainer.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.dataset.uid);
-
-                    if (selectedUsers.length === 0) {
-                        showMessage("Please select at least one user to add.");
-                        return;
-                    }
-
-                    try {
-                        await updateDoc(chatRef, {
-                            participants: arrayUnion(...selectedUsers)
-                        });
-                        showMessage("Users added to chat successfully!");
-                        createChatModal.classList.add('hidden');
-                    } catch (error) {
-                        console.error("Error adding user to chat:", error);
-                        showMessage("Failed to add user. Please try again.");
-                    }
-                };
-            });
-        }
-
-        // Leave chat button logic
-        if (leaveChatButton) {
-            leaveChatButton.addEventListener('click', async () => {
-                if (!currentUser || !activeChatId || activeChatId === 'general') {
-                    showMessage("You can't leave the public chat.");
-                    return;
-                }
-
-                try {
-                    const chatRef = doc(db, `artifacts/${appId}/chats`, activeChatId);
-                    const chatDoc = await getDoc(chatRef);
-                    if (!chatDoc.exists()) {
-                        showMessage("Chat not found.");
-                        return;
-                    }
-
-                    const chatData = chatDoc.data();
-                    const newParticipants = chatData.participants.filter(uid => uid !== currentUser.uid);
-
-                    if (newParticipants.length === 0) {
-                        // If no participants are left, delete the entire chat
-                        await deleteDoc(chatRef);
-                        showMessage("Chat has been deleted as you were the last member.");
-                    } else {
-                        await updateDoc(chatRef, {
-                            participants: newParticipants
-                        });
-                        showMessage("You have left the chat.");
-                    }
-
-                    // Redirect the user to the public chat after leaving
-                    switchChat('general', 'Public');
-                } catch (error) {
-                    console.error("Error leaving chat:", error);
-                    showMessage("Failed to leave chat. Please try again.");
-                }
-            });
-        }
-
-        if (createChatForm) {
-            createChatForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                if (selectedUsers.length === 0) {
-                    showMessage("Please select at least one user.");
-                    return;
-                }
-                if (selectedUsers.length > 1 && groupChatNameInput.value.trim() === '') {
-                    showMessage("Please enter a name for the group chat.");
-                    return;
-                }
-                
-                const participants = [currentUser.uid, ...selectedUsers.map(u => u.uid)];
-                const chatType = selectedUsers.length === 1 ? 'direct_message' : 'group';
-                const chatName = chatType === 'group' ? groupChatNameInput.value.trim() : null;
-
-                // Check if a DM chat already exists
-                if (chatType === 'direct_message') {
-                    const chatsRef = collection(db, `artifacts/${appId}/chats`);
-                    const q = query(chatsRef, 
-                        where('participants', 'array-contains', currentUser.uid)
-                    );
-                    const existingChats = await getDocs(q);
-                    var existingChatId = null;
-                    existingChats.forEach(doc => {
-                        const chatData = doc.data();
-                        if (chatData.participants.length === 2 && chatData.participants.includes(selectedUsers[0].uid)) {
-                            existingChatId = doc.id;
-                        }
-                    });
-
-                    if (existingChatId) {
-                        switchChat(existingChatId, selectedUsers[0].displayName);
-                        createChatModal.classList.add('hidden');
-                        return;
-                    }
-                }
-
-                try {
-                    const newChatRef = await addDoc(collection(db, `artifacts/${appId}/chats`), {
-                        participants: participants,
-                        type: chatType,
-                        name: chatName,
-                        createdAt: serverTimestamp()
-                    });
-                    showMessage("Chat created successfully!");
-                    createChatModal.classList.add('hidden');
-                    switchChat(newChatRef.id, chatName || selectedUsers[0].displayName);
-                } catch (error) {
-                    console.error("Error creating chat:", error);
-                    showMessage("Failed to create chat. Please try again.");
-                }
-            });
-        }
-
-        // Mute/Unmute Logic
-        let currentMuteAction = 'mute';
-
-        const openMuteUnmuteModal = async (action) => {
-            currentMuteAction = action;
-            if (muteUnmuteModal) muteUnmuteModal.classList.remove('hidden');
-            if (muteModalTitle) muteModalTitle.textContent = action === 'mute' ? 'Mute Users' : 'Unmute Users';
-            if (confirmMuteUnmuteButton) confirmMuteUnmuteButton.textContent = action === 'mute' ? 'Mute' : 'Unmute';
-            
-            muteUnmuteList.innerHTML = '<p class="text-gray-400">Loading users...</p>';
-            
-            let participantsDetails = [];
-
-            if (activeChatId === 'general') {
-                // For public chat, get all users in the system
-                participantsDetails = userList;
-            } else {
-                // For private chats, get participants from the chat document
-                const chatRef = doc(db, `artifacts/${appId}/chats`, activeChatId);
-                const chatDoc = await getDoc(chatRef);
-                if (!chatDoc.exists()) {
-                    muteUnmuteList.innerHTML = '<p class="text-red-400">Chat not found.</p>';
-                    return;
-                }
-                const participants = chatDoc.data().participants;
-                participantsDetails = userList.filter(u => participants.includes(u.uid));
-            }
-
-            const mutedForThisChat = mutedUsers[activeChatId] || [];
-
-            muteUnmuteList.innerHTML = '';
-            participantsDetails.forEach(user => {
-                if (user.uid === currentUser.uid) return;
-
-                const isMuted = mutedForThisChat.includes(user.uid);
-                const shouldDisplay = (action === 'mute' && !isMuted) || (action === 'unmute' && isMuted);
-                
-                if (shouldDisplay) {
-                    const userItem = document.createElement('div');
-                    userItem.className = 'flex items-center p-2 rounded-md hover:bg-gray-600 cursor-pointer';
-                    userItem.innerHTML = `
-                        <div class="flex items-center flex-1">
-                            <span class="text-gray-200">${user.displayName}</span>
-                        </div>
-                        <input type="checkbox" data-uid="${user.uid}" class="form-checkbox h-4 w-4 text-indigo-600 bg-gray-700 rounded border-gray-600 focus:ring-indigo-500">
-                    `;
-                    muteUnmuteList.appendChild(userItem);
-                }
-            });
-
-            if (muteUnmuteList.innerHTML === '') {
-                muteUnmuteList.innerHTML = action === 'mute' ? '<p class="text-gray-400">No users to mute.</p>' : '<p class="text-gray-400">No users are currently muted.</p>';
-            }
-        };
-
-        if (cancelMuteButton) {
-            cancelMuteButton.addEventListener('click', () => {
-                if (muteUnmuteModal) muteUnmuteModal.classList.add('hidden');
-            });
-        }
-        
-        if (confirmMuteUnmuteButton) {
-            confirmMuteUnmuteButton.addEventListener('click', () => {
-                const selectedUserIds = Array.from(muteUnmuteList.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.dataset.uid);
-                
-                if (!mutedUsers[activeChatId]) {
-                    mutedUsers[activeChatId] = [];
-                }
-
-                if (currentMuteAction === 'mute') {
-                    selectedUserIds.forEach(uid => {
-                        if (!mutedUsers[activeChatId].includes(uid)) {
-                            mutedUsers[activeChatId].push(uid);
-                        }
-                    });
-                    showMessage(`${selectedUserIds.length} users have been muted.`);
-                } else { // unmute
-                    mutedUsers[activeChatId] = mutedUsers[activeChatId].filter(uid => !selectedUserIds.includes(uid));
-                    showMessage(`${selectedUserIds.length} users have been unmuted.`);
-                }
-
-                localStorage.setItem('mutedUsers', JSON.stringify(mutedUsers));
-                if (muteUnmuteModal) muteUnmuteModal.classList.add('hidden');
-                // Re-render messages to apply the changes
-                switchChat(activeChatId, chatNameDisplay.textContent);
-            });
-        }
-
-        // Main logic when the window loads
-        window.onload = function() {
-            console.log("Window loaded. Initializing app...");
-
-            if (!auth || !db) {
-                showMessage("Failed to initialize Firebase. Check your console.");
-                return;
-            }
-
-            // Event listener for the 3-dot chat menu toggle
-            const chatMenuToggle = document.getElementById('chat-menu-toggle');
-            if (chatMenuToggle) {
-                chatMenuToggle.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const chatMenu = document.getElementById('chat-menu');
-                    if (chatMenu) {
-                        chatMenu.classList.toggle('hidden');
-                    }
-                });
-            }
-
-            // Global click listener to close menus
-            window.addEventListener('click', (e) => {
-                const chatMenu = document.getElementById('chat-menu');
-                if (chatMenu && !chatMenu.classList.contains('hidden')) {
-                    const isClickInsideMenu = chatMenu.contains(e.target) || chatMenuToggle.contains(e.target);
-                    if (!isClickInsideMenu) {
-                        chatMenu.classList.add('hidden');
-                    }
-                }
-            });
-
-            onAuthStateChanged(auth, async (user) => {
-                console.log("Authentication state changed. User:", user);
-                currentUser = user;
-                if (user) {
-                    // Ensure user's public data exists for channels to load correctly
-                    const userDocRef = doc(db, `artifacts/${appId}/public/data/users`, user.uid);
-                    const userDoc = await getDoc(userDocRef);
-                    if (!userDoc.exists() || !userDoc.data().displayName) {
-                        // If not, update it from the auth object or a default value
-                        await setDoc(userDocRef, { displayName: user.displayName || 'Anonymous' }, { merge: true });
-                        // Force a UI update to reflect the new username
-                        currentUser.displayName = user.displayName || 'Anonymous';
-                    }
-                    
-                    if (userIdDisplay) userIdDisplay.textContent = `User ID: ${user.uid}`;
-                    if (currentUserDisplay) currentUserDisplay.textContent = `You (${user.displayName || 'guest'})`;
-                    if (authModal) authModal.classList.add('hidden');
-                    setChatEnabled(true);
-                    fetchUsers();
-                    switchChat('general', 'Public');
-                    setupHourlyDeletion();
-                } else {
-                    if (userIdDisplay) userIdDisplay.textContent = `User ID: Not Signed In`;
-                    if (currentUserDisplay) currentUserDisplay.textContent = `Not Signed In`;
-                    if (authModal) authModal.classList.remove('hidden');
-                    setChatEnabled(false);
-                    const messagesContainer = document.getElementById('messages-container');
-                    if (messagesContainer) {
-                        messagesContainer.innerHTML = `<div class="flex items-center justify-center h-full text-gray-400 text-lg">
-                            Sign in to begin chatting.
-                        </div>`;
-                    }
-                    if (chatHeader) chatHeader.classList.add('hidden');
-                    if (messageForm) messageForm.classList.add('hidden');
-                    if (typingStatusDisplay) typingStatusDisplay.classList.add('hidden');
-                }
-            });
-            
-            window.addEventListener('beforeunload', () => {
-                if (currentUser) {
-                    deleteDoc(doc(db, `artifacts/${appId}/public/data/typing_status`, currentUser.uid));
-                }
-            });
-
-            if (authForm) {
-                authForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    const email = authEmailInput.value;
-                    const password = authPasswordInput.value;
-                    const username = authUsernameInput.value;
-
-                    try {
-                        if (authMode === 'signup') {
-                            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                            await updateProfile(userCredential.user, { displayName: username });
-                            await setDoc(doc(db, `artifacts/${appId}/public/data/users`, userCredential.user.uid), {
-                                displayName: username,
-                                email: email
-                            });
-                            showMessage("Account created successfully!");
-                        } else {
-                            await signInWithEmailAndPassword(auth, email, password);
-                            showMessage("Signed in successfully!");
-                        }
-                    } catch (error) {
-                        showMessage(`Authentication failed: ${error.message}`);
-                    }
-                });
-            }
-            
-            if (toggleAuthModeButton) {
-                toggleAuthModeButton.addEventListener('click', () => {
-                    if (authMode === 'signup') {
-                        authMode = 'signin';
-                        if (authTitle) authTitle.textContent = 'Sign In';
-                        if (authSubmitButton) authSubmitButton.textContent = 'Sign In';
-                        if (usernameField) usernameField.classList.add('hidden');
-                        if (toggleAuthModeButton) toggleAuthModeButton.textContent = 'Need an account? Sign Up';
-                    } else {
-                        authMode = 'signup';
-                        if (authTitle) authTitle.textContent = 'Create Account';
-                        if (authSubmitButton) authSubmitButton.textContent = 'Sign Up';
-                        if (usernameField) usernameField.classList.remove('hidden');
-                        if (toggleAuthModeButton) toggleAuthModeButton.textContent = 'Already have an account? Sign In';
-                    }
-                });
-            }
-
-            if (menuToggle) {
-                menuToggle.addEventListener('click', () => {
-                    sidebar.classList.remove('-translate-x-full');
-                    menuToggle.classList.add('hidden');
-                    closeMenuToggle.classList.remove('hidden');
-                });
-            }
-
-            if (closeMenuToggle) {
-                closeMenuToggle.addEventListener('click', () => {
-                    sidebar.classList.add('-translate-x-full');
-                    menuToggle.classList.remove('hidden');
-                    closeMenuToggle.classList.add('hidden');
-                });
-            }
-        };
-    </script>
+    <div class="flex flex-col h-screen bg-gray-900 text-gray-100 font-inter">
+        <div class="bg-gray-800 p-4 border-b border-gray-700 flex items-center justify-between">
+            <div class="flex items-center">
+                <div id="menu-icons-container" class="relative mr-2 md:hidden">
+                    <button id="menu-toggle" class="p-2 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="6" x2="20" y2="6"></line><line x1="4" y1="18" x2="20" y2="18"></line></svg>
+                    </button>
+                    <button id="close-menu-toggle" class="p-2 text-gray-400 hover:text-white focus:outline-none hidden absolute top-0 left-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6 text-indigo-400 mr-2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V3a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                <h1 class="text-xl font-bold">Schoolchats</h1>
+            </div>
+            <div id="user-id-display" class="text-xs text-gray-500 rounded-full px-3 py-1 bg-gray-700">
+                User ID: Connecting...
+            </div>
+        </div>
+
+        <div class="flex flex-1 overflow-hidden">
+            <div id="sidebar" class="bg-gray-800 w-64 flex-shrink-0 border-r border-gray-700 overflow-y-auto z-40 transition-transform duration-300 ease-in-out md:block md:relative md:transform-none fixed inset-y-0 left-0 transform -translate-x-full">
+                
+                <div class="p-4">
+                    <h2 class="text-md font-semibold text-gray-400 mb-2">Channels</h2>
+                    <div id="channels-list">
+                    </div>
+                    <button id="create-chat-button" class="mt-4 w-full px-4 py-2 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        + New Chat
+                    </button>
+                </div>
+                <div class="p-4 border-t border-gray-700">
+                    <h2 class="text-md font-semibold text-gray-400 mb-2">Users</h2>
+                    <div class="rounded-lg p-2 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-gray-400 mr-2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        <span id="current-user-display" class="text-sm">Connecting...</span>
+                    </div>
+                    <h2 class="text-md font-semibold text-gray-400 mt-4 mb-2">Settings</h2>
+                    <button id="change-username-button" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        Change Username
+                    </button>
+                    <div class="mt-2 p-2 rounded-lg bg-gray-700 flex items-center justify-between">
+                        <span>Dark Mode</span>
+                        <label class="switch">
+                            <input type="checkbox" id="theme-toggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="mt-2 p-2 rounded-lg bg-gray-700 flex items-center justify-between">
+                        <span>Profanity Filter</span>
+                        <label class="switch">
+                            <input type="checkbox" id="profanity-filter-toggle" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <button id="delete-account-button" class="mt-2 w-full px-4 py-2 bg-red-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
+                        Delete Account
+                    </button>
+                    <button id="sign-out-button" class="mt-2 w-full px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                        Sign Out
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex-1 flex flex-col">
+                <div id="public-chat-banner" class="bg-yellow-500 text-yellow-900 p-2 text-center text-sm font-semibold hidden">
+                    This is a public chat. All messages are deleted every hour.
+                </div>
+                <div id="chat-header" class="bg-gray-800 p-4 border-b border-gray-700 flex items-center justify-between hidden">
+                    <h2 id="chat-name" class="text-xl font-bold"></h2>
+                    <div class="relative">
+                        <button id="chat-menu-toggle" class="p-2 text-gray-400 hover:text-white focus:outline-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                        </button>
+                        <div id="chat-menu" class="absolute right-0 mt-2 w-48 bg-gray-700 rounded-md shadow-lg py-1 z-10 hidden">
+                            <button id="add-person-to-chat" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-600 w-full text-left">
+                                Add person to chat
+                            </button>
+                            <button id="leave-chat" class="block px-4 py-2 text-sm text-red-400 hover:bg-gray-600 w-full text-left">
+                                Leave chat
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="chat-page" class="flex-1 flex flex-col h-full">
+                    <div id="messages-container" class="flex-1 p-4 overflow-y-auto space-y-4">
+                        <div class="flex items-center justify-center h-full text-gray-400 text-lg">
+                            Select a chat to begin.
+                        </div>
+                    </div>
+                    <div id="typing-status" class="p-2 text-sm text-gray-400 bg-gray-800 border-t border-gray-700 hidden"></div>
+                    <form id="message-form" class="p-4 border-t border-gray-700 bg-gray-800 hidden">
+                        <div class="flex items-end space-x-2">
+                            <input
+                                id="message-input"
+                                type="text"
+                                placeholder="Message"
+                                class="flex-1 p-3 text-sm rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
+                            />
+                            <button
+                                type="submit"
+                                class="px-4 py-3 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Send
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="auth-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-sm">
+            <h2 id="auth-title" class="text-xl font-bold text-white mb-4">Sign In</h2>
+            <form id="auth-form">
+                <div id="username-field" class="mb-4 hidden">
+                    <input
+                        type="text"
+                        id="auth-username-input"
+                        placeholder="Username"
+                        class="w-full p-3 text-sm rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
+                        required
+                    />
+                </div>
+                <div class="mb-4">
+                    <input
+                        type="email"
+                        id="auth-email-input"
+                        placeholder="Email"
+                        class="w-full p-3 text-sm rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
+                        required
+                    />
+                </div>
+                <div class="mb-6">
+                    <input
+                        type="password"
+                        id="auth-password-input"
+                        placeholder="Password"
+                        class="w-full p-3 text-sm rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
+                        required
+                    />
+                </div>
+                <button
+                    type="submit"
+                    id="auth-submit-button"
+                    class="w-full px-4 py-3 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+                    Sign In
+                </button>
+            </form>
+            <div class="text-center mt-4">
+                <button id="toggle-auth-mode" class="text-sm text-indigo-400 hover:underline">Need an account? Sign Up</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="message-box" class="hidden fixed bottom-4 right-4 bg-red-600 text-white p-4 rounded-lg shadow-lg z-50">
+        <p id="message-text"></p>
+    </div>
+
+    <div id="confirmation-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-sm">
+            <h2 class="text-xl font-bold text-white mb-4">Confirm Deletion</h2>
+            <p class="text-gray-300 mb-6">Are you sure you want to delete this message? This action cannot be undone.</p>
+            <div class="flex justify-end space-x-4">
+                <button id="cancel-delete" class="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-700">Cancel</button>
+                <button id="confirm-delete" class="px-4 py-2 bg-red-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-red-700">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="all-chats-confirmation-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-sm">
+            <h2 class="text-xl font-bold text-white mb-4">Confirm Deletion of All Chats</h2>
+            <p class="text-gray-300 mb-6">Are you sure you want to delete all of your messages? This action cannot be undone.</p>
+            <div class="flex justify-end space-x-4">
+                <button id="cancel-all-delete" class="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-700">Cancel</button>
+                <button id="confirm-all-delete" class="px-4 py-2 bg-red-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-red-700">Delete All</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="delete-account-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-sm">
+            <h2 class="text-xl font-bold text-white mb-4">Delete Account</h2>
+            <p class="text-gray-300 mb-6">Are you absolutely sure you want to delete your account? This action is permanent and cannot be undone. All your messages will be deleted.</p>
+            <div class="mb-4">
+                <input
+                    type="password"
+                    id="reauth-password-input"
+                    placeholder="Enter password to confirm"
+                    class="w-full p-3 text-sm rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
+                    required
+                />
+            </div>
+            <div class="flex justify-end space-x-4">
+                <button id="cancel-delete-account" class="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-700">Cancel</button>
+                <button id="confirm-delete-account" class="px-4 py-2 bg-red-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-red-700">Delete My Account</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="mute-unmute-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-lg">
+            <h2 id="mute-modal-title" class="text-xl font-bold text-white mb-4">Mute Users</h2>
+            <form id="mute-unmute-form">
+                <div id="mute-unmute-list" class="max-h-48 overflow-y-auto bg-gray-700 rounded-lg p-2 mb-4">
+                    <p class="text-gray-400">Loading users...</p>
+                </div>
+                <div class="flex justify-end space-x-4">
+                    <button type="button" id="cancel-mute" class="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-700">Cancel</button>
+                    <button type="submit" id="confirm-mute-unmute" class="px-4 py-2 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed">
+                        Confirm
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="create-chat-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 w-full max-w-lg">
+            <h2 id="create-chat-title" class="text-xl font-bold text-white mb-4">New Direct Message</h2>
+            <form id="create-chat-form">
+                <div id="user-search-container" class="mb-4">
+                    <input
+                        type="text"
+                        id="user-search-input"
+                        placeholder="Search for users"
+                        class="w-full p-3 text-sm rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
+                    />
+                </div>
+                <div id="group-chat-name-field" class="mb-4 hidden">
+                    <input
+                        type="text"
+                        id="group-chat-name-input"
+                        placeholder="Group chat name"
+                        class="w-full p-3 text-sm rounded-lg bg-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
+                    />
+                </div>
+                <div id="user-list-container" class="max-h-48 overflow-y-auto bg-gray-700 rounded-lg p-2 mb-4">
+                    <p class="text-gray-400">Loading users...</p>
+                </div>
+                <div class="flex justify-end space-x-4">
+                    <button type="button" id="cancel-create-chat" class="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-gray-700">Cancel</button>
+                    <button type="submit" id="create-chat-submit-button" class="px-4 py-2 bg-indigo-500 text-white rounded-lg font-semibold transition-colors duration-200 hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed">
+                        Create Chat
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, deleteUser, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, setDoc, doc, serverTimestamp, query, where, getDocs, onSnapshot, deleteDoc, orderBy, limit, arrayUnion, writeBatch, updateDoc, getDoc, getDocFromCache, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global variables from the environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBGos4EjPNou4fnArQ4aAXNizNoe9nw-QE",
+            authDomain: "main-chat-app-5e845.firebaseapp.com",
+            databaseURL: "https://main-chat-app-5e845-default-rtdb.firebaseio.com",
+            projectId: "main-chat-app-5e845",
+            storageBucket: "main-chat-app-5e845.firebasestorage.app",
+            messagingSenderId: "663520599356",
+            appId: "1:663520599356:web:85ba7c1d8fb2bb2394d239"
+        };
+
+        // Profanity list for filtering
+        const profanityList = [
+            'fuck', 'shit', 'cunt', 'bitch', 'asshole', 'bastard', 'dick', 'pussy', 'whore',
+            'nigga', 'nigger', 'cuck', 'slut', 'fucking', 'fucker', 'retard', 'faggot', 'chink', 'gook', 'kike',
+            'ass', 'fag', 'chink', 'hitler', 'nazi'
+        ];
+        
+        // Function to create a more flexible regex pattern for a single word
+        function createProfanityRegex(word) {
+            // Create a pattern that allows one or more of each character
+            const pattern = word.split('').map(char => `${char}+`).join('');
+            return new RegExp(pattern, 'gi');
+        }
+
+        // Function to filter out profanity
+        function filterProfanity(message) {
+            let filteredMessage = message;
+            profanityList.forEach(profanity => {
+                const pattern = createProfanityRegex(profanity);
+                filteredMessage = filteredMessage.replace(pattern, '****');
+            });
+            return filteredMessage;
+        }
+
+        // Firebase Initialization
+        var app, auth, db;
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+        } catch (error) {
+            showMessage("Failed to initialize Firebase. Check your console for details.");
+            console.error("Firebase initialization failed:", error);
+        }
+
+        // DOM elements
+        const chatPage = document.getElementById('chat-page');
+        const gamesPage = document.getElementById('games-page');
+        const gamesTabButton = document.getElementById('games-tab-button');
+        const wordleButton = document.getElementById('wordle-button');
+        const wordleContainer = document.getElementById('wordle-container');
+        const messageForm = document.getElementById('message-form');
+        const messageInput = document.getElementById('message-input');
+        const messagesContainer = document.getElementById('messages-container');
+        const userIdDisplay = document.getElementById('user-id-display');
+        const currentUserDisplay = document.getElementById('current-user-display');
+        const authModal = document.getElementById('auth-modal');
+        const authForm = document.getElementById('auth-form');
+        const authTitle = document.getElementById('auth-title');
+        const authEmailInput = document.getElementById('auth-email-input');
+        const authPasswordInput = document.getElementById('auth-password-input');
+        const authUsernameInput = document.getElementById('auth-username-input');
+        const authSubmitButton = document.getElementById('auth-submit-button');
+        const usernameField = document.getElementById('username-field');
+        const toggleAuthModeButton = document.getElementById('toggle-auth-mode');
+        const typingStatusDisplay = document.getElementById('typing-status');
+        const sendButton = messageForm.querySelector('button[type="submit"]');
+        const signOutButton = document.getElementById('sign-out-button');
+        const deleteAccountButton = document.getElementById('delete-account-button');
+        const changeUsernameButton = document.getElementById('change-username-button');
+        const messageBox = document.getElementById('message-box');
+        const messageText = document.getElementById('message-text');
+        const confirmationModal = document.getElementById('confirmation-modal');
+        const confirmDeleteButton = document.getElementById('confirm-delete');
+        const cancelDeleteButton = document.getElementById('cancel-delete');
+        const allChatsConfirmationModal = document.getElementById('all-chats-confirmation-modal');
+        const confirmAllDeleteButton = document.getElementById('confirm-all-delete');
+        const cancelAllDeleteButton = document.getElementById('cancel-all-delete');
+        const deleteOtherMessagesButton = document.getElementById('delete-other-messages-button');
+        const deleteMyChatsButton = document.getElementById('delete-my-chats-button');
+        const channelMenu = document.getElementById('channel-menu');
+        const deleteAccountModal = document.getElementById('delete-account-modal');
+        const confirmDeleteAccountButton = document.getElementById('confirm-delete-account');
+        const cancelDeleteAccountButton = document.getElementById('cancel-delete-account');
+        const reauthPasswordInput = document.getElementById('reauth-password-input');
+        const createChatButton = document.getElementById('create-chat-button');
+        const createChatModal = document.getElementById('create-chat-modal');
+        const createChatForm = document.getElementById('create-chat-form');
+        const userSearchInput = document.getElementById('user-search-input');
+        const userListContainer = document.getElementById('user-list-container');
+        const createChatSubmitButton = document.getElementById('create-chat-submit-button');
+        const cancelCreateChatButton = document.getElementById('cancel-create-chat');
+        const chatHeader = document.getElementById('chat-header');
+        const chatNameDisplay = document.getElementById('chat-name');
+        const channelsList = document.getElementById('channels-list');
+        const groupChatNameField = document.getElementById('group-chat-name-field');
+        const groupChatNameInput = document.getElementById('group-chat-name-input');
+        const publicChatBanner = document.getElementById('public-chat-banner');
+        const themeToggle = document.getElementById('theme-toggle');
+        const profanityFilterToggle = document.getElementById('profanity-filter-toggle');
+        const menuToggle = document.getElementById('menu-toggle');
+        const closeMenuToggle = document.getElementById('close-menu-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const addPersonToChatButton = document.getElementById('add-person-to-chat');
+        const leaveChatButton = document.getElementById('leave-chat');
+        const chatMenuToggle = document.getElementById('chat-menu-toggle');
+        const muteUnmuteModal = document.getElementById('mute-unmute-modal');
+        const muteModalTitle = document.getElementById('mute-modal-title');
+        const muteUnmuteList = document.getElementById('mute-unmute-list');
+        const confirmMuteUnmuteButton = document.getElementById('confirm-mute-unmute');
+        const cancelMuteButton = document.getElementById('cancel-mute');
+        const changeUsernameModal = document.getElementById('change-username-modal');
+        const changeUsernameForm = document.getElementById('change-username-form');
+        const newUsernameInput = document.getElementById('new-username-input');
+        const changeUsernamePasswordInput = document.getElementById('change-username-password-input');
+
+        var currentUser = null;
+        var authMode = 'signin'; // 'signin' or 'signup'
+        var isTypingTimeout = null;
+        var messageToDeleteId = null;
+        var activeChatId = 'general';
+        var userList = [];
+        var selectedUsers = [];
+        var usersUnsubscribe = null;
+        var chatsUnsubscribe = null;
+        var messagesUnsubscribe = null;
+        var typingUnsubscribe = null;
+        var canSendMessage = true;
+        const cooldownPeriod = 2000; // 2 seconds in milliseconds
+        var mutedUsers = JSON.parse(localStorage.getItem('mutedUsers')) || {};
+
+        // Show a custom message box
+        function showMessage(msg) {
+            if (!messageText || !messageBox) return;
+            messageText.textContent = msg;
+            messageBox.classList.remove('hidden');
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 5000); // Hide after 5 seconds
+        }
+        
+        // Function to handle desktop notifications
+        function sendNotification(title, body) {
+            if (!("Notification" in window)) {
+                console.log("This browser does not support desktop notification");
+            } else if (Notification.permission === "granted") {
+                const notification = new Notification(title, { body: body, icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%3E%3Cpath d="M21 15a2 2 0 0 1-2 2H7l-4 4V3a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"%3E%3C/path%3E%3C/svg%3E' });
+            } else if (Notification.permission !== "denied") {
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") {
+                        const notification = new Notification(title, { body: body, icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%3E%3Cpath d="M21 15a2 2 0 0 1-2 2H7l-4 4V3a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"%3E%3C/path%3E%3C/svg%3E' });
+                    }
+                });
+            }
+        }
+
+        // Function to enable/disable message input and send button
+        const setChatEnabled = (enabled) => {
+            if (messageInput) messageInput.disabled = !enabled;
+            if (sendButton) sendButton.disabled = !enabled;
+            if (enabled) {
+                if (messageInput) messageInput.placeholder = "Message #general";
+            } else {
+                if (messageInput) messageInput.placeholder = "Please sign in to chat...";
+            }
+        };
+
+        const updateChannelUI = (newChatId) => {
+            // Remove 'bg-gray-700' from all channel elements
+            document.querySelectorAll('#channels-list > div').forEach(element => {
+                element.classList.remove('bg-gray-700');
+            });
+            
+            // Add 'bg-gray-700' to the newly selected channel
+            const newActiveChannel = document.getElementById(`channel-${newChatId}`);
+            if (newActiveChannel) {
+                newActiveChannel.classList.add('bg-gray-700');
+            }
+        };
+        
+        // Function to render messages to the DOM
+        const renderMessages = (messages) => {
+            // Get the list of hidden message IDs from local storage
+            const hiddenMessages = JSON.parse(localStorage.getItem('hiddenMessages')) || [];
+            
+            if (!messagesContainer) return;
+            const isScrolledToBottom = messagesContainer.scrollHeight - messagesContainer.clientHeight <= messagesContainer.scrollTop + 100;
+
+            messagesContainer.innerHTML = '';
+            messages.forEach(msg => {
+                // Skip rendering the message if its ID is in the hiddenMessages list
+                if (hiddenMessages.includes(msg.id)) {
+                    return;
+                }
+
+                // Check for muted users
+                const isMuted = mutedUsers[activeChatId] && mutedUsers[activeChatId].includes(msg.userId);
+                
+                // Allow commands to bypass the mute filter
+                const isCommand = msg.text.startsWith('/');
+                
+                if (isMuted && !isCommand) {
+                    return;
+                }
+
+                const messageElement = document.createElement('div');
+                messageElement.id = `message-${msg.id}`; // Add an ID to the message element
+                messageElement.className = "flex items-start group relative";
+                
+                const avatarChar = msg.user ? msg.user.charAt(0).toUpperCase() : 'U';
+                const timestamp = msg.timestamp?.toDate().toLocaleString() || "Sending...";
+                
+                const isSelf = currentUser && msg.userId === currentUser.uid;
+                const messageContainerClass = isSelf ? "flex-row-reverse" : "";
+                const messageBubbleClass = isSelf ? "bg-indigo-600 text-white" : "bg-gray-700 text-gray-300";
+                const messageMarginClass = isSelf ? "ml-3 mr-3 max-w-3/4" : "ml-3 mr-3 max-w-3/4";
+                
+                messageElement.innerHTML = `
+                    <div class="flex ${messageContainerClass} items-start w-full">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-full ${messageAvatarClass} flex items-center justify-center text-sm font-bold">
+                            ${avatarChar}
+                        </div>
+                        <div class="${messageMarginClass} flex flex-col ${isSelf ? "items-end" : "items-start"}">
+                            <div class="flex items-baseline ${isSelf ? "flex-row-reverse" : ""}">
+                                <span class="font-semibold text-white">${msg.user}</span>
+                                <span class="ml-2 mr-2 text-xs text-gray-500">${timestamp}</span>
+                            </div>
+                            <p class="text-sm rounded-xl px-3 py-2 ${messageBubbleClass} break-words mt-1">${msg.text}</p>
+                        </div>
+                        <div class="absolute inset-y-0 ${isSelf ? 'left-0' : 'right-0'} flex items-center pr-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div class="relative">
+                                <button class="flex items-center text-gray-400 hover:text-white focus:outline-none" onclick="toggleMenu(event, '${msg.id}', ${isSelf})">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                                </button>
+                                <div id="menu-${msg.id}" class="absolute ${isSelf ? 'left-6' : 'right-6'} top-1/2 -translate-y-1/2 w-48 bg-gray-700 rounded-md shadow-lg py-1 z-10 hidden">
+                                    ${isSelf ? `
+                                        <button class="block px-4 py-2 text-sm text-red-400 hover:bg-gray-600 w-full text-left" onclick="showConfirmationModal('${msg.id}')">
+                                            Remove my words
+                                        </button>
+                                    ` : ''}
+                                    <button class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-600 w-full text-left" onclick="hideMessageForUser('${msg.id}')">
+                                        Hide from my view
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                messagesContainer.appendChild(messageElement);
+            });
+            // Scroll to the bottom of the chat container
+            if (isScrolledToBottom) {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+        };
+        
+        // Global functions to be called from inline HTML
+        window.toggleMenu = (event, msgId, isSelf) => {
+            event.stopPropagation();
+            const menu = document.getElementById(`menu-${msgId}`);
+            if (menu) {
+                menu.classList.toggle('hidden');
+            }
+        };
+
+        window.toggleChannelMenu = (event) => {
+            event.stopPropagation();
+            if (channelMenu) {
+                channelMenu.classList.toggle('hidden');
+            }
+        };
+
+        window.showConfirmationModal = (msgId) => {
+            messageToDeleteId = msgId;
+            if (confirmationModal) {
+                confirmationModal.classList.remove('hidden');
+            }
+            // Hide all other menus
+            document.querySelectorAll('[id^="menu-"]').forEach(menu => {
+                if (!menu.classList.contains('hidden')) {
+                    menu.classList.add('hidden');
+                }
+            });
+        };
+        
+        // Function to hide a message from the user's view
+        window.hideMessageForUser = (msgId) => {
+            // Get existing hidden messages, or an empty array if none exist
+            const hiddenMessages = JSON.parse(localStorage.getItem('hiddenMessages')) || [];
+            // Add the new message ID to the list
+            hiddenMessages.push(msgId);
+            // Save the updated list to local storage
+            localStorage.setItem('hiddenMessages', JSON.stringify(hiddenMessages));
+            // Remove the message element from the DOM
+            const messageElement = document.getElementById(`message-${msgId}`);
+            if (messageElement) {
+                messageElement.remove();
+            }
+            showMessage("Message hidden from your view.");
+        };
+
+        window.deleteMessage = async (msgId) => {
+            try {
+                const messageRef = doc(db, `artifacts/${appId}/chats/${activeChatId}/messages`, msgId);
+                await deleteDoc(messageRef);
+                showMessage("Message deleted successfully.");
+            } catch (error) {
+                console.error("Error deleting message:", error);
+                showMessage("Failed to delete message. Please try again.");
+            }
+        };
+        
+        // Function to delete all messages in the current chat
+        const deleteAllMessagesInChat = async () => {
+            try {
+                const messagesRef = collection(db, `artifacts/${appId}/chats/${activeChatId}/messages`);
+                const q = query(messagesRef);
+                const querySnapshot = await getDocs(q);
+
+                const batch = writeBatch(db);
+                querySnapshot.forEach((doc) => {
+                    batch.delete(doc.ref);
+                });
+
+                await batch.commit();
+                showMessage("All messages in this chat have been deleted.");
+            } catch (error) {
+                console.error("Error deleting all messages:", error);
+                showMessage("Failed to delete all messages. Please try again.");
+            }
+        };
+
+        if (confirmAllDeleteButton) {
+            confirmAllDeleteButton.addEventListener('click', () => {
+                deleteAllMessagesInChat();
+                if (allChatsConfirmationModal) allChatsConfirmationModal.classList.add('hidden');
+            });
+        }
+
+        if (cancelAllDeleteButton) {
+            cancelAllDeleteButton.addEventListener('click', () => {
+                if (allChatsConfirmationModal) allChatsConfirmationModal.classList.add('hidden');
+            });
+        }
+        
+        window.deleteAccount = async () => {
+            if (!currentUser) {
+                showMessage("You must be signed in to delete your account.");
+                return;
+            }
+            try {
+                // Re-authenticate the user first.
+                const password = reauthPasswordInput.value;
+                if (!password) {
+                    showMessage("Password is required to delete your account.");
+                    return;
+                }
+                const credential = EmailAuthProvider.credential(currentUser.email, password);
+                await reauthenticateWithCredential(currentUser, credential);
+
+                const userChatsRef = collection(db, `artifacts/${appId}/chats`);
+                const qChats = query(userChatsRef, where('participants', 'array-contains', currentUser.uid));
+                const chatsSnapshot = await getDocs(qChats);
+                
+                const deletionPromises = [];
+                
+                for (const chatDoc of chatsSnapshot.docs) {
+                    const messagesRef = collection(db, `artifacts/${appId}/chats/${chatDoc.id}/messages`);
+                    const qMessages = query(messagesRef);
+                    const messagesSnapshot = await getDocs(qMessages);
+                    messagesSnapshot.forEach(messageDoc => {
+                        deletionPromises.push(deleteDoc(messageDoc.ref));
+                    });
+                    // Delete the chat document itself if the user is the last participant
+                    const chatData = chatDoc.data();
+                    if (chatData.participants.length <= 1) {
+                        deletionPromises.push(deleteDoc(chatDoc.ref));
+                    } else {
+                        // Otherwise, just remove the user from the participants list
+                        const newParticipants = chatData.participants.filter(uid => uid !== currentUser.uid);
+                        deletionPromises.push(updateDoc(chatDoc.ref, { participants: newParticipants }));
+                    }
+                };
+
+                await Promise.all(deletionPromises);
+                
+                // Delete the user's public user data and the user account itself
+                await deleteDoc(doc(db, `artifacts/${appId}/public/data/users`, currentUser.uid));
+                await deleteUser(currentUser);
+                showMessage("Account and all associated data deleted successfully.");
+            } catch (error) {
+                console.error("Error deleting account:", error);
+                showMessage(`Failed to delete account. Please try again: ${error.message}`);
+            }
+        };
+        
+        window.addEventListener('click', (e) => {
+            // Close all menus unless the click is inside a menu
+            document.querySelectorAll('.relative').forEach(container => {
+                const menu = container.querySelector('[id$="-menu"]');
+                const button = container.querySelector('[id$="-toggle"]');
+                if (menu && button && !menu.classList.contains('hidden') && !container.contains(e.target)) {
+                    menu.classList.add('hidden');
+                }
+            });
+        });
+
+        if (confirmDeleteButton) {
+            confirmDeleteButton.addEventListener('click', () => {
+                if (messageToDeleteId) {
+                    deleteMessage(messageToDeleteId);
+                    messageToDeleteId = null;
+                }
+                if (confirmationModal) confirmationModal.classList.add('hidden');
+            });
+        }
+
+        if (cancelDeleteButton) {
+            cancelDeleteButton.addEventListener('click', () => {
+                messageToDeleteId = null;
+                if (confirmationModal) confirmationModal.classList.add('hidden');
+            });
+        }
+
+        if (confirmAllDeleteButton) {
+            confirmAllDeleteButton.addEventListener('click', () => {
+                deleteAllMessagesInChat();
+                if (allChatsConfirmationModal) allChatsConfirmationModal.classList.add('hidden');
+            });
+        }
+
+        if (cancelAllDeleteButton) {
+            cancelAllDeleteButton.addEventListener('click', () => {
+                if (allChatsConfirmationModal) allChatsConfirmationModal.classList.add('hidden');
+            });
+        }
+        
+        if (confirmDeleteAccountButton) {
+            confirmDeleteAccountButton.addEventListener('click', async () => {
+                try {
+                    const password = reauthPasswordInput.value;
+                    if (!password) {
+                        showMessage("Please enter your password to confirm.");
+                        return;
+                    }
+                    const credential = EmailAuthProvider.credential(currentUser.email, password);
+                    await reauthenticateWithCredential(currentUser, credential);
+                    await deleteAccount();
+                    if (deleteAccountModal) deleteAccountModal.classList.add('hidden');
+                } catch (error) {
+                    console.error("Account deletion failed:", error);
+                    showMessage(`Account deletion failed: ${error.message}`);
+                }
+            });
+        }
+
+        if (cancelDeleteAccountButton) {
+            cancelDeleteAccountButton.addEventListener('click', () => {
+                if (deleteAccountModal) deleteAccountModal.classList.add('hidden');
+            });
+        }
+
+        if (changeUsernameButton) {
+            changeUsernameButton.addEventListener('click', async () => {
+                if (!currentUser) {
+                    showMessage("You must be signed in to change your username.");
+                    return;
+                }
+                // Hide all other menus before showing the new modal
+                document.querySelectorAll('.relative [id$="-menu"]').forEach(menu => menu.classList.add('hidden'));
+                // Show change username modal
+                changeUsernameModal.classList.remove('hidden');
+                newUsernameInput.value = currentUser.displayName;
+            });
+        }
+
+        // New Event Listener for the Change Username Form
+        if (changeUsernameForm) {
+            changeUsernameForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const newUsername = newUsernameInput.value.trim();
+                const password = changeUsernamePasswordInput.value;
+
+                if (newUsername === '' || password === '') {
+                    showMessage("New username and password are required.");
+                    return;
+                }
+
+                try {
+                    // Re-authenticate
+                    const credential = EmailAuthProvider.credential(currentUser.email, password);
+                    await reauthenticateWithCredential(currentUser, credential);
+
+                    // Update username in the users collection
+                    await setDoc(doc(db, `artifacts/${appId}/public/data/users`, currentUser.uid), { displayName: newUsername }, { merge: true });
+                    
+                    // Update messages with the old username to the new one
+                    const messagesRef = collection(db, `artifacts/${appId}/chats/general/messages`);
+                    const q = query(messagesRef, where('userId', '==', currentUser.uid));
+                    const messagesSnapshot = await getDocs(q);
+                    
+                    const batch = writeBatch(db);
+                    messagesSnapshot.forEach(doc => {
+                        batch.update(doc.ref, { user: newUsername });
+                    });
+                    await batch.commit();
+
+                    // Update the display name in Firebase Auth
+                    await updateProfile(currentUser, { displayName: newUsername });
+                    showMessage("Username updated successfully!");
+                    currentUser.displayName = newUsername; // Update the local user object
+                    if (currentUserDisplay) currentUserDisplay.textContent = `You (${newUsername})`;
+                    fetchUsers();
+                    changeUsernameModal.classList.add('hidden');
+                } catch (error) {
+                    console.error("Error changing username:", error);
+                    showMessage(`Failed to change username. Please try again: ${error.message}`);
+                }
+            });
+        }
+
+        // Theme toggle logic
+        if (themeToggle) {
+            themeToggle.addEventListener('change', () => {
+                if (themeToggle.checked) {
+                    document.body.classList.remove('bg-gray-900', 'text-gray-100');
+                    document.body.classList.add('bg-gray-100', 'text-gray-900');
+                } else {
+                    document.body.classList.remove('bg-gray-100', 'text-gray-900');
+                    document.body.classList.add('bg-gray-900', 'text-gray-100');
+                }
+            });
+        }
+        
+        // Profanity filter toggle logic
+        if (profanityFilterToggle) {
+            profanityFilterToggle.addEventListener('change', () => {
+                // This is handled by the `filterProfanity` function, which checks this state.
+            });
+        }
+
+        const updateTypingStatus = async (isTyping) => {
+            if (!currentUser || !currentUser.displayName) return;
+            try {
+                // Use a timestamp to track recent activity
+                await setDoc(doc(db, `artifacts/${appId}/public/data/typing_status`, currentUser.uid), {
+                    user: currentUser.displayName,
+                    isTyping: isTyping,
+                    timestamp: serverTimestamp()
+                }, { merge: true });
+            } catch (error) {
+                console.error("Error updating typing status:", error);
+            }
+        };
+        
+        const renderTypingStatus = (typingUsers) => {
+            const now = Date.now();
+            const otherTypingUsers = typingUsers.filter(u => 
+                u.id !== (currentUser ? currentUser.uid : null) &&
+                (u.timestamp && now - u.timestamp.toMillis() < 12000) // Check if timestamp exists and is recent
+            );
+
+            if (otherTypingUsers.length > 0) {
+                const names = otherTypingUsers.map(u => u.user).join(', ');
+                if (typingStatusDisplay) {
+                    typingStatusDisplay.textContent = `${names} is typing...`;
+                    typingStatusDisplay.classList.remove('hidden');
+                }
+            } else {
+                if (typingStatusDisplay) {
+                    typingStatusDisplay.classList.add('hidden');
+                }
+            }
+        };
+
+        const switchChat = (chatId, chatName) => {
+            activeChatId = chatId;
+            updateChannelUI(chatId);
+            
+            if (chatNameDisplay) chatNameDisplay.textContent = chatName;
+            
+            if (chatId === 'general') {
+                publicChatBanner.classList.remove('hidden');
+            } else {
+                publicChatBanner.classList.add('hidden');
+            }
+            
+            // Show or hide the chat menu
+            if (chatMenuToggle) {
+                if (chatId === 'general') {
+                    chatMenuToggle.classList.add('hidden');
+                    document.getElementById('chat-menu').classList.add('hidden');
+                } else {
+                    chatMenuToggle.classList.remove('hidden');
+                }
+            }
+
+            if (messagesContainer) messagesContainer.innerHTML = `<div class="flex items-center justify-center h-full text-gray-400 text-lg">
+                Loading messages...
+            </div>`;
+            
+            if (chatHeader) chatHeader.classList.remove('hidden');
+            if (messageForm) messageForm.classList.remove('hidden');
+            if (typingStatusDisplay) typingStatusDisplay.classList.remove('hidden');
+
+            if (messagesUnsubscribe) {
+                messagesUnsubscribe();
+            }
+            if (typingUnsubscribe) {
+                typingUnsubscribe();
+            }
+
+            const messagesCollectionRef = collection(db, `artifacts/${appId}/chats/${chatId}/messages`);
+            const qMessages = query(messagesCollectionRef, orderBy('timestamp'));
+            messagesUnsubscribe = onSnapshot(qMessages, (querySnapshot) => {
+                const fetchedMessages = [];
+                querySnapshot.docChanges().forEach((change) => {
+                    const msg = { id: change.doc.id, ...change.doc.data() };
+                    const isDM = activeChatId !== 'general';
+                    if (change.type === "added" && currentUser && msg.userId !== currentUser.uid) {
+                        if (isDM && document.hidden) {
+                            const filteredText = profanityFilterToggle.checked ? filterProfanity(msg.text) : msg.text;
+                            sendNotification(msg.user, filteredText);
+                        }
+                    }
+                });
+                querySnapshot.forEach((doc) => {
+                    fetchedMessages.push({ id: doc.id, ...doc.data() });
+                });
+                renderMessages(fetchedMessages);
+            }, (error) => {
+                console.error("Error fetching messages for chat:", error);
+                showMessage("Failed to load chat messages. Check your internet connection.");
+            });
+
+            const typingStatusCollectionRef = collection(db, `artifacts/${appId}/public/data/typing_status`);
+            typingUnsubscribe = onSnapshot(typingStatusCollectionRef, (querySnapshot) => {
+                const typingUsers = [];
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    if (data.isTyping && data.user) {
+                        typingUsers.push({ id: doc.id, user: data.user, timestamp: data.timestamp });
+                    }
+                });
+                renderTypingStatus(typingUsers);
+            }, (error) => {
+                console.error("Error fetching typing status:", error);
+            });
+            if (messageInput) messageInput.placeholder = `Message ${chatName}`;
+        };
+        
+        const getAndRenderChats = () => {
+            if (!currentUser) return;
+            if (chatsUnsubscribe) {
+                chatsUnsubscribe();
+            }
+
+            const chatsCollectionRef = collection(db, `artifacts/${appId}/chats`);
+            const qChats = query(chatsCollectionRef, where('participants', 'array-contains', currentUser.uid));
+            
+            chatsUnsubscribe = onSnapshot(qChats, (querySnapshot) => {
+                if (!channelsList) return;
+                channelsList.innerHTML = '';
+                
+                const publicChatElement = document.createElement('div');
+                publicChatElement.id = 'channel-general'; // Add ID for updating highlight
+                publicChatElement.className = `rounded-lg p-2 flex items-center justify-between cursor-pointer transition-colors duration-200 hover:bg-gray-600 mb-2 ${activeChatId === 'general' ? 'bg-gray-700' : ''}`;
+                publicChatElement.onclick = () => { switchChat('general', 'Public'); };
+                publicChatElement.innerHTML = `
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-gray-400 mr-2"><line x1="4" x2="20" y1="9" y2="9"></line><line x1="4" x2="20" y1="15" y2="15"></line><line x1="10" x2="14" y1="3" y2="21"></line><line x1="10" x2="14" y1="3" y2="21"></line></svg>
+                        <span class="text-sm">Public</span>
+                    </div>
+                `;
+                channelsList.appendChild(publicChatElement);
+
+                querySnapshot.forEach(doc => {
+                    const chat = doc.data();
+                    const chatId = doc.id;
+                    let chatName = chat.name || 'Group Chat';
+                    if (chat.type === 'direct_message' && chat.participants.length === 2) {
+                        const otherUserId = chat.participants.find(uid => uid !== currentUser.uid);
+                        const otherUser = userList.find(u => u.uid === otherUserId);
+                        chatName = otherUser ? otherUser.displayName : 'Direct Message';
+                    }
+
+                    const chatElement = document.createElement('div');
+                    chatElement.id = `channel-${chatId}`; // Add ID for updating highlight
+                    chatElement.className = `rounded-lg p-2 flex items-center justify-between cursor-pointer transition-colors duration-200 hover:bg-gray-600 mb-2 ${activeChatId === chatId ? 'bg-gray-700' : ''}`;
+                    chatElement.onclick = () => switchChat(chatId, chatName);
+                    chatElement.innerHTML = `
+                        <div class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-gray-400 mr-2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                            <span class="text-sm">${chatName}</span>
+                        </div>
+                    `;
+                    channelsList.appendChild(chatElement);
+                });
+            }, (error) => {
+                console.error("Error fetching chats:", error);
+                showMessage("Failed to load your chats.");
+            });
+        };
+
+        const renderUserList = (users) => {
+            userListContainer.innerHTML = '';
+            if (users.length === 0) {
+                userListContainer.innerHTML = '<p class="text-gray-400">No users found.</p>';
+                return;
+            }
+            users.forEach(user => {
+                if (user.uid === currentUser.uid) return;
+                const userItem = document.createElement('div');
+                userItem.className = 'flex items-center p-2 rounded-md hover:bg-gray-600 cursor-pointer';
+                userItem.innerHTML = `
+                    <div class="flex items-center flex-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 text-gray-400 mr-2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        <span class="text-gray-200">${user.displayName}</span>
+                    </div>
+                    <input type="checkbox" data-uid="${user.uid}" data-name="${user.displayName}" class="form-checkbox h-4 w-4 text-indigo-600 bg-gray-700 rounded border-gray-600 focus:ring-indigo-500">
+                `;
+                userItem.querySelector('input[type="checkbox"]').addEventListener('change', (e) => {
+                    const uid = e.target.dataset.uid;
+                    const name = e.target.dataset.name;
+                    if (e.target.checked) {
+                        selectedUsers.push({ uid, displayName: name });
+                    } else {
+                        selectedUsers = selectedUsers.filter(u => u.uid !== uid);
+                    }
+                    // Logic to show group name field
+                    if (selectedUsers.length > 1) {
+                        groupChatNameField.classList.remove('hidden');
+                    } else {
+                        groupChatNameField.classList.add('hidden');
+                    }
+                });
+                userListContainer.appendChild(userItem);
+            });
+        };
+
+        const fetchUsers = async () => {
+            if (!currentUser) return;
+            if (usersUnsubscribe) {
+                usersUnsubscribe();
+            }
+            userListContainer.innerHTML = '<p class="text-gray-400">Loading users...</p>';
+            const usersCollectionRef = collection(db, `artifacts/${appId}/public/data/users`);
+            try {
+                const querySnapshot = await getDocs(usersCollectionRef);
+                userList = querySnapshot.docs.map(doc => ({ uid: doc.id, displayName: doc.data().displayName }));
+                renderUserList(userList);
+                getAndRenderChats();
+            } catch (error) {
+                console.error("Error fetching users:", error);
+                userListContainer.innerHTML = '<p class="text-red-400">Failed to load users.</p>';
+            }
+        };
+        
+        // Set up hourly message deletion for the public chat
+        const setupHourlyDeletion = () => {
+            const deletePublicMessages = async () => {
+                const messagesRef = collection(db, `artifacts/${appId}/chats/general/messages`);
+                const q = query(messagesRef);
+                const querySnapshot = await getDocs(q);
+                
+                if (!querySnapshot.empty) {
+                    const batch = writeBatch(db);
+                    querySnapshot.forEach((doc) => {
+                        batch.delete(doc.ref);
+                    });
+                    await batch.commit();
+                    console.log("Public chat messages deleted.");
+                }
+            };
+
+            // Run immediately and then every hour
+            deletePublicMessages();
+            setInterval(deletePublicMessages, 60 * 60 * 1000); // 1 hour
+        };
+
+
+        if (createChatButton) {
+            createChatButton.addEventListener('click', () => {
+                if (!currentUser) {
+                    showMessage("You must be signed in to create a chat.");
+                    return;
+                }
+                selectedUsers = [];
+                if (createChatModal) createChatModal.classList.remove('hidden');
+                fetchUsers();
+            });
+        }
+
+        if (cancelCreateChatButton) {
+            cancelCreateChatButton.addEventListener('click', () => {
+                if (createChatModal) createChatModal.classList.add('hidden');
+                selectedUsers = [];
+                if (usersUnsubscribe) usersUnsubscribe();
+                groupChatNameField.classList.add('hidden');
+                if (groupChatNameInput) groupChatNameInput.value = '';
+            });
+        }
+        
+        // Add person to chat button logic
+        if (addPersonToChatButton) {
+            addPersonToChatButton.addEventListener('click', async () => {
+                if (!currentUser || !activeChatId || activeChatId === 'general') {
+                    showMessage("You can't add people to the public chat.");
+                    return;
+                }
+
+                const chatRef = doc(db, `artifacts/${appId}/chats`, activeChatId);
+                const chatDoc = await getDoc(chatRef);
+                if (!chatDoc.exists()) {
+                    showMessage("Chat not found.");
+                    return;
+                }
+
+                const currentParticipants = chatDoc.data().participants;
+                
+                // Fetch all users and filter out those already in the chat
+                const allUsers = await getDocs(collection(db, `artifacts/${appId}/public/data/users`));
+                const availableUsers = allUsers.docs.filter(doc => !currentParticipants.includes(doc.id)).map(doc => ({ uid: doc.id, displayName: doc.data().displayName }));
+
+                // Dynamically render the user list for the modal
+                userListContainer.innerHTML = '';
+                availableUsers.forEach(user => {
+                    const userItem = document.createElement('div');
+                    userItem.className = 'flex items-center p-2 rounded-md hover:bg-gray-600 cursor-pointer';
+                    userItem.innerHTML = `
+                        <div class="flex items-center flex-1">
+                            <span class="text-gray-200">${user.displayName}</span>
+                        </div>
+                        <input type="checkbox" data-uid="${user.uid}" data-name="${user.displayName}" class="form-checkbox h-4 w-4 text-indigo-600 bg-gray-700 rounded border-gray-600 focus:ring-indigo-500">
+                    `;
+                    userListContainer.appendChild(userItem);
+                });
+
+                // Change modal title and submit button text
+                document.getElementById('create-chat-title').textContent = 'Add Person to Chat';
+                document.getElementById('create-chat-submit-button').textContent = 'Add to Chat';
+                
+                // Show the modal
+                createChatModal.classList.remove('hidden');
+
+                // Handle form submission for adding users
+                createChatForm.onsubmit = async (e) => {
+                    e.preventDefault();
+                    const selectedUsers = Array.from(userListContainer.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.dataset.uid);
+
+                    if (selectedUsers.length === 0) {
+                        showMessage("Please select at least one user to add.");
+                        return;
+                    }
+
+                    try {
+                        await updateDoc(chatRef, {
+                            participants: arrayUnion(...selectedUsers)
+                        });
+                        showMessage("Users added to chat successfully!");
+                        createChatModal.classList.add('hidden');
+                    } catch (error) {
+                        console.error("Error adding user to chat:", error);
+                        showMessage("Failed to add user. Please try again.");
+                    }
+                };
+            });
+        }
+
+        // Leave chat button logic
+        if (leaveChatButton) {
+            leaveChatButton.addEventListener('click', async () => {
+                if (!currentUser || !activeChatId || activeChatId === 'general') {
+                    showMessage("You can't leave the public chat.");
+                    return;
+                }
+
+                try {
+                    const chatRef = doc(db, `artifacts/${appId}/chats`, activeChatId);
+                    const chatDoc = await getDoc(chatRef);
+                    if (!chatDoc.exists()) {
+                        showMessage("Chat not found.");
+                        return;
+                    }
+
+                    const chatData = chatDoc.data();
+                    const newParticipants = chatData.participants.filter(uid => uid !== currentUser.uid);
+
+                    if (newParticipants.length === 0) {
+                        // If no participants are left, delete the entire chat
+                        await deleteDoc(chatRef);
+                        showMessage("Chat has been deleted as you were the last member.");
+                    } else {
+                        await updateDoc(chatRef, {
+                            participants: newParticipants
+                        });
+                        showMessage("You have left the chat.");
+                    }
+
+                    // Redirect the user to the public chat after leaving
+                    switchChat('general', 'Public');
+                } catch (error) {
+                    console.error("Error leaving chat:", error);
+                    showMessage("Failed to leave chat. Please try again.");
+                }
+            });
+        }
+
+        if (createChatForm) {
+            createChatForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (selectedUsers.length === 0) {
+                    showMessage("Please select at least one user.");
+                    return;
+                }
+                if (selectedUsers.length > 1 && groupChatNameInput.value.trim() === '') {
+                    showMessage("Please enter a name for the group chat.");
+                    return;
+                }
+                
+                const participants = [currentUser.uid, ...selectedUsers.map(u => u.uid)];
+                const chatType = selectedUsers.length === 1 ? 'direct_message' : 'group';
+                const chatName = chatType === 'group' ? groupChatNameInput.value.trim() : null;
+
+                // Check if a DM chat already exists
+                if (chatType === 'direct_message') {
+                    const chatsRef = collection(db, `artifacts/${appId}/chats`);
+                    const q = query(chatsRef, 
+                        where('participants', 'array-contains', currentUser.uid)
+                    );
+                    const existingChats = await getDocs(q);
+                    var existingChatId = null;
+                    existingChats.forEach(doc => {
+                        const chatData = doc.data();
+                        if (chatData.participants.length === 2 && chatData.participants.includes(selectedUsers[0].uid)) {
+                            existingChatId = doc.id;
+                        }
+                    });
+
+                    if (existingChatId) {
+                        switchChat(existingChatId, selectedUsers[0].displayName);
+                        createChatModal.classList.add('hidden');
+                        return;
+                    }
+                }
+
+                try {
+                    const newChatRef = await addDoc(collection(db, `artifacts/${appId}/chats`), {
+                        participants: participants,
+                        type: chatType,
+                        name: chatName,
+                        createdAt: serverTimestamp()
+                    });
+                    showMessage("Chat created successfully!");
+                    createChatModal.classList.add('hidden');
+                    switchChat(newChatRef.id, chatName || selectedUsers[0].displayName);
+                } catch (error) {
+                    console.error("Error creating chat:", error);
+                    showMessage("Failed to create chat. Please try again.");
+                }
+            });
+        }
+
+        // Mute/Unmute Logic
+        let currentMuteAction = 'mute';
+
+        const openMuteUnmuteModal = async (action) => {
+            currentMuteAction = action;
+            if (muteUnmuteModal) muteUnmuteModal.classList.remove('hidden');
+            if (muteModalTitle) muteModalTitle.textContent = action === 'mute' ? 'Mute Users' : 'Unmute Users';
+            if (confirmMuteUnmuteButton) confirmMuteUnmuteButton.textContent = action === 'mute' ? 'Mute' : 'Unmute';
+            
+            muteUnmuteList.innerHTML = '<p class="text-gray-400">Loading users...</p>';
+            
+            let participantsDetails = [];
+
+            if (activeChatId === 'general') {
+                // For public chat, get all users in the system
+                participantsDetails = userList;
+            } else {
+                // For private chats, get participants from the chat document
+                const chatRef = doc(db, `artifacts/${appId}/chats`, activeChatId);
+                const chatDoc = await getDoc(chatRef);
+                if (!chatDoc.exists()) {
+                    muteUnmuteList.innerHTML = '<p class="text-red-400">Chat not found.</p>';
+                    return;
+                }
+                const participants = chatDoc.data().participants;
+                participantsDetails = userList.filter(u => participants.includes(u.uid));
+            }
+
+            const mutedForThisChat = mutedUsers[activeChatId] || [];
+
+            muteUnmuteList.innerHTML = '';
+            participantsDetails.forEach(user => {
+                if (user.uid === currentUser.uid) return;
+
+                const isMuted = mutedForThisChat.includes(user.uid);
+                const shouldDisplay = (action === 'mute' && !isMuted) || (action === 'unmute' && isMuted);
+                
+                if (shouldDisplay) {
+                    const userItem = document.createElement('div');
+                    userItem.className = 'flex items-center p-2 rounded-md hover:bg-gray-600 cursor-pointer';
+                    userItem.innerHTML = `
+                        <div class="flex items-center flex-1">
+                            <span class="text-gray-200">${user.displayName}</span>
+                        </div>
+                        <input type="checkbox" data-uid="${user.uid}" class="form-checkbox h-4 w-4 text-indigo-600 bg-gray-700 rounded border-gray-600 focus:ring-indigo-500">
+                    `;
+                    muteUnmuteList.appendChild(userItem);
+                }
+            });
+
+            if (muteUnmuteList.innerHTML === '') {
+                muteUnmuteList.innerHTML = action === 'mute' ? '<p class="text-gray-400">No users to mute.</p>' : '<p class="text-gray-400">No users are currently muted.</p>';
+            }
+        };
+
+        if (cancelMuteButton) {
+            cancelMuteButton.addEventListener('click', () => {
+                if (muteUnmuteModal) muteUnmuteModal.classList.add('hidden');
+            });
+        }
+        
+        if (confirmMuteUnmuteButton) {
+            confirmMuteUnmuteButton.addEventListener('click', () => {
+                const selectedUserIds = Array.from(muteUnmuteList.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.dataset.uid);
+                
+                if (!mutedUsers[activeChatId]) {
+                    mutedUsers[activeChatId] = [];
+                }
+
+                if (currentMuteAction === 'mute') {
+                    selectedUserIds.forEach(uid => {
+                        if (!mutedUsers[activeChatId].includes(uid)) {
+                            mutedUsers[activeChatId].push(uid);
+                        }
+                    });
+                    showMessage(`${selectedUserIds.length} users have been muted.`);
+                } else { // unmute
+                    mutedUsers[activeChatId] = mutedUsers[activeChatId].filter(uid => !selectedUserIds.includes(uid));
+                    showMessage(`${selectedUserIds.length} users have been unmuted.`);
+                }
+
+                localStorage.setItem('mutedUsers', JSON.stringify(mutedUsers));
+                if (muteUnmuteModal) muteUnmuteModal.classList.add('hidden');
+                // Re-render messages to apply the changes
+                switchChat(activeChatId, chatNameDisplay.textContent);
+            });
+        }
+
+        // Main logic when the window loads
+        window.onload = function() {
+            console.log("Window loaded. Initializing app...");
+
+            if (!auth || !db) {
+                showMessage("Failed to initialize Firebase. Check your console.");
+                return;
+            }
+
+            // Event listener for the 3-dot chat menu toggle
+            const chatMenuToggle = document.getElementById('chat-menu-toggle');
+            if (chatMenuToggle) {
+                chatMenuToggle.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const chatMenu = document.getElementById('chat-menu');
+                    if (chatMenu) {
+                        chatMenu.classList.toggle('hidden');
+                    }
+                });
+            }
+
+            // Global click listener to close menus
+            window.addEventListener('click', (e) => {
+                const chatMenu = document.getElementById('chat-menu');
+                const channelMenu = document.getElementById('channel-menu');
+                if (chatMenu && !chatMenu.classList.contains('hidden')) {
+                    const isClickInsideMenu = chatMenu.contains(e.target) || chatMenuToggle.contains(e.target);
+                    if (!isClickInsideMenu) {
+                        chatMenu.classList.add('hidden');
+                    }
+                }
+                if (channelMenu && !channelMenu.classList.contains('hidden')) {
+                    if (!channelMenu.contains(e.target)) {
+                        channelMenu.classList.add('hidden');
+                    }
+                }
+            });
+
+            onAuthStateChanged(auth, async (user) => {
+                console.log("Authentication state changed. User:", user);
+                currentUser = user;
+                if (user) {
+                    // Ensure user's public data exists for channels to load correctly
+                    const userDocRef = doc(db, `artifacts/${appId}/public/data/users`, user.uid);
+                    const userDoc = await getDoc(userDocRef);
+                    if (!userDoc.exists() || !userDoc.data().displayName) {
+                        // If not, update it from the auth object or a default value
+                        await setDoc(userDocRef, { displayName: user.displayName || 'Anonymous' }, { merge: true });
+                        // Force a UI update to reflect the new username
+                        currentUser.displayName = user.displayName || 'Anonymous';
+                    }
+                    
+                    if (userIdDisplay) userIdDisplay.textContent = `User ID: ${user.uid}`;
+                    if (currentUserDisplay) currentUserDisplay.textContent = `You (${user.displayName || 'guest'})`;
+                    if (authModal) authModal.classList.add('hidden');
+                    setChatEnabled(true);
+                    fetchUsers();
+                    switchChat('general', 'Public');
+                    setupHourlyDeletion();
+                } else {
+                    if (userIdDisplay) userIdDisplay.textContent = `User ID: Not Signed In`;
+                    if (currentUserDisplay) currentUserDisplay.textContent = `Not Signed In`;
+                    if (authModal) authModal.classList.remove('hidden');
+                    setChatEnabled(false);
+                    const messagesContainer = document.getElementById('messages-container');
+                    if (messagesContainer) {
+                        messagesContainer.innerHTML = `<div class="flex items-center justify-center h-full text-gray-400 text-lg">
+                            Sign in to begin chatting.
+                        </div>`;
+                    }
+                    if (chatHeader) chatHeader.classList.add('hidden');
+                    if (messageForm) messageForm.classList.add('hidden');
+                    if (typingStatusDisplay) typingStatusDisplay.classList.add('hidden');
+                }
+            });
+            
+            window.addEventListener('beforeunload', () => {
+                if (currentUser) {
+                    deleteDoc(doc(db, `artifacts/${appId}/public/data/typing_status`, currentUser.uid));
+                }
+            });
+
+            if (authForm) {
+                authForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const email = authEmailInput.value;
+                    const password = authPasswordInput.value;
+                    const username = authUsernameInput.value;
+
+                    try {
+                        if (authMode === 'signup') {
+                            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                            await updateProfile(userCredential.user, { displayName: username });
+                            await setDoc(doc(db, `artifacts/${appId}/public/data/users`, userCredential.user.uid), {
+                                displayName: username,
+                                email: email
+                            });
+                            showMessage("Account created successfully!");
+                        } else {
+                            await signInWithEmailAndPassword(auth, email, password);
+                            showMessage("Signed in successfully!");
+                        }
+                    } catch (error) {
+                        showMessage(`Authentication failed: ${error.message}`);
+                    }
+                });
+            }
+            
+            if (toggleAuthModeButton) {
+                toggleAuthModeButton.addEventListener('click', () => {
+                    if (authMode === 'signup') {
+                        authMode = 'signin';
+                        if (authTitle) authTitle.textContent = 'Sign In';
+                        if (authSubmitButton) authSubmitButton.textContent = 'Sign In';
+                        if (usernameField) usernameField.classList.add('hidden');
+                        if (toggleAuthModeButton) toggleAuthModeButton.textContent = 'Need an account? Sign Up';
+                    } else {
+                        authMode = 'signup';
+                        if (authTitle) authTitle.textContent = 'Create Account';
+                        if (authSubmitButton) authSubmitButton.textContent = 'Sign Up';
+                        if (usernameField) usernameField.classList.remove('hidden');
+                        if (toggleAuthModeButton) toggleAuthModeButton.textContent = 'Already have an account? Sign In';
+                    }
+                });
+            }
+
+            if (menuToggle) {
+                menuToggle.addEventListener('click', () => {
+                    sidebar.classList.remove('-translate-x-full');
+                    menuToggle.classList.add('hidden');
+                    closeMenuToggle.classList.remove('hidden');
+                });
+            }
+
+            if (closeMenuToggle) {
+                closeMenuToggle.addEventListener('click', () => {
+                    sidebar.classList.add('-translate-x-full');
+                    menuToggle.classList.remove('hidden');
+                    closeMenuToggle.classList.add('hidden');
+                });
+            }
+        };
+    </script>
 </body>
 </html>
